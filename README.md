@@ -2,6 +2,10 @@
 
 <div align="center">
 
+  <img height="500" src="https://user-images.githubusercontent.com/34153657/99389672-bb1c1380-291a-11eb-9228-22eb6c5de049.png"/>
+
+# Bootion : The Notion Clone
+
 [![GitHub Open Issues](https://img.shields.io/github/issues-raw/boostcamp-2020/Project18-C-Bootion?color=green)](https://github.com/boostcamp-2020/Project18-C-Bootion/issues)
 [![GitHub Closed Issues](https://img.shields.io/github/issues-closed-raw/boostcamp-2020/Project18-C-Bootion?color=red)](https://github.com/boostcamp-2020/Project18-C-Bootion/issues)
 [![GitHub Open PR](https://img.shields.io/github/issues-pr-raw/boostcamp-2020/Project18-C-Bootion?color=green)](https://github.com/boostcamp-2020/Project18-C-Bootion/issues)
@@ -11,11 +15,11 @@
 
 </div>
 
-## 데모 🖥
+## 🖥 데모
 
 http://bootion.kro.kr/
 
-## 기술 스택 ⚙️
+## ⚙️ 기술 스택
 
 | Tech | Stack |
 |:---:|:---:|
@@ -26,7 +30,7 @@ http://bootion.kro.kr/
 | CI / CD | <img height="50" src="https://i.morioh.com/2019/12/19/b2d58b5bee3c.jpg"/> |
 | SCM |  <img height="50" src="https://icongr.am/devicon/git-original.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://icongr.am/devicon/github-original.svg"/> |
 
-## 프로젝트 구조 🗂
+## 🗂 프로젝트 구조
 
 ```
 .
@@ -52,7 +56,7 @@ http://bootion.kro.kr/
 └── docker-compose.yml
 ```
 
-## 참여 개발자 🧑🏻‍💻
+## 참여 개발자 🧑🏻‍💻👩🏻‍💻
 
 | 👩🏻‍💻 이소정 | 🧑🏻‍💻 김남진 | 🧑🏻‍💻 시경덕 |
 | - | - | - |
