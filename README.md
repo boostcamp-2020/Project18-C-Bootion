@@ -7,9 +7,9 @@
 # Bootion : The Notion Clone
 
 [![GitHub Open Issues](https://img.shields.io/github/issues-raw/boostcamp-2020/Project18-C-Bootion?color=green)](https://github.com/boostcamp-2020/Project18-C-Bootion/issues)
-[![GitHub Closed Issues](https://img.shields.io/github/issues-closed-raw/boostcamp-2020/Project18-C-Bootion?color=red)](https://github.com/boostcamp-2020/Project18-C-Bootion/issues)
-[![GitHub Open PR](https://img.shields.io/github/issues-pr-raw/boostcamp-2020/Project18-C-Bootion?color=green)](https://github.com/boostcamp-2020/Project18-C-Bootion/issues)
-[![GitHub Closed PR](https://img.shields.io/github/issues-pr-closed-raw/boostcamp-2020/Project18-C-Bootion?color=red)](https://github.com/boostcamp-2020/Project18-C-Bootion/issues)
+[![GitHub Closed Issues](https://img.shields.io/github/issues-closed-raw/boostcamp-2020/Project18-C-Bootion?color=red)](https://github.com/boostcamp-2020/Project18-C-Bootion/issues?q=is%3Aissue+is%3Aclosed)
+[![GitHub Open PR](https://img.shields.io/github/issues-pr-raw/boostcamp-2020/Project18-C-Bootion?color=green)](https://github.com/boostcamp-2020/Project18-C-Bootion/pulls)
+[![GitHub Closed PR](https://img.shields.io/github/issues-pr-closed-raw/boostcamp-2020/Project18-C-Bootion?color=red)](https://github.com/boostcamp-2020/Project18-C-Bootion/pulls?q=is%3Apr+is%3Aclosed)
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
@@ -56,7 +56,7 @@ http://bootion.kro.kr/
 └── docker-compose.yml
 ```
 
-## 참여 개발자 🧑🏻‍💻👩🏻‍💻
+## 👩🏻‍💻 참여 개발자 🧑🏻‍💻
 
 | 👩🏻‍💻 이소정 | 🧑🏻‍💻 김남진 | 🧑🏻‍💻 시경덕 |
 | - | - | - |
