@@ -12,7 +12,10 @@ const resolvePathFromRoot = (...pathSegments) =>
 const config = {
   mode: MODE.dev,
   target: 'web',
-  entry: resolvePathFromRoot('src', 'index.tsx'),
+  resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+  },
+  entry: ['@babel/polyfill', resolvePathFromRoot('src', 'index.tsx')],
   output: {
     path: resolvePathFromRoot('dist'),
     filename: '[name].[hash].js',
@@ -37,7 +40,12 @@ const config = {
     rules: [
       {
         test: /\.tsx?$/,
+        exclude: /node_modules/,
         loader: 'awesome-typescript-loader',
+        options: {
+          useBabel: true,
+          babelCore: '@babel/core',
+        },
       },
       {
         test: /\.(gif|png|jpe?g|svg)$/i,
@@ -54,9 +62,6 @@ const config = {
         ],
       },
     ],
-  },
-  resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
   plugins: [
     new CleanWebpackPlugin(),
