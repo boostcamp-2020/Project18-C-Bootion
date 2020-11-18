@@ -295,3 +295,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/vscode,intellij,macos,windows,node,react,dotenv
+
+# mongo
+mongo/
