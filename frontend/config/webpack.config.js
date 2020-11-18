@@ -1,16 +1,22 @@
-const path = require('path');
 const { HotModuleReplacementPlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-module.exports = {
-  mode: 'development',
-  entry: './src/index.tsx',
+const path = require('path');
+
+const MODE = { prod: 'production', dev: 'development' };
+const resolvePathFromRoot = (...pathSegments) =>
+  path.resolve(__dirname, '..', ...pathSegments);
+
+const config = {
+  mode: MODE.dev,
+  entry: resolvePathFromRoot('src', 'index.tsx'),
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: resolvePathFromRoot('dist'),
     filename: '[name].[hash].js',
     publicPath: '/',
   },
+  devtool: 'source-map',
   devServer: {
     port: 4000,
     inline: true,
@@ -41,7 +47,15 @@ module.exports = {
     new HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: './src/index.html',
+      template: resolvePathFromRoot('src', 'index.html'),
     }),
   ],
 };
+
+if (process.env.NODE_ENV === MODE.prod) {
+  config.mode = MODE.prod;
+  delete config.devtool;
+  delete config.devServer;
+}
+
+module.exports = config;
