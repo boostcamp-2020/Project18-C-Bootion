@@ -14,5 +14,13 @@
   "ignorePatterns": [
     "dist/",
     "node_modules/"
-  ]
+  ],
+  "rules":{
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine":"auto"
+      }
+    ]
+  }
 }
