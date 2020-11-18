@@ -5,16 +5,18 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const path = require('path');
 
 const MODE = { prod: 'production', dev: 'development' };
+const PUBLIC_PATH = '/';
 const resolvePathFromRoot = (...pathSegments) =>
   path.resolve(__dirname, '..', ...pathSegments);
 
 const config = {
   mode: MODE.dev,
+  target: 'web',
   entry: resolvePathFromRoot('src', 'index.tsx'),
   output: {
     path: resolvePathFromRoot('dist'),
     filename: '[name].[hash].js',
-    publicPath: '/',
+    publicPath: PUBLIC_PATH,
   },
   devtool: 'source-map',
   devServer: {
@@ -37,10 +39,24 @@ const config = {
         test: /\.tsx?$/,
         loader: 'awesome-typescript-loader',
       },
+      {
+        test: /\.(gif|png|jpe?g|svg)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+              publicPath: PUBLIC_PATH,
+              name: '[name].[ext]?[hash]',
+              // esModule: false
+            },
+          },
+        ],
+      },
     ],
   },
   resolve: {
-    extensions: ['.js', 'jsx', '.ts', '.tsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
   plugins: [
     new CleanWebpackPlugin(),
