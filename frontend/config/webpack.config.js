@@ -15,7 +15,9 @@ const config = {
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
-  entry: ['@babel/polyfill', resolvePathFromRoot('src', 'index.tsx')],
+  entry: {
+    index: ['@babel/polyfill', resolvePathFromRoot('src', 'index.tsx')],
+  },
   output: {
     path: resolvePathFromRoot('dist'),
     filename: '[name].[hash].js',
