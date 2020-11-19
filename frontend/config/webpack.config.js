@@ -1,8 +1,10 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const resolvePathFromRoot = require('./resolvePathFromRoot');
+const path = require('path');
 
 const PUBLIC_PATH = '/';
+const resolvePathFromRoot = (...pathSegments) =>
+  path.resolve(__dirname, '..', ...pathSegments);
 
 module.exports = {
   target: 'web',
