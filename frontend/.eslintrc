@@ -40,6 +40,12 @@
           ".tsx"
         ]
       }
+    ],
+    "import/extensions": [
+      ".js",
+      ".jsx",
+      ".ts",
+      ".tsx"
     ]
   }
 }

@@ -1,4 +1,5 @@
-import React from 'react';
+/** @jsx jsx */
+import { jsx } from '@emotion/react';
 import ReactDOM from 'react-dom';
 
 import App from './App';
