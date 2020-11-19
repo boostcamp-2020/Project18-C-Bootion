@@ -25,13 +25,13 @@
   ],
   "rules": {
     "prettier/prettier": [
-      "error",
+      0,
       {
         "endOfLine": "auto"
       }
     ],
     "react/jsx-filename-extension": [
-      1,
+      0,
       {
         "extensions": [
           ".js",
@@ -40,6 +40,50 @@
           ".tsx"
         ]
       }
-    ]
+    ],
+    "no-use-before-define": 0,
+    "@typescript-eslint/no-var-requires": 0,
+    "import/extensions": 0,
+    "import/no-unresolved": 0
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
+      },
+      "alias": {
+        "map": [
+          [
+            "@",
+            "./src"
+          ],
+          [
+            "@components",
+            "./src/components"
+          ],
+          [
+            "@atoms",
+            "./src/components/atoms"
+          ],
+          [
+            "@molecules",
+            "./src/components/molecules"
+          ],
+          [
+            "@themes",
+            "./src/components/organisms"
+          ],
+          [
+            "@pages",
+            "./src/components/pages"
+          ]
+        ]
+      }
+    }
   }
 }

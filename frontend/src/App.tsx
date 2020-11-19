@@ -12,7 +12,11 @@ const appStyle: SerializedStyles = css`
 `;
 
 function App(): JSX.Element {
-  return <div css={appStyle}>Hello Bootion!</div>;
+  return (
+    <div css={appStyle}>
+      Hello Bootion!
+    </div>
+  );
 }
 
 export default App;
