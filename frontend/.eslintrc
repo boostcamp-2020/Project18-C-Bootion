@@ -22,5 +22,14 @@
   "ignorePatterns": [
     "dist/",
     "node_modules/"
-  ]
+  ],
+  "rules":{
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine":"auto"
+      }
+    ],
+    "react/jsx-filename-extension": [[2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }]]
+  }
 }
