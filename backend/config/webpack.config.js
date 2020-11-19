@@ -1,25 +1,31 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
 const path = require('path');
 
+const resolvePathFromRoot = (...pathSegments) =>
+  path.resolve(__dirname, '..', ...pathSegments);
+
 module.exports = {
-  entry: './src/www.ts',
+  target: 'node',
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+  entry: {
+    www: resolvePathFromRoot('src', 'www.ts'),
+  },
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, '..', 'dist'),
+    path: resolvePathFromRoot('dist'),
   },
+  devtool: 'source-map',
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
+        test: /\.ts$/,
         exclude: /node_modules/,
+        loader: 'ts-loader',
       },
     ],
-  },
-  target: 'node',
-  devtool: 'source-map',
-  resolve: {
-    extensions: ['.ts', '.js'],
   },
   plugins: [new CleanWebpackPlugin()],
 };
