@@ -16,11 +16,11 @@ const config = {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
     alias: {
       '@': resolvePathFromRoot('src'),
-      '@components': resolvePathFromRoot('src','components'),
-      '@atoms': resolvePathFromRoot('src', 'components','atoms'),
-      '@molecules': resolvePathFromRoot('src','components','molecules'),
-      '@organisms': resolvePathFromRoot('src','components','organisms'),
-      '@pages': resolvePathFromRoot('src','components','pages'),
+      '@components': resolvePathFromRoot('src', 'components'),
+      '@atoms': resolvePathFromRoot('src', 'components', 'atoms'),
+      '@molecules': resolvePathFromRoot('src', 'components', 'molecules'),
+      '@organisms': resolvePathFromRoot('src', 'components', 'organisms'),
+      '@pages': resolvePathFromRoot('src', 'components', 'pages'),
     },
   },
   entry: {
@@ -77,6 +77,7 @@ const config = {
     new CleanWebpackPlugin(),
     new HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
+      favicon: './src/assets/favicon.png',
       filename: 'index.html',
       template: resolvePathFromRoot('src', 'index.html'),
     }),
