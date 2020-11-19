@@ -11,7 +11,7 @@ const appStyle: SerializedStyles = css`
   }
 `;
 
-function App() {
+function App(): JSX.Element {
   return <div css={appStyle}>Hello Bootion!</div>;
 }
 
