@@ -2,8 +2,6 @@
 name: pull request
 about: Pull Request Template
 title: pr title
-reviewers: domino8788, skid901, YiSoJeong
-
 ---
 
 # 제목
