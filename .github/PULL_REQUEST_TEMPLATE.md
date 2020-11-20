@@ -1,9 +1,3 @@
----
-name: pull request
-about: Pull Request Template
-title: pr title
----
-
 # 제목
 
 ## 해당 이슈 📎
