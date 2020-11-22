@@ -1,12 +1,10 @@
-import * as express from 'express';
-import * as logger from 'morgan';
+import express from 'express';
+import logger from 'morgan';
 import { config } from 'dotenv';
-import * as createError from 'http-errors';
-
+import createError from 'http-errors';
 import { connect, UserModel } from './schemas';
 
 config();
-
 export class App {
   public app: express.Application;
 
