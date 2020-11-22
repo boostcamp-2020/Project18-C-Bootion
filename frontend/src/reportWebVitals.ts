@@ -10,6 +10,6 @@ const reportWebVitals = (onPerfEntry?: ReportHandler) => {
       getTTFB(onPerfEntry);
     });
   }
-}
+};
 
 export default reportWebVitals;
