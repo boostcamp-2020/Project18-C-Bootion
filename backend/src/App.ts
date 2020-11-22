@@ -2,8 +2,11 @@ import * as express from 'express';
 import * as logger from 'morgan';
 import { config } from 'dotenv';
 import * as createError from 'http-errors';
-import { connect } from './schemas';
+
+import { connect, UserModel } from './schemas';
+
 config();
+
 export class App {
   public app: express.Application;
 
@@ -25,14 +28,21 @@ export class App {
     this.app.use(express.urlencoded({ extended: false }));
     this.app.get(
       '/',
-      (
+      async (
         req: express.Request,
         res: express.Response,
         next: express.NextFunction,
       ) => {
-        res.send('Hello world');
+        const user = await new UserModel({
+          id: 'domino',
+          name: 'namjin',
+          password: 'pass',
+        });
+        await user.save();
+        res.json(user);
       },
     );
+
     this.app.use(function (req, res, next) {
       next(createError(404));
     });
