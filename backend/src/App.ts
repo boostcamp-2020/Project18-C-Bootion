@@ -1,6 +1,10 @@
 import * as express from 'express';
-
-class App {
+import * as logger from 'morgan';
+import { config } from 'dotenv';
+import * as createError from 'http-errors';
+import { connect } from './schemas';
+config();
+export class App {
   public app: express.Application;
 
   /**
@@ -14,7 +18,11 @@ class App {
   }
 
   constructor() {
+    connect();
     this.app = express();
+    this.app.use(logger('dev'));
+    this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: false }));
     this.app.get(
       '/',
       (
@@ -25,6 +33,9 @@ class App {
         res.send('Hello world');
       },
     );
+    this.app.use(function (req, res, next) {
+      next(createError(404));
+    });
   }
 }
 
