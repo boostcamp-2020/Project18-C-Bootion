@@ -1,6 +1,6 @@
 import 'source-map-support/register';
 import App from './App';
-import * as express from 'express';
+import express from 'express';
 
 const port: number = Number(process.env.PORT) || 3000;
 const app: express.Application = new App().app;
