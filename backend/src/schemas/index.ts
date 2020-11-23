@@ -1,19 +1,24 @@
-import mongoose from 'mongoose';
 import { config } from 'dotenv';
+import mongoose from 'mongoose';
 
 config();
 
 export const connect = (): void => {
+  let { MONGO_USERNAME, MONGO_PASSWORD, MONGO_DATABASE } = process.env;
+  let ip = 'mongo';
+
   if (process.env.NODE_ENV !== 'production') {
     mongoose.set('debug', true);
+    ip = 'localhost';
   }
 
-  let { MONGO_USERNAME, MONGO_PASSWORD } = process.env;
   MONGO_USERNAME = encodeURIComponent(MONGO_USERNAME);
   MONGO_PASSWORD = encodeURIComponent(MONGO_PASSWORD);
+  MONGO_DATABASE = encodeURIComponent(MONGO_DATABASE);
+  ip = encodeURIComponent(ip);
 
   mongoose.connect(
-    `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@localhost:27017/admin`,
+    `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${ip}:27017/${MONGO_DATABASE}?authSource=admin`,
     { useNewUrlParser: true },
     (error) => {
       if (error) {
