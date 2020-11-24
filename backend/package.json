@@ -24,8 +24,7 @@
     "nodemon": "^2.0.6",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.2",
-    "ts-node": "^9.0.0",
-    "typescript": "^4.0.5"
+    "ts-node": "^9.0.0"
   },
   "dependencies": {
     "@types/http-errors": "^1.8.0",
@@ -38,6 +37,7 @@
     "morgan": "^1.10.0",
     "source-map-support": "^0.5.19",
     "ts-loader": "^8.0.11",
+    "typescript": "^4.1.2",
     "webpack": "^5.6.0",
     "webpack-cli": "^4.2.0"
   }
