@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev:db": "docker-compose -f ../docker-compose.dev.yml up -d",
     "start": "nodemon --watch src --delay 1 --exec ts-node src/www.ts",
     "build": "webpack --config config/webpack.config.js"
   },
@@ -23,11 +24,8 @@
     "nodemon": "^2.0.6",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.2",
-    "ts-loader": "^8.0.11",
     "ts-node": "^9.0.0",
-    "typescript": "^4.0.5",
-    "webpack": "^5.5.0",
-    "webpack-cli": "^4.2.0"
+    "typescript": "^4.0.5"
   },
   "dependencies": {
     "@types/http-errors": "^1.8.0",
@@ -38,6 +36,9 @@
     "http-errors": "^1.8.0",
     "mongoose": "^5.10.15",
     "morgan": "^1.10.0",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "^0.5.19",
+    "ts-loader": "^8.0.11",
+    "webpack": "^5.6.0",
+    "webpack-cli": "^4.2.0"
   }
 }
