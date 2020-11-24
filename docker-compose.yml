@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    expose:
+      - "27017"
+    volumes:
+      - ./mongo/db:/data/db
+      - ./mongo/log:/var/log/mongodb/
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+    ports:
+      - "${BACKEND_PORT}:3000"
+    links:
+      - mongo
+    depends_on:
+      - mongo
+    environment:
+      - NODE_ENV=production
+    command: 
+      - bash
+      - -c
+      - |
+        /wait-for-it.sh mongo:27017 -t 10
+        pm2-docker /dist/www.js
