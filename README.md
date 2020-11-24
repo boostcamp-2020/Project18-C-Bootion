@@ -51,7 +51,7 @@ http://bootion.kro.kr/
 │       │   └── seeders
 │       │
 │       ├── app.js
-│       └── www
+│       └── www.js
 │
 └── docker-compose.yml
 ```
