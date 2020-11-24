@@ -1,28 +1,17 @@
 {
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaVersion": 2020,
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true
-    }
-  },
   "plugins": [
+    "prettier",
     "@typescript-eslint"
   ],
   "extends": [
-    "prettier",
-    "airbnb",
-    "airbnb/hooks",
-    "prettier/react",
-    "plugin:@typescript-eslint/recommended",
-    "prettier/@typescript-eslint",
-    "plugin:prettier/recommended"
+    "airbnb-typescript",
+    "react-app",
+    "prettier"
   ],
-  "ignorePatterns": [
-    "dist/",
-    "node_modules/"
-  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
   "rules": {
     "prettier/prettier": [
       0,
@@ -54,34 +43,6 @@
           ".jsx",
           ".ts",
           ".tsx"
-        ]
-      },
-      "alias": {
-        "map": [
-          [
-            "@",
-            "./src"
-          ],
-          [
-            "@components",
-            "./src/components"
-          ],
-          [
-            "@atoms",
-            "./src/components/atoms"
-          ],
-          [
-            "@molecules",
-            "./src/components/molecules"
-          ],
-          [
-            "@themes",
-            "./src/components/organisms"
-          ],
-          [
-            "@pages",
-            "./src/components/pages"
-          ]
         ]
       }
     }

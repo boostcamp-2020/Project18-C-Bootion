@@ -1,5 +1,1 @@
-import Button from './Button';
-
-export default {
-  Button,
-};
+export * as Button from './Button';

@@ -1,11 +1,14 @@
 import React from 'react';
-import Button from '@atoms/Button';
+import Button from './index';
 
-export default {
+const desc =  {
   component: Button,
   title: 'Atoms/Button',
 };
+
 export const Default = (): JSX.Element => {
   //   const content = text('content', 'No results matched your search.');
   return <Button color="#FFFFFF" backgroundColor="#FFFFFF" />;
 };
+
+export default desc;
