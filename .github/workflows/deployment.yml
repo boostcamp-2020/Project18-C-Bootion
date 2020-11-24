@@ -14,7 +14,7 @@ jobs:
       with:
         host: ${{ secrets.BOOTION_HOST }}
         port: ${{ secrets.BOOTION_PORT }}
-        username: ${{ secrets.BOOTUON_USERNAME }}
+        username: ${{ secrets.BOOTION_USERNAME }}
         key: ${{ secrets.BOOTION_SECRET }}
         script: |
           cd Project18-C-Bootion
