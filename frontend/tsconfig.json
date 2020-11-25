@@ -1,4 +1,5 @@
 {
+  "extends": "./tsconfig.paths.json",
   "compilerOptions": {
     "target": "es5",
     "lib": [
@@ -9,7 +10,6 @@
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
@@ -21,7 +21,9 @@
     "jsx": "react-jsx",
     "types": [
       "@emotion/react/types/css-prop"
-    ]
+    ],
+    "noImplicitAny": true,
+    "removeComments": true
   },
   "include": [
     "src"

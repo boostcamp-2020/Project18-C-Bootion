@@ -1,1 +1,5 @@
-export * as Button from './Button';
+import Block from '@/atoms/Block';
+
+export default {
+  Block,
+};
