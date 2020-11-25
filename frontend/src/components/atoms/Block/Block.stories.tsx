@@ -1,13 +1,10 @@
 import React from 'react';
 
-// import BlockType from '@schemes/BlockType';
-// import Block from '@/Block';
-import { Record, BlockType } from '@schemes/index';
-
-import A from '@/atoms';
+import Block from './Block';
+import { Record, BlockType } from '../../../schemes';
 
 const desc = {
-  component: A.Block,
+  component: Block,
   title: 'Atoms/Block',
 };
 
@@ -17,7 +14,7 @@ export const Default = (): JSX.Element => {
     type: BlockType.TEXT,
     value: 'Hello, Bootion!!',
   };
-  return <A.Block {...{ record }} />;
+  return <Block {...{ record }} />;
 };
 
 export const HasDescendants = (): JSX.Element => {
@@ -50,7 +47,7 @@ export const HasDescendants = (): JSX.Element => {
       },
     ],
   };
-  return <A.Block {...{ record }} />;
+  return <Block {...{ record }} />;
 };
 
 export const Grid = (): JSX.Element => {
@@ -117,7 +114,7 @@ export const Grid = (): JSX.Element => {
       },
     ],
   };
-  return <A.Block {...{ record }} />;
+  return <Block {...{ record }} />;
 };
 
 export default desc;

@@ -1,5 +1,1 @@
-import Block from '@/atoms/Block';
-
-export default {
-  Block,
-};
+export * as Block from './Block';

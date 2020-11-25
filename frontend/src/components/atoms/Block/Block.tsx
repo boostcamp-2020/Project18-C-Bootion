@@ -2,9 +2,7 @@
 /** @jsxRuntime classic */
 import { jsx } from '@emotion/react';
 
-// import { Record, BlockType } from '@schemes/index';
-import Record from '@schemes/Record';
-import BlockType from '@schemes/BlockType';
+import { Record, BlockType } from '../../../schemes';
 
 const block = { border: '1px solid #000000', margin: 5, width: '100%' };
 const descendants = { border: '1px solid red', margin: 5 };
