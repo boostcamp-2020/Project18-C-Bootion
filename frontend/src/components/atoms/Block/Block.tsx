@@ -1,6 +1,7 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx } from '@emotion/react';
+import { useState, useEffect, useRef, FormEvent } from 'react';
 
 import { Record, BlockType } from '../../../schemes';
 
@@ -20,11 +21,18 @@ interface BlockProps {
 }
 
 function Block({ record }: BlockProps): JSX.Element {
+  const text = useRef(record.value);
+
+  const handleValue = (event: FormEvent<HTMLDivElement>) => {
+    text.current = event.currentTarget.textContent || '';
+    console.log(text.current[0]);
+  };
+
   return (
     <div css={{ ...block }}>
       {!isGridOrColumn(record) ? (
-        <div css={contents} contentEditable>
-          {record.value}
+        <div css={contents} contentEditable suppressContentEditableWarning onInput={handleValue}>
+          {text.current}
         </div>
       ) : (
         ''
