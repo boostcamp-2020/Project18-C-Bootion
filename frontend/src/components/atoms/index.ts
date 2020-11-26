@@ -1,1 +1,1 @@
-export * as Button from './Button';
+export * as BlockComponent from './BlockComponent';

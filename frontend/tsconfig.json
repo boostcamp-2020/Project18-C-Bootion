@@ -9,7 +9,6 @@
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
@@ -21,7 +20,10 @@
     "jsx": "react-jsx",
     "types": [
       "@emotion/react/types/css-prop"
-    ]
+    ],
+    "noImplicitAny": true,
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "src"
