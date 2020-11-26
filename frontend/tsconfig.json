@@ -23,6 +23,8 @@
     "types": [
       "@emotion/react/types/css-prop"
     ],
+    "noImplicitAny": true,
+    "removeComments": true,
   },
   "include": [
     "src"
