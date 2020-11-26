@@ -1,6 +1,7 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
+import { useState, useRef, FormEvent } from 'react';
 
 import { Block, BlockType } from '../../../schemes';
 
@@ -34,16 +35,46 @@ const descendantsCss = (block: Block): SerializedStyles => css`
   fill: inherit;
 `;
 
+const regex = {
+  'h1': /^#\s[^\s.]*/gm,
+  'h2': /^##\s[^\s.]*/gm,
+  'h3': /^###\s[^\s.]*/gm,
+};
+
 interface Props {
   block: Block;
 }
 
+const ConvertBlock = (type: string, handleValue: any, content: any, block: Block): JSX.Element  => {
+  const compoProps = {
+    handleValue,
+    content,
+    block,
+  };
+  // if (type === 'Heading1') return <Heading1 {...compoProps} />;
+  // if (type === 'Heading2') return <Heading2 {...compoProps} />;
+  // if (type === 'Heading3') return <Heading3 {...compoProps} />;
+  return (
+    <div css={contentsCss(block)} contentEditable suppressContentEditableWarning onInput={handleValue}>
+      {content.current}
+    </div>
+  );
+};
+
 function BlockComponent({ block }: Props): JSX.Element {
+  const content = useRef(block.value);
+  const [type, setType] = useState('');
+
+  const handleValue = (event: FormEvent<HTMLDivElement>) => {
+    content.current = event.currentTarget.textContent || '';
+    if (regex.h1.test(content.current)) setType('Heading1');
+    if (regex.h2.test(content.current)) setType('Heading2');
+    if (regex.h3.test(content.current)) setType('Heading3');
+  };
+
   return (
     <div css={blockCss()}>
-      <div css={contentsCss(block)} contentEditable>
-        {block.value}
-      </div>
+      {ConvertBlock(type, handleValue, content, block)}
       {block?.children?.length && (
         <div css={descendantsCss(block)}>
           {block.children.map((_block: Block) => (
