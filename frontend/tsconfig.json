@@ -11,6 +11,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "strictNullChecks": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
@@ -21,7 +22,7 @@
     "jsx": "react-jsx",
     "types": [
       "@emotion/react/types/css-prop"
-    ]
+    ],
   },
   "include": [
     "src"
