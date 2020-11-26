@@ -1,7 +1,7 @@
 import React from 'react';
-import Button from './index';
+import Button from '.';
 
-const desc =  {
+const desc = {
   component: Button,
   title: 'Atoms/Button',
 };
