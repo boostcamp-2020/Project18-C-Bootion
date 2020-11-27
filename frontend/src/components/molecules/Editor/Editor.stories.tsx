@@ -1,24 +1,20 @@
 import React from 'react';
 
-import Block from './Block';
-import { Record, BlockType } from '../../../schemes';
+import Editor from './Editor';
+import { Page, Block, BlockType } from '../../../schemes';
 
 const desc = {
-  component: Block,
-  title: 'Atoms/Block',
+  component: Editor,
+  title: 'molecules/Editor',
 };
 
 export const Default = (): JSX.Element => {
-  const record: Record = {
+  const block01: Block = {
     id: 1,
     type: BlockType.TEXT,
     value: 'Hello, Bootion!!',
   };
-  return <Block {...{ record }} />;
-};
-
-export const HasDescendants = (): JSX.Element => {
-  const record: Record = {
+  const block02: Block = {
     id: 1,
     type: BlockType.TEXT,
     value: 'Parent Block',
@@ -47,11 +43,7 @@ export const HasDescendants = (): JSX.Element => {
       },
     ],
   };
-  return <Block {...{ record }} />;
-};
-
-export const Grid = (): JSX.Element => {
-  const record: Record = {
+  const block03: Block = {
     id: 0,
     type: BlockType.GRID,
     value: 'Grid Block',
@@ -114,7 +106,12 @@ export const Grid = (): JSX.Element => {
       },
     ],
   };
-  return <Block {...{ record }} />;
+  const page: Page = {
+    id: 0,
+    title: 'Page 01',
+    records: [block01, block02, block03],
+  };
+  return <Editor {...{ page }} />;
 };
 
 export default desc;

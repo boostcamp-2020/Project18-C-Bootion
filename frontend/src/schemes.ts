@@ -4,9 +4,15 @@ export enum BlockType {
   COLUMN = 'column',
 }
 
-export interface Record {
+export interface Block {
   id: string | number;
   type: BlockType;
   value: string;
-  children?: Record[];
+  children?: Block[];
+}
+
+export interface Page {
+  id: string | number;
+  title: string;
+  records: Block[];
 }

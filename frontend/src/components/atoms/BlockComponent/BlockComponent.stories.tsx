@@ -1,17 +1,24 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx, css, Global } from '@emotion/react';
+import React from 'react';
 
-import { Block, BlockType, Page } from './schemes';
-import PageComponent from './components/pages/PageComponent';
+import BlockComponent from './BlockComponent';
+import { Block, BlockType } from '../../../schemes';
 
-function App(): JSX.Element {
-  const block01: Block = {
+const desc = {
+  component: BlockComponent,
+  title: 'Atoms/Block',
+};
+
+export const Default = (): JSX.Element => {
+  const block: Block = {
     id: 1,
     type: BlockType.TEXT,
     value: 'Hello, Bootion!!',
   };
-  const block02: Block = {
+  return <BlockComponent {...{ block }} />;
+};
+
+export const HasDescendants = (): JSX.Element => {
+  const block: Block = {
     id: 1,
     type: BlockType.TEXT,
     value: 'Parent Block',
@@ -40,7 +47,11 @@ function App(): JSX.Element {
       },
     ],
   };
-  const block03: Block = {
+  return <BlockComponent {...{ block }} />;
+};
+
+export const Grid = (): JSX.Element => {
+  const block: Block = {
     id: 0,
     type: BlockType.GRID,
     value: 'Grid Block',
@@ -103,28 +114,7 @@ function App(): JSX.Element {
       },
     ],
   };
-  const page: Page = {
-    id: 0,
-    title: 'Page 01',
-    records: [block01, block02, block03],
-  };
-  return (
-    <div>
-      <Global
-        styles={css`
-          /* Simple Reset CSS */
-          *,
-          *:before,
-          *:after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-        `}
-      />
-      <PageComponent page={page} menuClosed />
-    </div>
-  );
-}
+  return <BlockComponent {...{ block }} />;
+};
 
-export default App;
+export default desc;

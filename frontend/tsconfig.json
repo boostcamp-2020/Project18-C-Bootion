@@ -22,7 +22,8 @@
       "@emotion/react/types/css-prop"
     ],
     "noImplicitAny": true,
-    "removeComments": true
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "src"
