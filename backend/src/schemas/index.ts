@@ -1,9 +1,9 @@
 import { config } from 'dotenv';
-import mongoose from 'mongoose';
+import mongoose, { ConnectionOptions } from 'mongoose';
 
 config();
 
-export const connect = (): void => {
+export const connect = () => {
   let { MONGO_USERNAME, MONGO_PASSWORD, MONGO_DATABASE } = process.env;
   let ip = 'mongo';
 
@@ -12,22 +12,22 @@ export const connect = (): void => {
     ip = 'localhost';
   }
 
-  MONGO_USERNAME = encodeURIComponent(MONGO_USERNAME);
-  MONGO_PASSWORD = encodeURIComponent(MONGO_PASSWORD);
-  MONGO_DATABASE = encodeURIComponent(MONGO_DATABASE);
-  ip = encodeURIComponent(ip);
+  const url = `mongodb://${ip}:27017?authSource=admin`;
+  const options: ConnectionOptions = {
+    user: MONGO_USERNAME,
+    pass: MONGO_PASSWORD,
+    dbName: MONGO_DATABASE,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    reconnectTries: Number.MAX_VALUE,
+    reconnectInterval: 500,
+    connectTimeoutMS: 10000,
+  };
 
-  mongoose.connect(
-    `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${ip}:27017/${MONGO_DATABASE}?authSource=admin`,
-    { useNewUrlParser: true },
-    (error) => {
-      if (error) {
-        console.log('몽고디비 연결 에러', error);
-      } else {
-        console.log('몽고디비 연결 성공');
-      }
-    },
-  );
+  mongoose
+    .connect(url, options)
+    .then(() => console.log('MongoDB is connected'))
+    .catch((err) => console.log('MongoDB connection failed', err));
 };
 
 export { default as UserModel } from './user';

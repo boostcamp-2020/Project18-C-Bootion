@@ -10,7 +10,7 @@ FROM node:14
 COPY package*.json ./
 
 # RUN npm install
-RUN npm install --production
+RUN npm install
 RUN npm install -g pm2
 
 # 앱 소스 추가
@@ -20,3 +20,4 @@ COPY . .
 RUN npm run build
 
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /
+RUN chmod +x /wait-for-it.sh

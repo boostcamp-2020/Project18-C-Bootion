@@ -19,5 +19,5 @@ jobs:
         script: |
           cd Project18-C-Bootion
           git pull origin master
-          docker-compose down --remove-orphans
-          docker-compose up -d
+          docker-compose down --rmi all --remove-orphans
+          docker-compose up --build -d
