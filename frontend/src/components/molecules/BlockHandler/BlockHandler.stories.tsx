@@ -1,18 +1,46 @@
+/** @jsx jsx */
+/** @jsxRuntime classic */
+import { jsx, css, SerializedStyles } from '@emotion/react';
 import React, { useState, useCallback } from 'react';
 import BlockHandler from '.';
-import Block from '../Block';
+import { Block, BlockType } from '../../../schemes';
+import BlockComponent from '../BlockComponent';
 
 const desc = {
   component: BlockHandler,
   title: 'Molecules/BlockHandler',
-  decorators: [
-    (Story: any) => (
-      <div style={{ width: '400px', margin: 'auto', position: 'relative' }}>
-        <Story />
-      </div>
-    ),
+};
+
+const block: Block = {
+  id: 1,
+  type: BlockType.TEXT,
+  value: 'Parent Block',
+  children: [
+    {
+      id: 2,
+      type: BlockType.TEXT,
+      value: 'Child Block 01',
+      children: [
+        {
+          id: 4,
+          type: BlockType.TEXT,
+          value: 'Grandson Block 01',
+        },
+        {
+          id: 5,
+          type: BlockType.TEXT,
+          value: 'Grandson Block 02',
+        },
+      ],
+    },
+    {
+      id: 3,
+      type: BlockType.TEXT,
+      value: 'Child Block 02',
+    },
   ],
 };
+
 export const Default = (): JSX.Element => {
   const [hoveredComponent, setHoveredComponent] = useState({
     id: null,
@@ -48,46 +76,17 @@ export const Default = (): JSX.Element => {
   );
   return (
     <div onMouseLeave={onMouseLeave}>
+      <BlockComponent block={block} notifyHover={setHoveredComponent} />
       <div>
-        <div>
-          <Block
-            {...{
-              id: '123',
-              type: 1,
-              value: 'test',
-              notifyHover: setHoveredComponent,
-            }}
-          />
-          <Block
-            {...{
-              id: '124',
-              type: 1,
-              value: 'test',
-              notifyHover: setHoveredComponent,
-            }}
-          />
-          <Block
-            {...{
-              id: '125',
-              type: 1,
-              value: 'test',
-              notifyHover: setHoveredComponent,
-            }}
-          />
-        </div>
-      </div>
-      <>
-        {hoveredComponent.id ? (
+        {hoveredComponent.id && (
           <BlockHandler
             location={{
               x: hoveredComponent.componentInfo.x,
               y: hoveredComponent.componentInfo.y,
             }}
           />
-        ) : (
-          ''
         )}
-      </>
+      </div>
     </div>
   );
 };
