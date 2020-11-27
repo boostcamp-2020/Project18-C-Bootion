@@ -2,6 +2,9 @@ export enum BlockType {
   TEXT = 'text',
   GRID = 'grid',
   COLUMN = 'column',
+  HEADING1 = 'heading1',
+  HEADING2 = 'heading2',
+  HEADING3 = 'heading3',
 }
 
 export interface Block {
