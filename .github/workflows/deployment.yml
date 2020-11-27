@@ -9,15 +9,15 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: deploy production server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.BOOTION_HOST }}
-          port: ${{ secrets.BOOTION_PORT }}
-          username: ${{ secrets.BOOTION_USERNAME }}
-          key: ${{ secrets.BOOTION_SECRET }}
-          script: |
-            cd Project18-C-Bootion
-            git pull origin master
-            docker-compose down --rmi all --remove-orphans
-            docker-compose up --build -d
+    - name: deploy production server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.BOOTION_HOST }}
+        port: ${{ secrets.BOOTION_PORT }}
+        username: ${{ secrets.BOOTION_USERNAME }}
+        key: ${{ secrets.BOOTION_SECRET }}
+        script: |
+          cd Project18-C-Bootion
+          git pull origin master
+          docker-compose down --rmi all --remove-orphans
+          docker-compose up --build -d
