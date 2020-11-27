@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
