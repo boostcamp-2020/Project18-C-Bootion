@@ -1,8 +1,10 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useState, useRef, FormEvent } from 'react';
 
+import { Heading1, Heading2, Heading3 } from '../Heading';
 import { Block, BlockType } from '../../../schemes';
 
 const isGridOrColumn = (block: Block): boolean =>
@@ -36,26 +38,35 @@ const descendantsCss = (block: Block): SerializedStyles => css`
 `;
 
 const regex = {
-  'h1': /^#\s[^\s.]*/gm,
-  'h2': /^##\s[^\s.]*/gm,
-  'h3': /^###\s[^\s.]*/gm,
+  h1: /^#\s[^\s.]*/gm,
+  h2: /^##\s[^\s.]*/gm,
+  h3: /^###\s[^\s.]*/gm,
 };
 
 interface Props {
   block: Block;
 }
 
-const ConvertBlock = (type: string, handleValue: any, content: any, block: Block): JSX.Element  => {
+const ConvertBlock = (
+  type: string,
+  handleValue: any,
+  content: any,
+  block: Block,
+): JSX.Element => {
   const compoProps = {
     handleValue,
     content,
-    block,
   };
-  // if (type === 'Heading1') return <Heading1 {...compoProps} />;
-  // if (type === 'Heading2') return <Heading2 {...compoProps} />;
-  // if (type === 'Heading3') return <Heading3 {...compoProps} />;
+  if (type === 'Heading1') return <Heading1 {...compoProps} />;
+  if (type === 'Heading2') return <Heading2 {...compoProps} />;
+  if (type === 'Heading3') return <Heading3 {...compoProps} />;
   return (
-    <div css={contentsCss(block)} contentEditable suppressContentEditableWarning onInput={handleValue}>
+    <div
+      css={contentsCss(block)}
+      contentEditable
+      suppressContentEditableWarning
+      onInput={handleValue}
+    >
       {content.current}
     </div>
   );
