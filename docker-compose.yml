@@ -15,6 +15,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    command: mongod --auth
 
   backend:
     container_name: backend
@@ -26,9 +27,13 @@ services:
       - mongo
     depends_on:
       - mongo
+    restart: always
     environment:
       - NODE_ENV=production
-    command: 
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+    command:
       - bash
       - -c
       - |
