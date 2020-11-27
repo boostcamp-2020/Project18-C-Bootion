@@ -1,7 +1,8 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, FormEvent } from 'react';
+import { Heading1, Heading2, Heading3 } from '../../atoms/Heading';
 import { Block, BlockType } from '../../../schemes';
 
 const isGridOrColumn = (block: Block): boolean =>
@@ -50,10 +51,42 @@ const descendantsCss = (block: Block): SerializedStyles => css`
   fill: inherit;
 `;
 
+const regex = {
+  h1: /^#\s[^\s.]*/gm,
+  h2: /^##\s[^\s.]*/gm,
+  h3: /^###\s[^\s.]*/gm,
+};
+
 interface Props {
   block: Block;
   notifyHover: Function;
 }
+
+const ConvertBlock = (
+  type: string,
+  handleValue: any,
+  content: any,
+  block: Block,
+): JSX.Element => {
+  const compoProps = {
+    handleValue,
+    content,
+  };
+  if (type === 'Heading1') return <Heading1 {...compoProps} />;
+  if (type === 'Heading2') return <Heading2 {...compoProps} />;
+  if (type === 'Heading3') return <Heading3 {...compoProps} />;
+  return (
+    <div
+      css={contentsCss(block)}
+      contentEditable
+      suppressContentEditableWarning
+      placeholder="Type '/' for commands"
+      onInput={handleValue}
+    >
+      {content.current}
+    </div>
+  );
+};
 
 interface HoverInfo {
   componentInfo: { width: number; height: number };
@@ -97,8 +130,16 @@ function HoverArea({ componentInfo }: HoverInfo): React.ReactElement {
 }
 
 function BlockComponent({ block, notifyHover }: Props): JSX.Element {
-  const blockRef = useRef<HTMLDivElement>();
+  const content = useRef(block.value);
+  const [type, setType] = useState('');
   const [componentSize, setComponentSize] = useState({ width: 0, height: 0 });
+  const blockRef = useRef<HTMLDivElement>();
+  const handleValue = (event: FormEvent<HTMLDivElement>) => {
+    content.current = event.currentTarget.textContent || '';
+    if (regex.h1.test(content.current)) setType('Heading1');
+    if (regex.h2.test(content.current)) setType('Heading2');
+    if (regex.h3.test(content.current)) setType('Heading3');
+  };
   const onMouseEnter = useCallback(
     (ev: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       notifyHover({
@@ -125,14 +166,7 @@ function BlockComponent({ block, notifyHover }: Props): JSX.Element {
         onFocus={() => {}}
         ref={blockRef}
       >
-        <div
-          css={contentsCss(block)}
-          contentEditable="true"
-          suppressContentEditableWarning
-          placeholder="Type '/' for commands"
-        >
-          {block.value}
-        </div>
+        {ConvertBlock(type, handleValue, content, block)}
         <HoverArea componentInfo={componentSize} />
       </div>
 

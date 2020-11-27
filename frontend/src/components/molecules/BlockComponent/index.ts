@@ -1,1 +1,1 @@
-export { default } from './BlockComponent';
+export * as BlockComponent from './BlockComponent';

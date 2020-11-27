@@ -1,5 +1,2 @@
-import Button from './Button';
-
-export default {
-  Button,
-};
+export * as HeaderLink from './HeaderLink';
+export * as HeaderButton from './HeaderButton';

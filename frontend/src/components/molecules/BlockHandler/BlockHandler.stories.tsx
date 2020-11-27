@@ -1,10 +1,10 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css, SerializedStyles } from '@emotion/react';
+import { jsx } from '@emotion/react';
 import React, { useState, useCallback } from 'react';
 import BlockHandler from '.';
 import { Block, BlockType } from '../../../schemes';
-import BlockComponent from '../BlockComponent';
+import BlockComponent from '../BlockComponent/BlockComponent';
 
 const desc = {
   component: BlockHandler,

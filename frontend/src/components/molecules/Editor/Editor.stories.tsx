@@ -1,11 +1,14 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx, css, Global } from '@emotion/react';
+import React from 'react';
 
-import { Block, BlockType, Page } from './schemes';
-import PageComponent from './components/pages/PageComponent';
+import Editor from './Editor';
+import { Page, Block, BlockType } from '../../../schemes';
 
-function App(): JSX.Element {
+const desc = {
+  component: Editor,
+  title: 'molecules/Editor',
+};
+
+export const Default = (): JSX.Element => {
   const block01: Block = {
     id: 1,
     type: BlockType.TEXT,
@@ -108,23 +111,7 @@ function App(): JSX.Element {
     title: 'Page 01',
     records: [block01, block02, block03],
   };
-  return (
-    <div>
-      <Global
-        styles={css`
-          /* Simple Reset CSS */
-          *,
-          *:before,
-          *:after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-        `}
-      />
-      <PageComponent page={page} menuClosed />
-    </div>
-  );
-}
+  return <Editor {...{ page }} />;
+};
 
-export default App;
+export default desc;
