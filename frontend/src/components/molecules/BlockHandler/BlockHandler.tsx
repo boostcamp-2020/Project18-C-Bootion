@@ -10,7 +10,7 @@ const ButtonWrapper = styled.div`
   display: block;
   position: absolute;
   top: ${(props: ComponentInfo) => props.location.y + 6}px;
-  left: ${(props: ComponentInfo) => props.location.x - 48}px;
+  left: ${(props: ComponentInfo) => props.location.x - 40}px;
   z-index: 10;
   & svg {
     margin-right: 2px;
