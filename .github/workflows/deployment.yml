@@ -16,6 +16,7 @@ jobs:
         port: ${{ secrets.BOOTION_PORT }}
         username: ${{ secrets.BOOTION_USERNAME }}
         key: ${{ secrets.BOOTION_SECRET }}
+        command_timeout: 200m
         script: |
           cd Project18-C-Bootion
           git pull origin master
