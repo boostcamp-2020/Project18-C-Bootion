@@ -29,7 +29,7 @@ export class App {
     this.app.use(express.urlencoded({ extended: false }));
 
     this.app.get(
-      '/',
+      '/api',
       async (
         req: express.Request,
         res: express.Response,
@@ -37,7 +37,7 @@ export class App {
       ) => {
         try {
           const user = await new UserModel({
-            id: 'domino',
+            id: `domino-${parseInt(String(Math.random() * 1000))}`,
             name: 'namjin',
             password: 'pass',
           });
