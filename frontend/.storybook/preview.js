@@ -6,7 +6,13 @@ export const parameters = {
 
 export const decorators = [
   (Story) => (
-    <div style={{ margin: '3em', border: '1px solid #000000' }}>
+    <div
+      style={{
+        margin: '3em',
+        border: '1px solid #000000',
+        position: 'relative',
+      }}
+    >
       <Global
         styles={css`
           /* Simple Reset CSS */

@@ -3,7 +3,7 @@
 import { jsx, css, SerializedStyles } from '@emotion/react';
 
 import { Page, Block } from '../../../schemes';
-import BlockComponent from '../../atoms/BlockComponent';
+import BlockComponent from '../BlockComponent/BlockComponent';
 
 const wrapperCss = (): SerializedStyles => css`
   padding-left: calc(96px + env(safe-area-inset-left));
@@ -33,14 +33,16 @@ function Editor({ page }: Props): JSX.Element {
     <div>
       <div css={wrapperCss()}>
         <div css={titlePaddingTopCss()} />
-        <div css={titleCss()} contentEditable>{page.title}</div>
+        <div css={titleCss()} contentEditable>
+          {page.title}
+        </div>
       </div>
       <div css={wrapperCss()}>
         <div css={emptyCss()} />
       </div>
       <div css={wrapperCss()}>
         {page.records.map((block: Block) => (
-          <BlockComponent block={block} />
+          <BlockComponent block={block} notifyHover={() => {}} />
         ))}
       </div>
     </div>
