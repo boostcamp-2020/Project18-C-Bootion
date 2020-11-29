@@ -2,8 +2,6 @@
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
 
-import { Page } from '../../../schemes';
-
 const wrapperCss = (): SerializedStyles => css`
   width: 30px;
   width: 240px;
@@ -17,9 +15,7 @@ const wrapperCss = (): SerializedStyles => css`
 interface Props {}
 
 function Menu(): JSX.Element {
-  return (
-    <div css={wrapperCss()}>menu</div>
-  );
+  return <div css={wrapperCss()}>menu</div>;
 }
 
 export default Menu;

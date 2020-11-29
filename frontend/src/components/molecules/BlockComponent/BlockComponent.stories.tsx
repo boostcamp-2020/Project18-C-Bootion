@@ -1,7 +1,8 @@
 import React from 'react';
 
-import BlockComponent from './BlockComponent';
-import { Block, BlockType } from '../../../schemes';
+import { Block, BlockType } from '@/schemes';
+
+import BlockComponent from '.';
 
 const desc = {
   component: BlockComponent,
@@ -14,7 +15,7 @@ export const Default = (): JSX.Element => {
     type: BlockType.TEXT,
     value: 'Hello, Bootion!!',
   };
-  return <BlockComponent {...{ block }} />;
+  return <BlockComponent {...{ block, notifyHover: () => {} }} />;
 };
 
 export const HasDescendants = (): JSX.Element => {
@@ -47,7 +48,7 @@ export const HasDescendants = (): JSX.Element => {
       },
     ],
   };
-  return <BlockComponent {...{ block }} />;
+  return <BlockComponent {...{ block, notifyHover: () => {} }} />;
 };
 
 export const Grid = (): JSX.Element => {
@@ -114,7 +115,7 @@ export const Grid = (): JSX.Element => {
       },
     ],
   };
-  return <BlockComponent {...{ block }} />;
+  return <BlockComponent {...{ block, notifyHover: () => {} }} />;
 };
 
 export default desc;
