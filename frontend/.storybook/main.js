@@ -16,9 +16,9 @@ module.exports = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': resolvePathFromRoot('src'),
-      '@asset': resolvePathFromRoot('src', 'asset'),
+      '@assets': resolvePathFromRoot('src', 'assets'),
       '@utils': resolvePathFromRoot('src', 'utils'),
-      '@component': resolvePathFromRoot('src', 'components'),
+      '@components': resolvePathFromRoot('src', 'components'),
       '@atoms': resolvePathFromRoot('src', 'components', 'atoms'),
       '@molecules': resolvePathFromRoot('src', 'components', 'molecules'),
       '@organisms': resolvePathFromRoot('src', 'components', 'organisms'),
