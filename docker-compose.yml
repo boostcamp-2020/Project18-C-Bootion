@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"
+#    links:
+#      - backend
+#    depends_on:
+#      - backend
+    restart: always
+#    command:
+#      - bash
+#      - -c
+#      - |
+#        /wait-for-it.sh backend:${BACKEND_PORT} -t 10
+#        nginx -g daemon off;
