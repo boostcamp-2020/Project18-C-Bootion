@@ -1,10 +1,12 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx } from '@emotion/react';
-import React, { useState, useCallback } from 'react';
+import React from 'react';
+import { useRecoilState } from 'recoil';
 import BlockHandler from '.';
 import { Block, BlockType } from '../../../schemes';
 import BlockComponent from '../BlockComponent/BlockComponent';
+import pageState from '../../../stores/page';
 
 const desc = {
   component: BlockHandler,
@@ -42,47 +44,19 @@ const block: Block = {
 };
 
 export const Default = (): JSX.Element => {
-  const [hoveredComponent, setHoveredComponent] = useState({
-    id: null,
-    componentInfo: {
-      x: 0,
-      y: 0,
-    },
-  });
-  const onMouseLeave = useCallback(
-    (ev: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      const { relatedTarget } = ev;
-      const blockComponent = !(relatedTarget instanceof Window)
-        ? relatedTarget.closest('.block')
-        : null;
-      const classLists = relatedTarget?.classList;
-
-      if (
-        !(classLists
-          ? Object.values(classLists).includes('block-handler')
-          : null) ||
-        blockComponent?.dataset.componentId === hoveredComponent.id
-      ) {
-        setHoveredComponent({
-          id: null,
-          componentInfo: {
-            x: 0,
-            y: 0,
-          },
-        });
-      }
-    },
-    [],
+  const [hoveredBlock, setHoveredBlock] = useRecoilState(
+    pageState.hoveredBlockState,
   );
+
   return (
-    <div onMouseLeave={onMouseLeave}>
-      <BlockComponent block={block} notifyHover={setHoveredComponent} />
+    <div>
+      <BlockComponent block={block} />
       <div>
-        {hoveredComponent.id && (
+        {hoveredBlock.id && (
           <BlockHandler
             location={{
-              x: hoveredComponent.componentInfo.x,
-              y: hoveredComponent.componentInfo.y,
+              x: hoveredBlock.position.x,
+              y: hoveredBlock.position.y,
             }}
           />
         )}
