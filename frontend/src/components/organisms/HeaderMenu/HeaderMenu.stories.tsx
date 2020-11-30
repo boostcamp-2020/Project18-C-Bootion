@@ -1,6 +1,6 @@
 import React from 'react';
 
-import HeaderMenu from './HeaderMenu';
+import HeaderMenu from '.';
 
 const desc = {
   component: HeaderMenu,

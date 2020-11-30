@@ -1,8 +1,9 @@
 import React from 'react';
-import { Heading1, Heading2, Heading3 } from '.';
+
+import Heading from '.';
 
 const desc = {
-  component: Heading1,
+  component: Heading.Heading1,
   title: 'Atoms/Heading',
 };
 
@@ -11,7 +12,7 @@ export const HEADING1 = (): JSX.Element => {
     handleValue: () => {},
     content: { current: 'Heading1' },
   };
-  return <Heading1 {...headingProps} />;
+  return <Heading.Heading1 {...headingProps} />;
 };
 
 export const HEADING2 = (): JSX.Element => {
@@ -19,7 +20,7 @@ export const HEADING2 = (): JSX.Element => {
     handleValue: () => {},
     content: { current: 'Heading2' },
   };
-  return <Heading2 {...headingProps} />;
+  return <Heading.Heading2 {...headingProps} />;
 };
 
 export const HEADING3 = (): JSX.Element => {
@@ -27,7 +28,7 @@ export const HEADING3 = (): JSX.Element => {
     handleValue: () => {},
     content: { current: 'Heading3' },
   };
-  return <Heading3 {...headingProps} />;
+  return <Heading.Heading3 {...headingProps} />;
 };
 
 export default desc;

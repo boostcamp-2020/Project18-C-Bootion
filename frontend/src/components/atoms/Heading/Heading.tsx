@@ -6,7 +6,7 @@ const h1 = { margin: 5, fontSize: 'xx-large' };
 const h2 = { margin: 5, fontSize: 'x-large' };
 const h3 = { margin: 5, fontSize: 'large' };
 
-export interface HeadingProps {
+interface HeadingProps {
   handleValue: any;
   content: any;
 }
@@ -50,4 +50,4 @@ function Heading3(compoProps: HeadingProps): JSX.Element {
   );
 }
 
-export { Heading1, Heading2, Heading3 };
+export default { Heading1, Heading2, Heading3 };

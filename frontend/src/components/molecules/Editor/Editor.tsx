@@ -2,8 +2,8 @@
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
 
-import { Page, Block } from '../../../schemes';
-import BlockComponent from '../BlockComponent/BlockComponent';
+import { Page, Block } from '@/schemes';
+import { BlockComponent } from '@components/molecules';
 
 const wrapperCss = (): SerializedStyles => css`
   padding-left: calc(96px + env(safe-area-inset-left));

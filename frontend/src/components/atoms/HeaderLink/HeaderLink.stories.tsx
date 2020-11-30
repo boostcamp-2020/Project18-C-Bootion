@@ -1,6 +1,6 @@
 import React from 'react';
 
-import HeaderLink from './HeaderLink';
+import HeaderLink from '.';
 
 const desc = {
   component: HeaderLink,

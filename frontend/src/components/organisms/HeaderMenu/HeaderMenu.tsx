@@ -3,10 +3,10 @@
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useState } from 'react';
 
-import { ReactComponent as HamburgerMenu } from '../../../assets/hamburgerMenu.svg';
-import { ReactComponent as DoubleChevronRight } from '../../../assets/doubleChevronRight.svg';
-import HeaderButton from '../../atoms/HeaderButton';
-import Menu from '../../molecules/Menu';
+import { HeaderButton } from '@components/atoms';
+import { Menu } from '@components/molecules';
+import { ReactComponent as HamburgerMenu } from '@assets/hamburgerMenu.svg';
+import { ReactComponent as DoubleChevronRight } from '@assets/doubleChevronRight.svg';
 
 const wrapperCss = (isMenuClosed: boolean): SerializedStyles => css`
   position: relative;

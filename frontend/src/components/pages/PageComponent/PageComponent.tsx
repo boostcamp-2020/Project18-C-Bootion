@@ -3,10 +3,9 @@
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useState } from 'react';
 
-import { Page } from '../../../schemes';
-import Editor from '../../molecules/Editor';
-import Header from '../../molecules/Header';
-import HeaderMenu from '../../organisms/HeaderMenu';
+import { Page } from '@/schemes';
+import { Header, Editor } from '@components/molecules';
+import { HeaderMenu } from '@components/organisms';
 
 const staticMenuAreaCss = (): SerializedStyles => css`
   position: fixed;

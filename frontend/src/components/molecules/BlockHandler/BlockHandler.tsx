@@ -3,8 +3,9 @@
 import { jsx } from '@emotion/react';
 import styled from '@emotion/styled';
 import React from 'react';
-import { ReactComponent as DraggableIcon } from '../../../assets/draggable.svg';
-import { ReactComponent as PlusIcon } from '../../../assets/plus.svg';
+
+import { ReactComponent as DraggableIcon } from '@assets/draggable.svg';
+import { ReactComponent as PlusIcon } from '@assets/plus.svg';
 
 const ButtonWrapper = styled.div`
   display: block;

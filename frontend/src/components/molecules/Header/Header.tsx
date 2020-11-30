@@ -3,12 +3,10 @@
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useState } from 'react';
 
-import { Page } from '../../../schemes';
-import HeaderLink from '../../atoms/HeaderLink';
-import HeaderButton from '../../atoms/HeaderButton';
-import HeaderMenu from '../../organisms/HeaderMenu';
-import { ReactComponent as Dots } from '../../../assets/dots.svg';
-import { ReactComponent as Check } from '../../../assets/check.svg';
+import { Page } from '@/schemes';
+import { HeaderLink, HeaderButton } from '@components/atoms';
+import { ReactComponent as Dots } from '@assets/dots.svg';
+import { ReactComponent as Check } from '@assets/check.svg';
 
 const headerCss = (): SerializedStyles => css`
   width: 100%;

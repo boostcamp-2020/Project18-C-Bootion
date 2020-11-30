@@ -1,12 +1,11 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx } from '@emotion/react';
-import React from 'react';
-import { useRecoilState } from 'recoil';
+import React, { useState, useCallback } from 'react';
+
+import { Block, BlockType } from '@/schemes';
+import { BlockComponent } from '@components/molecules';
 import BlockHandler from '.';
-import { Block, BlockType } from '../../../schemes';
-import BlockComponent from '../BlockComponent/BlockComponent';
-import pageState from '../../../stores/page';
 
 const desc = {
   component: BlockHandler,
