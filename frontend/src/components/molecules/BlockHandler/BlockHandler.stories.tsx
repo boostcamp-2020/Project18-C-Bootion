@@ -43,23 +43,9 @@ const block: Block = {
 };
 
 export const Default = (): JSX.Element => {
-  const [hoveredBlock, setHoveredBlock] = useRecoilState(
-    pageState.hoveredBlockState,
-  );
-
   return (
     <div>
       <BlockComponent block={block} />
-      <div>
-        {hoveredBlock.id && (
-          <BlockHandler
-            location={{
-              x: hoveredBlock.position.x,
-              y: hoveredBlock.position.y,
-            }}
-          />
-        )}
-      </div>
     </div>
   );
 };
