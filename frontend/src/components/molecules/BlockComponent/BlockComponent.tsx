@@ -3,7 +3,11 @@
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useRef, useState, useEffect, useCallback, FormEvent } from 'react';
 import { Heading } from '@components/atoms';
+import { HoverArea } from '@components/molecules';
 import { Block, BlockType } from '@/schemes';
+import pageState from '@stores/page';
+import { useRecoilState } from 'recoil';
+import BlockHandler from '../BlockHandler';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
@@ -29,7 +33,6 @@ const contentsCss = (block: Block): SerializedStyles => css`
   caret-color: rgb(55, 53, 47);
   padding: 3px 2px;
   min-height: 1em;
-  z-index: 10;
   color: rgb(55, 53, 47);
   fill: inherit;
   &:focus {
@@ -88,88 +91,22 @@ const ConvertBlock = (
   );
 };
 
-interface HoverInfo {
-  size: { width: number; height: number };
-}
-
-function HoverArea({ size }: HoverInfo): React.ReactElement {
-  return (
-    <div className="hover-area">
-      <div
-        className="leftHoverArea"
-        css={css`
-          position: absolute;
-          top: 0;
-          right: ${size.width}px;
-          width: calc(10% + 36px);
-          height: ${size.height}px;
-        `}
-      />
-      <div
-        className="centerHoverArea"
-        css={css`
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: ${size.height}px;
-          z-index: -1;
-        `}
-      />
-      <div
-        className="rightHoverArea"
-        css={css`
-          position: absolute;
-          top: 0;
-          left: ${size.width}px;
-          width: 10%;
-          height: ${size.height}px;
-        `}
-      />
-    </div>
-  );
-}
-
 function BlockComponent({ block }: Props): JSX.Element {
   const content = useRef(block.value);
-  const [hoveredBlock, setHoveredBlock] = useRecoilState(
+  const blockRef = useRef<HTMLDivElement>();
+  const [hoveredBlockId, setHoveredBlockId] = useRecoilState(
     pageState.hoveredBlockState,
   );
-  const [type, setType] = useState('');
   const [componentSize, setComponentSize] = useState({ width: 0, height: 0 });
+  const [type, setType] = useState('');
   const handleMouseOver = (
     ev: React.MouseEvent<HTMLDivElement, MouseEvent>,
   ) => {
-    setHoveredBlock({
-      id: block.id,
-      position: {
-        x: blockRef.current.offsetLeft,
-        y: blockRef.current.offsetTop,
-      },
-    });
+    setHoveredBlockId(block.id);
   };
   const handleMouseLeave = (ev: any) => {
-    const { relatedTarget } = ev;
-    const blockComponent = relatedTarget.closest
-      ? relatedTarget.closest('.block')
-      : null;
-    const classLists = relatedTarget.closest
-      ? relatedTarget.closest('.block-handler')?.classList
-      : null;
-
-    if (
-      !(classLists
-        ? Object.values(classLists).includes('block-handler')
-        : null) ||
-      blockComponent?.dataset.componentId === hoveredBlock.id
-    ) {
-      setHoveredBlock({
-        id: null,
-        position: { x: 0, y: 0 },
-      });
-    }
+    setHoveredBlockId(null);
   };
-  const blockRef = useRef<HTMLDivElement>();
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     content.current = event.currentTarget.textContent || '';
     if (regex.h1.test(content.current)) setType('Heading1');
@@ -184,12 +121,7 @@ function BlockComponent({ block }: Props): JSX.Element {
     });
   }, [blockRef.current?.clientWidth, blockRef.current?.clientHeight]);
   return (
-    <div
-      key={block.id}
-      css={blockCss()}
-      data-block-id={block.id}
-      className="block"
-    >
+    <div css={blockCss()}>
       <div
         css={{ position: 'relative' }}
         onMouseOver={handleMouseOver}
@@ -199,12 +131,13 @@ function BlockComponent({ block }: Props): JSX.Element {
       >
         {ConvertBlock(type, handleValue, content, block)}
         <HoverArea size={componentSize} />
+        {hoveredBlockId === block.id && <BlockHandler />}
       </div>
 
       {block?.children?.length && (
         <div css={descendantsCss(block)}>
           {block.children.map((_block: Block) => (
-            <BlockComponent block={_block} />
+            <BlockComponent key={block.id} block={_block} />
           ))}
         </div>
       )}
