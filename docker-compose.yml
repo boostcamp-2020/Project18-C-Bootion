@@ -39,3 +39,21 @@ services:
       - |
         /wait-for-it.sh mongo:27017 -t 10
         pm2-docker /dist/www.js
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"
+     links:
+       - backend
+     depends_on:
+       - backend
+    restart: always
+     command:
+       - bash
+       - -c
+       - |
+         /wait-for-it.sh backend:${BACKEND_PORT} -t 10
+         nginx -g daemon off;
