@@ -2,8 +2,10 @@
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useRef, useState, useEffect, useCallback, FormEvent } from 'react';
+import { useRecoilState } from 'recoil';
 import { Heading1, Heading2, Heading3 } from '../../atoms/Heading';
 import { Block, BlockType } from '../../../schemes';
+import pageState from '../../../stores/page';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
@@ -59,7 +61,6 @@ const regex = {
 
 interface Props {
   block: Block;
-  notifyHover: Function;
 }
 
 const ConvertBlock = (
@@ -89,9 +90,10 @@ const ConvertBlock = (
 };
 
 interface HoverInfo {
-  componentInfo: { width: number; height: number };
+  size: { width: number; height: number };
 }
-function HoverArea({ componentInfo }: HoverInfo): React.ReactElement {
+
+function HoverArea({ size }: HoverInfo): React.ReactElement {
   return (
     <div className="hover-area">
       <div
@@ -99,9 +101,9 @@ function HoverArea({ componentInfo }: HoverInfo): React.ReactElement {
         css={css`
           position: absolute;
           top: 0;
-          right: ${componentInfo.width}px;
+          right: ${size.width}px;
           width: calc(10% + 36px);
-          height: ${componentInfo.height}px;
+          height: ${size.height}px;
         `}
       />
       <div
@@ -111,7 +113,7 @@ function HoverArea({ componentInfo }: HoverInfo): React.ReactElement {
           top: 0;
           left: 0;
           width: 100%;
-          height: ${componentInfo.height}px;
+          height: ${size.height}px;
           z-index: -1;
         `}
       />
@@ -120,19 +122,54 @@ function HoverArea({ componentInfo }: HoverInfo): React.ReactElement {
         css={css`
           position: absolute;
           top: 0;
-          left: ${componentInfo.width}px;
+          left: ${size.width}px;
           width: 10%;
-          height: ${componentInfo.height}px;
+          height: ${size.height}px;
         `}
       />
     </div>
   );
 }
 
-function BlockComponent({ block, notifyHover }: Props): JSX.Element {
+function BlockComponent({ block }: Props): JSX.Element {
   const content = useRef(block.value);
+  const [hoveredBlock, setHoveredBlock] = useRecoilState(
+    pageState.hoveredBlockState,
+  );
   const [type, setType] = useState('');
   const [componentSize, setComponentSize] = useState({ width: 0, height: 0 });
+  const handleMouseOver = (
+    ev: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
+    setHoveredBlock({
+      id: block.id,
+      position: {
+        x: blockRef.current.offsetLeft,
+        y: blockRef.current.offsetTop,
+      },
+    });
+  };
+  const handleMouseLeave = (ev: any) => {
+    const { relatedTarget } = ev;
+    const blockComponent = relatedTarget.closest
+      ? relatedTarget.closest('.block')
+      : null;
+    const classLists = relatedTarget.closest
+      ? relatedTarget.closest('.block-handler')?.classList
+      : null;
+
+    if (
+      !(classLists
+        ? Object.values(classLists).includes('block-handler')
+        : null) ||
+      blockComponent?.dataset.componentId === hoveredBlock.id
+    ) {
+      setHoveredBlock({
+        id: null,
+        position: { x: 0, y: 0 },
+      });
+    }
+  };
   const blockRef = useRef<HTMLDivElement>();
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     content.current = event.currentTarget.textContent || '';
@@ -140,18 +177,7 @@ function BlockComponent({ block, notifyHover }: Props): JSX.Element {
     if (regex.h2.test(content.current)) setType('Heading2');
     if (regex.h3.test(content.current)) setType('Heading3');
   };
-  const onMouseEnter = useCallback(
-    (ev: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      notifyHover({
-        id: block.id,
-        componentInfo: {
-          x: blockRef.current.offsetLeft,
-          y: blockRef.current.offsetTop,
-        },
-      });
-    },
-    [],
-  );
+
   useEffect(() => {
     setComponentSize({
       width: blockRef.current.clientWidth,
@@ -159,25 +185,27 @@ function BlockComponent({ block, notifyHover }: Props): JSX.Element {
     });
   }, [blockRef.current?.clientWidth, blockRef.current?.clientHeight]);
   return (
-    <div css={blockCss()} data-block-id={block.id} className="block">
+    <div
+      key={block.id}
+      css={blockCss()}
+      data-block-id={block.id}
+      className="block"
+    >
       <div
         css={{ position: 'relative' }}
-        onMouseOver={onMouseEnter}
+        onMouseOver={handleMouseOver}
+        onMouseLeave={handleMouseLeave}
         onFocus={() => {}}
         ref={blockRef}
       >
         {ConvertBlock(type, handleValue, content, block)}
-        <HoverArea componentInfo={componentSize} />
+        <HoverArea size={componentSize} />
       </div>
 
       {block?.children?.length && (
         <div css={descendantsCss(block)}>
           {block.children.map((_block: Block) => (
-            <BlockComponent
-              key={_block.id}
-              block={_block}
-              notifyHover={notifyHover}
-            />
+            <BlockComponent block={_block} />
           ))}
         </div>
       )}
