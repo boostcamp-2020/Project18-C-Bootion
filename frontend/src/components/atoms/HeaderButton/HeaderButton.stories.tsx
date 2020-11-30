@@ -1,6 +1,6 @@
 import React from 'react';
 
-import HeaderButton from './HeaderButton';
+import HeaderButton from '.';
 
 const desc = {
   component: HeaderButton,

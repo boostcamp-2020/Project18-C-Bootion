@@ -2,8 +2,8 @@
 /** @jsx jsx */
 import { jsx, css, Global } from '@emotion/react';
 
-import { Block, BlockType, Page } from './schemes';
-import PageComponent from './components/pages/PageComponent';
+import { Block, BlockType, Page } from '@/schemes';
+import { PageComponent } from '@components/pages';
 
 function App(): JSX.Element {
   const block01: Block = {

@@ -2,11 +2,13 @@
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useRef, useState, useEffect, useCallback, FormEvent } from 'react';
-import { Heading1, Heading2, Heading3 } from '../../atoms/Heading';
-import { Block, BlockType } from '../../../schemes';
+
+import { Heading } from '@components/atoms';
+import { Block, BlockType } from '@/schemes';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
+
 const blockCss = (): SerializedStyles => css`
   width: 100%;
   max-width: 1000px;
@@ -72,9 +74,9 @@ const ConvertBlock = (
     handleValue,
     content,
   };
-  if (type === 'Heading1') return <Heading1 {...compoProps} />;
-  if (type === 'Heading2') return <Heading2 {...compoProps} />;
-  if (type === 'Heading3') return <Heading3 {...compoProps} />;
+  if (type === 'Heading1') return <Heading.Heading1 {...compoProps} />;
+  if (type === 'Heading2') return <Heading.Heading2 {...compoProps} />;
+  if (type === 'Heading3') return <Heading.Heading3 {...compoProps} />;
   return (
     <div
       css={contentsCss(block)}

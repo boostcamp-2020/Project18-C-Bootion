@@ -1,1 +1,1 @@
-export * as PageComponent from './PageComponent';
+export { default as PageComponent } from './PageComponent';

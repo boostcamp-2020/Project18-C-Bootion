@@ -1,7 +1,7 @@
 import React from 'react';
 
-import Editor from './Editor';
-import { Page, Block, BlockType } from '../../../schemes';
+import { Page, Block, BlockType } from '@/schemes';
+import Editor from '.';
 
 const desc = {
   component: Editor,
