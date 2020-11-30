@@ -8,11 +8,12 @@ import { ReactComponent as DraggableIcon } from '@assets/draggable.svg';
 import { ReactComponent as PlusIcon } from '@assets/plus.svg';
 
 const ButtonWrapper = styled.div`
-  display: block;
+  display: flex;
+  height: 100%;
   position: absolute;
-  top: ${(props: ComponentInfo) => props.location.y + 6}px;
-  left: ${(props: ComponentInfo) => props.location.x - 40}px;
-  z-index: 10;
+  top: 0;
+  align-items: center;
+  left: -40px;
   & svg {
     margin-right: 2px;
   }
@@ -23,13 +24,9 @@ const ButtonWrapper = styled.div`
   }
 `;
 
-interface ComponentInfo {
-  location: { x: number; y: number };
-}
-
-function BlockHandler({ location }: ComponentInfo): React.ReactElement {
+function BlockHandler(): React.ReactElement {
   return (
-    <ButtonWrapper className="block-handler" location={location}>
+    <ButtonWrapper>
       <PlusIcon css={{ height: '16px' }} />
       <DraggableIcon css={{ height: '16px' }} />
     </ButtonWrapper>
