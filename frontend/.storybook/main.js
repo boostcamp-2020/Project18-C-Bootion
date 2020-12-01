@@ -18,6 +18,7 @@ module.exports = {
       '@': resolvePathFromRoot('src'),
       '@assets': resolvePathFromRoot('src', 'assets'),
       '@utils': resolvePathFromRoot('src', 'utils'),
+      '@stores': resolvePathFromRoot('src', 'stores'),
       '@components': resolvePathFromRoot('src', 'components'),
       '@atoms': resolvePathFromRoot('src', 'components', 'atoms'),
       '@molecules': resolvePathFromRoot('src', 'components', 'molecules'),

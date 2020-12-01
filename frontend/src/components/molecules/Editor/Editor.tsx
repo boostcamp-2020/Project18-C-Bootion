@@ -42,7 +42,7 @@ function Editor({ page }: Props): JSX.Element {
       </div>
       <div css={wrapperCss()}>
         {page.records.map((block: Block) => (
-          <BlockComponent block={block} notifyHover={() => {}} />
+          <BlockComponent block={block} />
         ))}
       </div>
     </div>
