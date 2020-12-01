@@ -10,7 +10,7 @@
       "@atoms/*": ["src/components/atoms/*"],
       "@molecules/*": ["src/components/molecules/*"],
       "@organisms/*": ["src/components/organisms/*"],
-      "@pages/*": ["src/components/pages/*"],
+      "@pages/*": ["src/components/pages/*"]
     }
   }
 }
