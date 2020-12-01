@@ -1,7 +1,6 @@
 import React from 'react';
 
-import Menu from './Menu';
-import { Page } from '../../../schemes';
+import Menu from '.';
 
 const desc = {
   component: Menu,
@@ -9,7 +8,7 @@ const desc = {
 };
 
 export const Default = (): JSX.Element => {
-  return <Menu  />;
+  return <Menu />;
 };
 
 export default desc;

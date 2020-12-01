@@ -1,7 +1,7 @@
 import React from 'react';
 
-import PageComponent from './PageComponent';
-import { Page, Block, BlockType } from '../../../schemes';
+import { Page, Block, BlockType } from '@/schemes';
+import PageComponent from '.';
 
 const desc = {
   component: PageComponent,
