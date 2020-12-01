@@ -42,7 +42,7 @@ function Editor({ page }: Props): JSX.Element {
       </div>
       <div css={wrapperCss()}>
         {page?.blockList.map((block: Block) => (
-          <BlockComponent block={block} />
+          <BlockComponent blockDTO={block} />
         ))}
       </div>
     </div>
