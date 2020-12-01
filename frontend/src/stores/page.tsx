@@ -1,6 +1,7 @@
 import { atom } from 'recoil';
 
-const hoveredBlockState = atom<number | string | null>({
+type HoveredBlockId = number | string | null;
+const hoveredBlockState = atom<HoveredBlockId>({
   key: 'hoveredBlockId',
   default: null,
 });
