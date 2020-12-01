@@ -7,15 +7,30 @@ export enum BlockType {
   HEADING3 = 'heading3',
 }
 
+export type IdType = string;
+
 export interface Block {
-  id: string | number;
+  id: IdType;
   type: BlockType;
   value: string;
-  children?: Block[];
+  children: Block[];
+  parentBlockId: IdType | null;
+  pageId: IdType;
 }
 
 export interface Page {
-  id: string | number;
+  id: IdType;
   title: string;
-  records: Block[];
+  blockIdList: IdType[];
 }
+
+export interface User {
+  id: IdType;
+  password: string;
+  ownedPageIdList: Array<IdType>;
+  editablePageIdList: Array<IdType>;
+  readablePageIdList: Array<IdType>;
+  oAuths: Array<OAuth>;
+}
+
+export interface OAuth {}
