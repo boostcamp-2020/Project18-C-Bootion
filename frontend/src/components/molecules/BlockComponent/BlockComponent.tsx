@@ -2,15 +2,16 @@
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useRef, useState, FormEvent } from 'react';
+
 import { Heading } from '@components/atoms';
-import { HoverArea } from '@components/molecules';
+import { BlockHandler, HoverArea } from '@components/molecules';
 import { Block, BlockType } from '@/schemes';
 import { hoverState } from '@stores/page';
 import { useRecoilState } from 'recoil';
-import BlockHandler from '../BlockHandler';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
+
 const blockCss = (): SerializedStyles => css`
   width: 100%;
   max-width: 1000px;
@@ -53,14 +54,13 @@ const descendantsCss = (block: Block): SerializedStyles => css`
   color: inherit;
   fill: inherit;
 `;
+
 const regex = {
   h1: /^#\s[^\s.]*/gm,
   h2: /^##\s[^\s.]*/gm,
   h3: /^###\s[^\s.]*/gm,
 };
-interface Props {
-  block: Block;
-}
+
 const ConvertBlock = (
   type: string,
   handleValue: any,
@@ -86,6 +86,11 @@ const ConvertBlock = (
     </div>
   );
 };
+
+interface Props {
+  block: Block;
+}
+
 function BlockComponent({ block }: Props): JSX.Element {
   const content = useRef(block.value);
   const [hoverId, setHoverId] = useRecoilState(hoverState);
