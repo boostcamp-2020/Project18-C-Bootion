@@ -46,7 +46,7 @@ function Header({ page, menuClosed }: Props): JSX.Element {
       <div css={wrapperCss()}>
         {/* {isMenuClosed && <HeaderMenu isMenuClosed />} */}
         {isMenuClosed && <div css={menuMarginCss()} />}
-        <HeaderLink>{page.title}</HeaderLink>
+        <HeaderLink>{page?.title}</HeaderLink>
         <span>/</span>
         <HeaderLink>temp</HeaderLink>
       </div>

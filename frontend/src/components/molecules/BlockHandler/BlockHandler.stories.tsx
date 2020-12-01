@@ -1,10 +1,10 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx } from '@emotion/react';
-import React, { useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 
-import { Block, BlockType } from '@/schemes';
 import { BlockComponent } from '@components/molecules';
+import { getPage } from '@/utils';
 import BlockHandler from '.';
 
 const desc = {
@@ -12,37 +12,13 @@ const desc = {
   title: 'Molecules/BlockHandler',
 };
 
-const block: Block = {
-  id: 1,
-  type: BlockType.TEXT,
-  value: 'Parent Block',
-  children: [
-    {
-      id: 2,
-      type: BlockType.TEXT,
-      value: 'Child Block 01',
-      children: [
-        {
-          id: 4,
-          type: BlockType.TEXT,
-          value: 'Grandson Block 01',
-        },
-        {
-          id: 5,
-          type: BlockType.TEXT,
-          value: 'Grandson Block 02',
-        },
-      ],
-    },
-    {
-      id: 3,
-      type: BlockType.TEXT,
-      value: 'Child Block 02',
-    },
-  ],
-};
-
 export const Default = (): JSX.Element => {
+  const [block, setBlock] = useState(null);
+  useEffect(() => {
+    (async () => {
+      setBlock((await getPage('1')).blockList[2]);
+    })();
+  });
   return (
     <div>
       <BlockComponent block={block} />

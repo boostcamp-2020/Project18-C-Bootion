@@ -34,14 +34,14 @@ function Editor({ page }: Props): JSX.Element {
       <div css={wrapperCss()}>
         <div css={titlePaddingTopCss()} />
         <div css={titleCss()} contentEditable>
-          {page.title}
+          {page?.title}
         </div>
       </div>
       <div css={wrapperCss()}>
         <div css={emptyCss()} />
       </div>
       <div css={wrapperCss()}>
-        {page.records.map((block: Block) => (
+        {page?.blockList.map((block: Block) => (
           <BlockComponent block={block} />
         ))}
       </div>

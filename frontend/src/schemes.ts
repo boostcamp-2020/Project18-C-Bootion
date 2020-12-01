@@ -22,6 +22,7 @@ export interface Page {
   id: IdType;
   title: string;
   blockIdList: IdType[];
+  blockList?: Block[];
 }
 
 export interface User {
