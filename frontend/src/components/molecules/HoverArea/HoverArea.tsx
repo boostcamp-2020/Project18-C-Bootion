@@ -2,28 +2,25 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 
-interface ComponentSize {
-  size: { width: number; height: number };
-}
-const LeftHoverAreaCss = ({ size }: ComponentSize) => css`
+const LeftHoverAreaCss = css`
   position: absolute;
   top: 0;
-  right: ${size.width}px;
+  right: 100%;
   width: calc(10% + 36px);
-  height: ${size.height}px;
+  height: 100%;
 `;
-const RightHoverAreaCss = ({ size }: ComponentSize) => css`
+const RightHoverAreaCss = css`
   position: absolute;
   top: 0;
-  left: ${size.width}px;
+  left: 100%;
   width: 10%;
-  height: ${size.height}px;
+  height: 100%;
 `;
-function HoverArea(sizeInfo: ComponentSize): React.ReactElement {
+function HoverArea(): React.ReactElement {
   return (
     <div>
-      <div css={LeftHoverAreaCss(sizeInfo)} />
-      <div css={RightHoverAreaCss(sizeInfo)} />
+      <div css={LeftHoverAreaCss} />
+      <div css={RightHoverAreaCss} />
     </div>
   );
 }
