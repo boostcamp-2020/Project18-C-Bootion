@@ -1,7 +1,7 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useRef, useState, useEffect, useCallback, FormEvent } from 'react';
+import { useRef, useState, useEffect, FormEvent } from 'react';
 import { Heading } from '@components/atoms';
 import { HoverArea } from '@components/molecules';
 import { Block, BlockType } from '@/schemes';
@@ -11,7 +11,6 @@ import BlockHandler from '../BlockHandler';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
-
 const blockCss = (): SerializedStyles => css`
   width: 100%;
   max-width: 1000px;
@@ -54,17 +53,14 @@ const descendantsCss = (block: Block): SerializedStyles => css`
   color: inherit;
   fill: inherit;
 `;
-
 const regex = {
   h1: /^#\s[^\s.]*/gm,
   h2: /^##\s[^\s.]*/gm,
   h3: /^###\s[^\s.]*/gm,
 };
-
 interface Props {
   block: Block;
 }
-
 const ConvertBlock = (
   type: string,
   handleValue: any,
@@ -90,47 +86,27 @@ const ConvertBlock = (
     </div>
   );
 };
-
 function BlockComponent({ block }: Props): JSX.Element {
   const content = useRef(block.value);
-  const blockRef = useRef<HTMLDivElement>();
   const [hoveredBlockId, setHoveredBlockId] = useRecoilState(
     pageState.hoveredBlockState,
   );
-  const [componentSize, setComponentSize] = useState({ width: 0, height: 0 });
   const [type, setType] = useState('');
-  const handleMouseOver = (
-    ev: React.MouseEvent<HTMLDivElement, MouseEvent>,
-  ) => {
-    setHoveredBlockId(block.id);
-  };
-  const handleMouseLeave = (ev: any) => {
-    setHoveredBlockId(null);
-  };
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     content.current = event.currentTarget.textContent || '';
     if (regex.h1.test(content.current)) setType('Heading1');
     if (regex.h2.test(content.current)) setType('Heading2');
     if (regex.h3.test(content.current)) setType('Heading3');
   };
-
-  useEffect(() => {
-    setComponentSize({
-      width: blockRef.current.clientWidth,
-      height: blockRef.current.clientHeight,
-    });
-  }, [blockRef.current?.clientWidth, blockRef.current?.clientHeight]);
   return (
     <div css={blockCss()}>
       <div
         css={{ position: 'relative' }}
-        onMouseOver={handleMouseOver}
-        onMouseLeave={handleMouseLeave}
-        onFocus={() => {}}
-        ref={blockRef}
+        onMouseEnter={() => setHoveredBlockId(block.id)}
+        onMouseLeave={() => setHoveredBlockId(null)}
       >
         {ConvertBlock(type, handleValue, content, block)}
-        <HoverArea size={componentSize} />
+        <HoverArea />
         {hoveredBlockId === block.id && <BlockHandler />}
       </div>
 
