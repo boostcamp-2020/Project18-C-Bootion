@@ -1,11 +1,11 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useRef, useState, useEffect, FormEvent } from 'react';
+import { useRef, useState, FormEvent } from 'react';
 import { Heading } from '@components/atoms';
 import { HoverArea } from '@components/molecules';
 import { Block, BlockType } from '@/schemes';
-import pageState from '@stores/page';
+import { hoverState } from '@stores/page';
 import { useRecoilState } from 'recoil';
 import BlockHandler from '../BlockHandler';
 
@@ -88,9 +88,7 @@ const ConvertBlock = (
 };
 function BlockComponent({ block }: Props): JSX.Element {
   const content = useRef(block.value);
-  const [hoveredBlockId, setHoveredBlockId] = useRecoilState(
-    pageState.hoveredBlockState,
-  );
+  const [hoverId, setHoverId] = useRecoilState(hoverState);
   const [type, setType] = useState('');
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     content.current = event.currentTarget.textContent || '';
@@ -102,12 +100,12 @@ function BlockComponent({ block }: Props): JSX.Element {
     <div css={blockCss()}>
       <div
         css={{ position: 'relative' }}
-        onMouseEnter={() => setHoveredBlockId(block.id)}
-        onMouseLeave={() => setHoveredBlockId(null)}
+        onMouseEnter={() => setHoverId(block.id)}
+        onMouseLeave={() => setHoverId(null)}
       >
         {ConvertBlock(type, handleValue, content, block)}
         <HoverArea />
-        {hoveredBlockId === block.id && <BlockHandler />}
+        {hoverId === block.id && <BlockHandler />}
       </div>
 
       {block?.children?.length && (
