@@ -1,11 +1,8 @@
-import { config } from 'dotenv';
 import express from 'express';
 import logger from 'morgan';
 import createError from 'http-errors';
 
 import { connect, UserModel } from './schemas';
-
-config();
 
 export class App {
   public app: express.Application;

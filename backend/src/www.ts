@@ -1,8 +1,12 @@
 import 'source-map-support/register';
-import App from './App';
+import { config } from 'dotenv';
 import express from 'express';
 
-const port: number = Number(process.env.PORT) || 3000;
+import App from './App';
+
+config();
+
+const port: number = Number(process.env.BACKEND_PORT) || 3000;
 const app: express.Application = new App().app;
 
 app
