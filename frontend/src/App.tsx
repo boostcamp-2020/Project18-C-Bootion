@@ -1,10 +1,10 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx, css, Global } from '@emotion/react';
-
-import { PageComponent } from '@components/pages';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { getPage } from '@/utils';
-import { useEffect, useState } from 'react';
+
+const PageComponent = lazy(() => import('@components/pages/PageComponent'));
 
 function App(): JSX.Element {
   const [page, setPage] = useState(null);
@@ -27,7 +27,9 @@ function App(): JSX.Element {
           }
         `}
       />
-      <PageComponent page={page} menuClosed />
+      <Suspense fallback={<div />}>
+        <PageComponent page={page} menuClosed />
+      </Suspense>
     </div>
   );
 }
