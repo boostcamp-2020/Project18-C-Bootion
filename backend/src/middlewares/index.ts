@@ -1,1 +1,1 @@
-export { errorHandler, ErrorStatus, ErrorMessages } from './errorHandler';
+export { errorHandler, StatusCode, ErrorMessage } from './errorHandler';

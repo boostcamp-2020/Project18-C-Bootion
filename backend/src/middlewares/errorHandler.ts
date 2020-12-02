@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import createHttpError from 'http-errors';
 
-export enum ErrorStatus {
+export enum StatusCode {
   OK = 200,
   CREATED = 201,
+  NO_CONTENT = 204,
   BAD_REQUEST = 400,
   UNAUTHORIZED = 401,
   FORBIDDEN = 403,
@@ -12,7 +13,7 @@ export enum ErrorStatus {
   INTERNAL_SERVER_ERROR = 500,
 }
 
-export enum ErrorMessages {
+export enum ErrorMessage {
   BAD_REQUEST = 'Bad request',
   NOT_FOUND = 'Not found',
 }
@@ -25,9 +26,9 @@ export const errorHandler = (controller: any): any => async (
   try {
     await controller(req, res, next);
   } catch (err) {
-    const status = ErrorStatus[err.message];
+    const status = StatusCode[err.message];
     next(
-      createHttpError(status || ErrorStatus.INTERNAL_SERVER_ERROR, err.message),
+      createHttpError(status || StatusCode.INTERNAL_SERVER_ERROR, err.message),
     );
   }
 };
