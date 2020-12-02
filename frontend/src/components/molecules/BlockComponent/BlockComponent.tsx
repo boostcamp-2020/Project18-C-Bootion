@@ -3,7 +3,7 @@
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useRef, useState, useEffect, FormEvent } from 'react';
 
-import { useBlockConversion } from '@/hooks';
+import { BlockContent } from '@atoms/index';
 import { BlockHandler, HoverArea } from '@components/molecules';
 import { Block, BlockType } from '@/schemes';
 import { blockState, focusState, hoverState } from '@stores/page';
@@ -35,7 +35,7 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
   const [focusId, setFocusId] = useRecoilState(focusState);
   const [hoverId, setHoverId] = useRecoilState(hoverState);
   const blockRef = useRef(null);
-  const contentComponent = useBlockConversion(block ?? blockDTO);
+  const renderBlock = block ?? blockDTO;
 
   useEffect(() => {
     setBlock(blockDTO);
@@ -45,7 +45,7 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (focusId === block.id) {
+    if (focusId === renderBlock.id) {
       blockRef.current.focus();
     }
   }, []);
@@ -54,17 +54,17 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
     <div css={blockCss()}>
       <div
         css={{ position: 'relative' }}
-        onMouseEnter={() => setHoverId(block.id)}
+        onMouseEnter={() => setHoverId(renderBlock.id)}
         onMouseLeave={() => setHoverId(null)}
       >
-        {contentComponent}
+        <BlockContent {...renderBlock} />
         <HoverArea />
-        {hoverId === block.id && <BlockHandler />}
+        {hoverId === renderBlock.id && <BlockHandler />}
       </div>
 
-      {block.children.length ? (
-        <div css={descendantsCss(block)}>
-          {block.children.map((_block: Block) => (
+      {renderBlock.children.length ? (
+        <div css={descendantsCss(renderBlock)}>
+          {renderBlock.children.map((_block: Block) => (
             <BlockComponent key={_block.id} blockDTO={_block} />
           ))}
         </div>
