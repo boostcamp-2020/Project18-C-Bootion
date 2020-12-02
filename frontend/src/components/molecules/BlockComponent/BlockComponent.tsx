@@ -10,7 +10,7 @@ import { hoverState } from '@stores/page';
 import { useRecoilState } from 'recoil';
 
 const isGridOrColumn = (block: Block): boolean =>
-  block?.type === BlockType.GRID || block?.type === BlockType.COLUMN;
+  block.type === BlockType.GRID || block.type === BlockType.COLUMN;
 
 const blockCss = (): SerializedStyles => css`
   width: 100%;
@@ -92,7 +92,7 @@ interface Props {
 }
 
 function BlockComponent({ block }: Props): JSX.Element {
-  const content = useRef(block?.value);
+  const content = useRef(block.value);
   const [hoverId, setHoverId] = useRecoilState(hoverState);
   const [type, setType] = useState('');
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
@@ -105,18 +105,18 @@ function BlockComponent({ block }: Props): JSX.Element {
     <div css={blockCss()}>
       <div
         css={{ position: 'relative' }}
-        onMouseEnter={() => setHoverId(block?.id)}
+        onMouseEnter={() => setHoverId(block.id)}
         onMouseLeave={() => setHoverId(null)}
       >
         {ConvertBlock(type, handleValue, content, block)}
         <HoverArea />
-        {hoverId === block?.id && <BlockHandler />}
+        {hoverId === block.id && <BlockHandler />}
       </div>
 
-      {block?.children?.length ? (
+      {block.children.length ? (
         <div css={descendantsCss(block)}>
           {block.children.map((_block: Block) => (
-            <BlockComponent key={block?.id} block={_block} />
+            <BlockComponent key={_block.id} block={_block} />
           ))}
         </div>
       ) : (

@@ -12,7 +12,7 @@ function App(): JSX.Element {
     (async () => {
       setPage(await getPage('1'));
     })();
-  });
+  }, []);
   return (
     <div>
       <Global
