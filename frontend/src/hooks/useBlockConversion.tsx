@@ -1,11 +1,12 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useRef } from 'react';
+import { useRef, FormEvent } from 'react';
 import { useRecoilState } from 'recoil';
 
 import { blockState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
+import { regex } from '@utils/regex';
 
 const isGridOrColumn = (block: Block): boolean =>
   block?.type === BlockType.GRID || block?.type === BlockType.COLUMN;
@@ -36,8 +37,24 @@ const contentsCss = (block: Block): SerializedStyles => css`
   }
 `;
 
+const h1 = { margin: 5, fontSize: 'xx-large' };
+const h2 = { margin: 5, fontSize: 'x-large' };
+const h3 = { margin: 5, fontSize: 'large' };
+
 const useBlockConversion = (blockDTO: Block) => {
-  const [block, setBlock] = useRecoilState(blockState(blockDTO?.id));
+  const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
+  console.log('customHook', block);
+  const content = useRef('block?.value');
+  console.log('ref', content.current);
+
+  const handleValue = (event: FormEvent<HTMLDivElement>) => {
+    if (regex.h1.test(content.current))
+      setBlock({ ...block, type: BlockType.HEADING1 });
+    if (regex.h2.test(content.current))
+      setBlock({ ...block, type: BlockType.HEADING2 });
+    if (regex.h3.test(content.current))
+      setBlock({ ...block, type: BlockType.HEADING3 });
+  };
 
   return (
     <div
@@ -45,9 +62,10 @@ const useBlockConversion = (blockDTO: Block) => {
       contentEditable
       suppressContentEditableWarning
       placeholder="Type '/' for commands"
-      onInput={() => {}}
+      onInput={handleValue}
     >
-      {block?.value}
+      {/* {block?.value} */}
+      {content.current}
     </div>
   );
 };
