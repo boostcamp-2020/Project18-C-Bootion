@@ -1,10 +1,7 @@
-import { config } from 'dotenv';
 import mongoose, { ConnectionOptions } from 'mongoose';
 
-config();
-
 export const connect = () => {
-  let { MONGO_USERNAME, MONGO_PASSWORD, MONGO_DATABASE } = process.env;
+  const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_DATABASE } = process.env;
   let ip = 'mongo';
 
   if (process.env.NODE_ENV !== 'production') {
