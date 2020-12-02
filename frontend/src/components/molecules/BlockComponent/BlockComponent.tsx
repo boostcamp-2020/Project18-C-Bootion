@@ -10,7 +10,7 @@ import { blockState, focusState, hoverState } from '@stores/page';
 import { useRecoilState } from 'recoil';
 
 const isGridOrColumn = (block: Block): boolean =>
-  block?.type === BlockType.GRID || block?.type === BlockType.COLUMN;
+  block.type === BlockType.GRID || block.type === BlockType.COLUMN;
 
 const blockCss = (): SerializedStyles => css`
   width: 100%;
@@ -34,7 +34,7 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
   const [focusId, setFocusId] = useRecoilState(focusState);
   const [hoverId, setHoverId] = useRecoilState(hoverState);
-  const BlockRef = useRef(null);
+  const blockRef = useRef(null);
   const contentComponent = useBlockConversion(block ?? blockDTO);
 
   useEffect(() => {
@@ -45,8 +45,8 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (focusId === block?.id) {
-      BlockRef.current.focus();
+    if (focusId === block.id) {
+      blockRef.current.focus();
     }
   }, []);
 
@@ -54,18 +54,18 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
     <div css={blockCss()}>
       <div
         css={{ position: 'relative' }}
-        onMouseEnter={() => setHoverId(block?.id)}
+        onMouseEnter={() => setHoverId(block.id)}
         onMouseLeave={() => setHoverId(null)}
       >
         {contentComponent}
         <HoverArea />
-        {hoverId === block?.id && <BlockHandler />}
+        {hoverId === block.id && <BlockHandler />}
       </div>
 
-      {block?.children?.length ? (
+      {block.children.length ? (
         <div css={descendantsCss(block)}>
           {block.children.map((_block: Block) => (
-            <BlockComponent key={block?.id} blockDTO={_block} />
+            <BlockComponent key={_block.id} blockDTO={_block} />
           ))}
         </div>
       ) : (
