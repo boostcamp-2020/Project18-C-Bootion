@@ -27,4 +27,5 @@ export const connect = () => {
     .catch((err) => console.log('MongoDB connection failed', err));
 };
 
-export { default as UserModel } from './user';
+export { Page } from './page';
+export { Block } from './block';
