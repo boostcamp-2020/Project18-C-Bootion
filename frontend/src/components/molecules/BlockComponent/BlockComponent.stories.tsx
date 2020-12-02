@@ -15,7 +15,8 @@ export const Default = (): JSX.Element => {
       setBlock((await getPage('1')).blockList[0]);
     })();
   });
-  return <BlockComponent {...{ block, notifyHover: () => {} }} />;
+
+  return <BlockComponent blockDTO={block} />;
 };
 
 export const HasDescendants = (): JSX.Element => {
@@ -25,7 +26,7 @@ export const HasDescendants = (): JSX.Element => {
       setBlock((await getPage('1')).blockList[1]);
     })();
   });
-  return <BlockComponent {...{ block, notifyHover: () => {} }} />;
+  return <BlockComponent blockDTO={block} />;
 };
 
 export const Grid = (): JSX.Element => {
@@ -35,7 +36,7 @@ export const Grid = (): JSX.Element => {
       setBlock((await getPage('1')).blockList[2]);
     })();
   });
-  return <BlockComponent {...{ block, notifyHover: () => {} }} />;
+  return <BlockComponent blockDTO={block} />;
 };
 
 export default desc;

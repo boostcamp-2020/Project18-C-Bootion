@@ -21,7 +21,7 @@ export const Default = (): JSX.Element => {
   });
   return (
     <div>
-      <BlockComponent block={block} />
+      <BlockComponent blockDTO={block} />
     </div>
   );
 };
