@@ -1,12 +1,12 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useRef, useState, useEffect, FormEvent } from 'react';
+import { useEffect } from 'react';
 
-import { useBlockConversion } from '@/hooks';
+import { useBlockConversion, useCommand } from '@/hooks';
 import { BlockHandler, HoverArea } from '@components/molecules';
 import { Block, BlockType } from '@/schemes';
-import { blockState, focusState, hoverState } from '@stores/page';
+import { hoverState, focusState, blockState } from '@stores/page';
 import { useRecoilState } from 'recoil';
 
 const isGridOrColumn = (block: Block): boolean =>
@@ -31,11 +31,18 @@ const descendantsCss = (block: Block): SerializedStyles => css`
 `;
 
 function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
+  const [focusId, setFocusId] = useRecoilState<string>(focusState);
+  const [Dispatcher] = useCommand();
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
-  const [focusId, setFocusId] = useRecoilState(focusState);
   const [hoverId, setHoverId] = useRecoilState(hoverState);
-  const blockRef = useRef(null);
-  const contentComponent = useBlockConversion(block ?? blockDTO);
+  const renderBlock = block ?? blockDTO;
+  const handleKeyPress = (ev: any) => {
+    if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown') {
+      ev.preventDefault();
+      Dispatcher(ev.key);
+    }
+  };
+  const contentComponent = useBlockConversion(renderBlock, handleKeyPress);
 
   useEffect(() => {
     setBlock(blockDTO);
@@ -44,27 +51,29 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
     };
   }, []);
 
-  useEffect(() => {
-    if (focusId === block.id) {
-      blockRef.current.focus();
-    }
-  }, []);
-
   return (
     <div css={blockCss()}>
       <div
         css={{ position: 'relative' }}
-        onMouseEnter={() => setHoverId(block.id)}
+        onMouseEnter={() => setHoverId(renderBlock.id)}
         onMouseLeave={() => setHoverId(null)}
+        role="input"
+        onKeyDown={handleKeyPress}
+        tabIndex={-1}
+        onFocus={() => {
+          if (focusId !== renderBlock.id) {
+            setFocusId(renderBlock.id);
+          }
+        }}
       >
         {contentComponent}
         <HoverArea />
-        {hoverId === block.id && <BlockHandler />}
+        {hoverId === renderBlock.id && <BlockHandler />}
       </div>
 
-      {block.children.length ? (
-        <div css={descendantsCss(block)}>
-          {block.children.map((_block: Block) => (
+      {renderBlock.children.length ? (
+        <div css={descendantsCss(renderBlock)}>
+          {renderBlock.children.map((_block: Block) => (
             <BlockComponent key={_block.id} blockDTO={_block} />
           ))}
         </div>
