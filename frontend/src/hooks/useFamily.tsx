@@ -5,6 +5,15 @@ import { Block, Page, BlockType, BlockFamily } from '@/schemes';
 interface FamilyFunc {
   getNextBlock: () => Block | null;
 }
+
+const findLastDescendant = (targetBlock: Block) => {
+  let currentBlock = targetBlock;
+  while (currentBlock.children.length) {
+    currentBlock = currentBlock.children[currentBlock.children.length - 1];
+  }
+  return currentBlock;
+};
+
 const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
   const block: Block = useRecoilValue(blockState(blockId));
   const page: Page = useRecoilValue(pageState(block?.pageId));
