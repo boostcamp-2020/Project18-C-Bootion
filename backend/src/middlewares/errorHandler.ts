@@ -26,6 +26,7 @@ export const errorHandler = (controller: any): any => async (
   try {
     await controller(req, res, next);
   } catch (err) {
+    console.error(err);
     const status = StatusCode[err.message];
     next(
       createHttpError(status || StatusCode.INTERNAL_SERVER_ERROR, err.message),
