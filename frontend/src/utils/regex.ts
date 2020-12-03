@@ -5,5 +5,5 @@ export const regex = {
   li: /^-\s[^\s.]*/gm,
   ol: /^1.\s[^\s.]*/gm,
   toggle: /^>\s[^\s.]*/gm,
-  quote: /^|\s[^\s.]*/gm,
+  quote: /^\|\s[^\s.]*/gm,
 };
