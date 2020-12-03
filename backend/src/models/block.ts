@@ -2,16 +2,15 @@ import { model, Schema } from 'mongoose';
 
 const BlockSchema = new Schema();
 BlockSchema.add({
-  id: {
-    type: Schema.Types.ObjectId,
-    unique: true,
-    required: true,
-  },
   type: {
     type: String,
     required: true,
+    default: 'text',
   },
-  value: String,
+  value: {
+    type: String,
+    default: '',
+  },
   pageId: {
     type: Schema.Types.ObjectId,
     ref: 'Page',
