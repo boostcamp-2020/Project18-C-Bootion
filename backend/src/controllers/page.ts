@@ -22,7 +22,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
   const page = await pageService.update({
     id: req.params.id,
     title: req.body.title,
-    blocks: req.body.blocks,
+    blockList: req.body.blocks,
   });
   res.status(StatusCode.OK).json(page);
 };

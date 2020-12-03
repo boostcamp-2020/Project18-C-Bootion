@@ -10,11 +10,11 @@ export const create = async (params: { title: string }): Promise<Document> => {
 };
 
 export const getAll = async (): Promise<Document[]> => {
-  return await Page.find().populate('blocks').exec();
+  return await Page.find().populate('blockList').exec();
 };
 
 export const getOne = async (params: { id: string }): Promise<Document> => {
-  const page = await Page.findById(params.id).populate('blocks').exec();
+  const page = await Page.findById(params.id).populate('blockList').exec();
 
   if (!page) {
     throw new Error(ErrorMessage.NOT_FOUND);
@@ -25,11 +25,11 @@ export const getOne = async (params: { id: string }): Promise<Document> => {
 export const update = async (params: {
   id: string;
   title: string | null;
-  blocks: string[] | null;
+  blockList: string[] | null;
 }): Promise<Document> => {
-  const update = { title: params.title, blocks: params.blocks };
+  const update = { title: params.title, blockList: params.blockList };
   update.title ?? delete update.title;
-  update.blocks ?? delete update.blocks;
+  update.blockList ?? delete update.blockList;
   const page = await Page.findByIdAndUpdate(params.id, update, {
     new: true,
   }).exec();

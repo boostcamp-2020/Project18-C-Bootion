@@ -5,7 +5,7 @@ const PageSchema = new Schema({
     type: String,
     required: true,
   },
-  blocks: [
+  blockList: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Block',
