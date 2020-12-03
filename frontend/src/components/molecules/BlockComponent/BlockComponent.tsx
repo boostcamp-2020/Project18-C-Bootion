@@ -37,7 +37,15 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
   const [hoverId, setHoverId] = useRecoilState(hoverState);
   const renderBlock = block ?? blockDTO;
   const handleKeyPress = (ev: any) => {
-    if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown') {
+    const { focusNode, focusOffset } = window.getSelection();
+    if (
+      ev.key === 'ArrowUp' ||
+      ev.key === 'ArrowDown' ||
+      (ev.key === 'ArrowLeft' && focusOffset === 0) ||
+      (ev.key === 'ArrowRight' &&
+        focusOffset ===
+          ((focusNode as any).length ?? (focusNode as any).innerText.length))
+    ) {
       ev.preventDefault();
       Dispatcher(ev.key);
     }
@@ -62,6 +70,7 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
         tabIndex={-1}
         onFocus={() => {
           if (focusId !== renderBlock.id) {
+            console.log(`${renderBlock.id} 가 focus`);
             setFocusId(renderBlock.id);
           }
         }}
