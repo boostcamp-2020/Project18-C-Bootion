@@ -9,6 +9,11 @@ const useCommand = () => {
 
   const Dispatcher = (key: String) => {
     switch (key) {
+      case 'ArrowUp': {
+        const prevBlock: Block = familyFunc.getPrevBlock();
+        if (prevBlock) setFocusId(prevBlock.id);
+        break;
+      }
       case 'ArrowDown': {
         const nextBlock: Block = familyFunc.getNextBlock();
         if (nextBlock) setFocusId(nextBlock.id);
