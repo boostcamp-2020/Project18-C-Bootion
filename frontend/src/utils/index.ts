@@ -1,2 +1,2 @@
 export { getPage } from './fetchApi';
-export { regex } from './regex';
+export { regex, fontSize, placeHolder } from './blockContent';
