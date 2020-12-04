@@ -2,9 +2,9 @@
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useRef, FormEvent, useEffect } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
-import { blockState, focusState } from '@/stores';
+import { blockState, blockRefState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import { regex } from '@utils/regex';
 
@@ -43,7 +43,7 @@ const h3 = { margin: 5, fontSize: 'large' };
 
 const useBlockConversion = (blockDTO: Block, onKeyPress: any) => {
   const contentEditableRef = useRef(null);
-  const [focusId, setFocusId] = useRecoilState<string>(focusState);
+  const setBlockRef = useSetRecoilState(blockRefState);
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
   const content = useRef('block?.value');
 
@@ -55,11 +55,20 @@ const useBlockConversion = (blockDTO: Block, onKeyPress: any) => {
     if (regex.h3.test(content.current))
       setBlock({ ...block, type: BlockType.HEADING3 });
   };
+
   useEffect(() => {
-    if (focusId === blockDTO.id) {
-      contentEditableRef.current.focus();
-    }
-  }, [focusId]);
+    setBlockRef((data: any) => ({
+      ...data,
+      [blockDTO.id]: contentEditableRef,
+    }));
+    return () => {
+      setBlockRef((data: any) => ({
+        ...data,
+        [blockDTO.id]: null,
+      }));
+    };
+  }, []);
+
   return (
     <div
       ref={contentEditableRef}
