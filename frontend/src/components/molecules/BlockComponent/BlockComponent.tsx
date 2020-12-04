@@ -70,7 +70,6 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
         tabIndex={-1}
         onFocus={() => {
           if (focusId !== renderBlock.id) {
-            console.log(`${renderBlock.id} 가 focus`);
             setFocusId(renderBlock.id);
           }
         }}
