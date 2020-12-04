@@ -8,6 +8,8 @@ enum StateType {
   BLOCK_STATE = 'blockState',
   HOVER_STATE = 'hoverState',
   FOCUS_STATE = 'focusState',
+  CARET_STATE = 'caretState',
+  BLOCK_REF_STATE = 'blockRefState',
 }
 
 export const pageState = atomFamily({
@@ -20,9 +22,19 @@ export const blockState = atomFamily({
   default: null,
 });
 
+export const blockRefState = atom<any>({
+  key: StateType.BLOCK_REF_STATE,
+  default: {},
+});
+
 export const hoverState = atom({
   key: StateType.HOVER_STATE,
   default: null,
+});
+
+export const caretState = atom({
+  key: StateType.CARET_STATE,
+  default: 0,
 });
 
 export const focusState = atom({
