@@ -1,1 +1,8 @@
-export { pageState, blockState, hoverState, focusState } from './page';
+export {
+  pageState,
+  blockState,
+  hoverState,
+  focusState,
+  caretState,
+  blockRefState,
+} from './page';
