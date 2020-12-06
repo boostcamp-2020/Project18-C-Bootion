@@ -14,6 +14,7 @@ BlockSchema.add({
   pageId: {
     type: Schema.Types.ObjectId,
     ref: 'Page',
+    default: null,
   },
   parentId: {
     type: Schema.Types.ObjectId,
