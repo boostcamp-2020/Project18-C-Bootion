@@ -11,7 +11,7 @@ import {
   fontSize,
   placeHolder,
   listComponent,
-} from '@/utils/blockContent';
+} from '@utils/blockContent';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
