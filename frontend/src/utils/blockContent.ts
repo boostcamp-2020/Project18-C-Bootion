@@ -1,10 +1,10 @@
-export const regex = {
-  h1: /^#\s[^\s.]*/gm,
-  h2: /^##\s[^\s.]*/gm,
-  h3: /^###\s[^\s.]*/gm,
-  li: /^-\s[^\s.]*/gm,
-  ol: /^1.\s[^\s.]*/gm,
-  toggle: /^>\s[^\s.]*/gm,
+export const regex: { [key: string]: RegExp } = {
+  heading1: /^#\s[^\s.]*/gm,
+  heading2: /^##\s[^\s.]*/gm,
+  heading3: /^###\s[^\s.]*/gm,
+  bulletedlist: /^-\s[^\s.]*/gm,
+  numberedlist: /^1.\s[^\s.]*/gm,
+  togglelist: /^>\s[^\s.]*/gm,
   quote: /^\|\s[^\s.]*/gm,
 };
 
