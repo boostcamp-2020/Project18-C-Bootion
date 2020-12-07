@@ -1,3 +1,8 @@
+/** @jsx jsx */
+/** @jsxRuntime classic */
+import { jsx, css, SerializedStyles } from '@emotion/react';
+import { ReactComponent as Toggle } from '@assets/toggle-default.svg';
+
 export const regex: { [key: string]: RegExp } = {
   heading1: /^#\s[^\s.]*/gm,
   heading2: /^##\s[^\s.]*/gm,
@@ -6,6 +11,17 @@ export const regex: { [key: string]: RegExp } = {
   numberedlist: /^1.\s[^\s.]*/gm,
   togglelist: /^>\s[^\s.]*/gm,
   quote: /^\|\s[^\s.]*/gm,
+};
+
+export const listComponent: { [key: string]: any } = {
+  bulletedlist: <span>•</span>,
+  numberedlist: <span> 1. </span>,
+  togglelist: (
+    <span>
+      <Toggle />
+    </span>
+  ),
+  quote: <span>▕</span>,
 };
 
 export const fontSize: { [key: string]: string } = {

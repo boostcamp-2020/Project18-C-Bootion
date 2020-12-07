@@ -6,8 +6,12 @@ import { useRecoilState } from 'recoil';
 
 import { blockState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
-import { regex, fontSize, placeHolder } from '@/utils/blockContent';
-import { ReactComponent as Toggle } from '@assets/toggle-default.svg';
+import {
+  regex,
+  fontSize,
+  placeHolder,
+  listComponent,
+} from '@/utils/blockContent';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
@@ -43,17 +47,6 @@ const editableDivCSS = (block: Block): SerializedStyles => css`
     cursor: text;
   }
 `;
-
-const listComponent: { [key: string]: any } = {
-  bulletedlist: <span>•</span>,
-  numberedlist: <span> 1. </span>,
-  togglelist: (
-    <span>
-      <Toggle />
-    </span>
-  ),
-  quote: <span>▕</span>,
-};
 
 function BlockContent(blockDTO: Block) {
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
