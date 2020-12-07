@@ -3,7 +3,8 @@
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useEffect } from 'react';
 
-import { useBlockConversion, useCommand } from '@/hooks';
+import { BlockContent } from '@atoms/index';
+import { useCommand } from '@/hooks';
 import { BlockHandler, HoverArea } from '@components/molecules';
 import { Block, BlockType } from '@/schemes';
 import { hoverState, focusState, blockState } from '@stores/page';
@@ -50,7 +51,6 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
       Dispatcher(ev.key);
     }
   };
-  const contentComponent = useBlockConversion(renderBlock, handleKeyPress);
 
   useEffect(() => {
     setBlock(blockDTO);
@@ -74,7 +74,7 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
           }
         }}
       >
-        {contentComponent}
+        <BlockContent {...renderBlock} />
         <HoverArea />
         {hoverId === renderBlock.id && <BlockHandler />}
       </div>

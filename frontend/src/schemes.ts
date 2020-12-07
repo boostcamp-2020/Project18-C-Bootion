@@ -5,6 +5,11 @@ export enum BlockType {
   HEADING1 = 'heading1',
   HEADING2 = 'heading2',
   HEADING3 = 'heading3',
+  BULLETEDLIST = 'bulletedlist',
+  NUMBEREDLIST = 'numberedlist',
+  TOGGLELIST = 'togglelist',
+  QUOTE = 'quote',
+  PAGE = 'page',
 }
 
 export type IdType = string;
