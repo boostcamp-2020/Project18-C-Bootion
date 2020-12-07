@@ -2,7 +2,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { focusState } from '@/stores';
 import { useFamily } from '@/hooks';
 import { Block } from '@/schemes';
-import { blockRefState } from '@/stores/dist/page';
+import { blockRefState } from '@/stores/page';
 
 const useCommand = () => {
   const [focusId, setFocusId] = useRecoilState(focusState);
