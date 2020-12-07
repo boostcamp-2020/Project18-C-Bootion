@@ -80,7 +80,12 @@ function BlockContent(blockDTO: Block) {
   };
 
   const handleBackSpace = (event: KeyboardEvent<HTMLDivElement>) => {
-    // console.log('>>>>', event);
+    if (event.key === 'Backspace' && !renderBlock.value) {
+      setBlock({
+        ...renderBlock,
+        type: BlockType.TEXT,
+      });
+    }
   };
 
   return (
