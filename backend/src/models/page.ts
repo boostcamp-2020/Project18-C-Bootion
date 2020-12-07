@@ -61,14 +61,9 @@ PageSchema.methods.removeBlock = async function (
   this: PageDoc,
   block: BlockDoc,
 ): Promise<void> {
-  this.blockIdList = this.blockIdList.filter((blockId: Types.ObjectId) => {
-    console.log(
-      block.id !== blockId.toHexString(),
-      block.id,
-      blockId.toHexString(),
-    );
-    return block.id !== blockId.toHexString();
-  });
+  this.blockIdList = this.blockIdList.filter(
+    (blockId: Types.ObjectId) => block.id !== blockId.toHexString(),
+  );
   await this.save();
 };
 
