@@ -1,10 +1,10 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useRef, FormEvent } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRef, FormEvent, useEffect } from 'react';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
-import { blockState } from '@/stores';
+import { blockState, blockRefState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import { regex } from '@utils/regex';
 
@@ -41,11 +41,11 @@ const h1 = { margin: 5, fontSize: 'xx-large' };
 const h2 = { margin: 5, fontSize: 'x-large' };
 const h3 = { margin: 5, fontSize: 'large' };
 
-const useBlockConversion = (blockDTO: Block) => {
+const useBlockConversion = (blockDTO: Block, onKeyPress: any) => {
+  const contentEditableRef = useRef(null);
+  const setBlockRef = useSetRecoilState(blockRefState);
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
-  console.log('customHook', block);
   const content = useRef('block?.value');
-  console.log('ref', content.current);
 
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     if (regex.h1.test(content.current))
@@ -56,16 +56,29 @@ const useBlockConversion = (blockDTO: Block) => {
       setBlock({ ...block, type: BlockType.HEADING3 });
   };
 
+  useEffect(() => {
+    setBlockRef((data: any) => ({
+      ...data,
+      [blockDTO.id]: contentEditableRef,
+    }));
+    return () => {
+      setBlockRef((data: any) => ({
+        ...data,
+        [blockDTO.id]: null,
+      }));
+    };
+  }, []);
+
   return (
     <div
+      ref={contentEditableRef}
       css={contentsCss(block)}
       contentEditable
       suppressContentEditableWarning
       placeholder="Type '/' for commands"
       onInput={handleValue}
     >
-      {/* {block?.value} */}
-      {content.current}
+      {block?.value}
     </div>
   );
 };

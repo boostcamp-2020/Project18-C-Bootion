@@ -18,6 +18,18 @@ export interface Block {
   pageId: IdType;
 }
 
+export interface BlockFamily {
+  block: Block;
+  blockIndex: number;
+  parent: Block | null;
+  parentIndex: number | null;
+  grandParent: Block | null;
+  page: Page;
+  children: Block[];
+  siblings: Block[];
+  parents: Block[];
+}
+
 export interface Page {
   id: IdType;
   title: string;
