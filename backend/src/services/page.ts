@@ -1,7 +1,7 @@
 import { Document, Types } from 'mongoose';
 
 import { PageModel, BlockModel, Page, PageDoc } from '@/models';
-import { ErrorMessage } from '@/middlewares';
+import { ErrorMessage } from '@/aops';
 
 export const create = async (params: { title: string }): Promise<Document> => {
   const page = new PageModel({ title: params.title });

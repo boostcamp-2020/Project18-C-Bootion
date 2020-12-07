@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { pageController } from '@/controllers';
-import { errorHandler } from '@/middlewares';
+import { errorHandler } from '@/aops';
 
 export const pageRouter = Router();
 

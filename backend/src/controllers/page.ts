@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { pageService } from '@/services';
-import { StatusCode, transactionHandler } from '@/middlewares';
+import { StatusCode, transactionHandler } from '@/aops';
 
 export const create = transactionHandler(
   async (req: Request, res: Response): Promise<void> => {

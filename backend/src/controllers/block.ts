@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
 import { blockService } from '@/services';
-import { ErrorMessage, StatusCode, transactionHandler } from '@/middlewares';
+import { ErrorMessage, StatusCode, transactionHandler } from '@/aops';
 import { BlockDoc, PageDoc } from '@/models';
 
 export const create = transactionHandler(

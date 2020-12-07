@@ -4,7 +4,7 @@ import createHttpError from 'http-errors';
 
 import { connect } from '@/models';
 import { apiRouter } from '@/routes';
-import { StatusCode, ErrorMessage } from '@/middlewares';
+import { StatusCode, ErrorMessage } from '@/aops';
 
 export class App {
   public app: Application;

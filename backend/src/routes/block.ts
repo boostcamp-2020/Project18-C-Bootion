@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { blockController } from '@/controllers';
-import { errorHandler } from '@/middlewares';
+import { errorHandler } from '@/aops';
 
 export const blockRouter = Router();
 
