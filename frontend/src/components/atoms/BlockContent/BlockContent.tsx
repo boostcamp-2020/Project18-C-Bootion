@@ -1,10 +1,10 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useEffect, FormEvent, KeyboardEvent } from 'react';
-import { useRecoilState } from 'recoil';
+import { useEffect, useRef, FormEvent, KeyboardEvent } from 'react';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
-import { blockState } from '@/stores';
+import { blockState, blockRefState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
   regex,
@@ -12,6 +12,7 @@ import {
   placeHolder,
   listComponent,
 } from '@utils/blockContent';
+import { useCommand } from '@/hooks';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
@@ -49,8 +50,25 @@ const editableDivCSS = (block: Block): SerializedStyles => css`
 `;
 
 function BlockContent(blockDTO: Block) {
+  const contentEditableRef = useRef(null);
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
+  const setBlockRef = useSetRecoilState(blockRefState);
   const renderBlock: Block = block ?? blockDTO;
+  const [Dispatcher] = useCommand();
+  const handleKeyDown = (ev: any) => {
+    const { focusNode, focusOffset } = window.getSelection();
+    if (
+      ev.key === 'ArrowUp' ||
+      ev.key === 'ArrowDown' ||
+      (ev.key === 'ArrowLeft' && focusOffset === 0) ||
+      (ev.key === 'ArrowRight' &&
+        focusOffset ===
+          ((focusNode as any).length ?? (focusNode as any).innerText.length))
+    ) {
+      ev.preventDefault();
+      Dispatcher(ev.key);
+    }
+  };
 
   useEffect(() => {
     const newType = Object.entries(regex).find((testRegex) =>
@@ -64,6 +82,19 @@ function BlockContent(blockDTO: Block) {
       });
     }
   }, [renderBlock.value]);
+
+  useEffect(() => {
+    setBlockRef((data: any) => ({
+      ...data,
+      [renderBlock.id]: contentEditableRef,
+    }));
+    return () => {
+      setBlockRef((data: any) => ({
+        ...data,
+        [renderBlock.id]: null,
+      }));
+    };
+  }, []);
 
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     setBlock({
@@ -85,8 +116,10 @@ function BlockContent(blockDTO: Block) {
     <div css={blockContentCSS}>
       {listComponent[renderBlock.type]}
       <div
+        ref={contentEditableRef}
         css={editableDivCSS(renderBlock)}
         contentEditable
+        onKeyDown={handleKeyDown}
         suppressContentEditableWarning
         placeholder={placeHolder[renderBlock.type]}
         onInput={handleValue}
