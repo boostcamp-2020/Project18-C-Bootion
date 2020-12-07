@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 
 import { pageService } from '@/services';
-import { StatusCode } from '@/middlewares';
+import { StatusCode, transactionHandler } from '@/middlewares';
 
-export const create = async (req: Request, res: Response): Promise<void> => {
-  const page = await pageService.create({ title: req.body.title });
-  res.status(StatusCode.CREATED).json(page);
-};
+export const create = transactionHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const page = await pageService.create({ title: req.body.title });
+    res.status(StatusCode.CREATED).json(page);
+  },
+);
 
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   const pages = await pageService.getAll();
@@ -19,11 +21,9 @@ export const getOne = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const update = async (req: Request, res: Response): Promise<void> => {
-  const page = await pageService.update({
-    id: req.params.id,
-    title: req.body.title,
-    blockList: req.body.blocks,
-  });
+  const { id } = req.params;
+  const { title } = req.body;
+  const page = await pageService.update({ id, title });
   res.status(StatusCode.OK).json(page);
 };
 
