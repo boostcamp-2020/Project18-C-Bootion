@@ -1,104 +1,94 @@
-import { Document, Types } from 'mongoose';
-
-import { Block, Page } from '@/models';
-import { ErrorMessage } from '@/middlewares';
+import {
+  BlockType,
+  Block,
+  BlockDoc,
+  PageDoc,
+  BlockModel,
+  PageModel,
+} from '@/models';
 
 export const createToPage = async (params: {
   pageId: string;
-  targetId: string | null;
-}): Promise<{ block: Document; page: Document; parent: null }> => {
-  let page: any = await Page.findById(params.pageId).exec();
-  const block = new Block({
-    pageId: page.id,
-  });
-  await block.save();
+  block: Block;
+  targetIndex: number | null;
+}): Promise<{ block: BlockDoc; page: PageDoc; parent: null }> => {
+  const page: PageDoc = await PageModel.findById(params.pageId).exec();
+  const block = new BlockModel(params.block ?? {});
 
-  let targetIndex = page.blockList.findIndex(
-    (blockId: string) => blockId === params.targetId,
-  );
-  targetIndex < 0 && (targetIndex = page.blockList.length);
-  page.blockList.splice(targetIndex, 0, block.id);
-  await page.save();
-  page = await Page.findById(params.pageId).populate('blockList').exec();
-
+  await page.addBlock(block, params.targetIndex);
+  await page.populateBlock();
   return { block, page, parent: null };
 };
 
 export const createToBlock = async (params: {
-  parentId: string;
-  targetId: string | null;
-}): Promise<{ block: Document; parent: Document; page: null }> => {
-  const parent: any = await getOne({ id: params.parentId });
-  const block = new Block({
-    pageId: parent.pageId,
-    parentId: parent.id,
-  });
+  parent: Block;
+  block: Block;
+  targetIndex: number | null;
+}): Promise<{ block: BlockDoc; parent: BlockDoc; page: null }> => {
+  const parent: BlockDoc = await getOne(params.parent);
+  const block: BlockDoc = new BlockModel(params.block ?? {});
 
-  let targetIndex = parent.children.findIndex(
-    (child: any) => child.id === params.targetId,
-  );
-  targetIndex < 0 && (targetIndex = parent.children.length);
-  parent.children.splice(targetIndex, 0, block);
-
-  if (parent.parentId) {
-    await parent.ownerDocument().save();
-  } else {
-    await parent.save();
-  }
-
+  await parent.addChild(block, params.targetIndex);
+  await parent.requestSave();
   return { block, parent, page: null };
 };
 
-export const getOne = async (params: { id: string }): Promise<Document> => {
-  const block = await Block.findById(params.id).exec();
-
-  if (!block) {
-    throw new Error(ErrorMessage.NOT_FOUND);
+export const getOne = async (block: Block): Promise<BlockDoc> => {
+  block.id = block._id;
+  if (block?.parentIdList.length) {
+    const rootId = block.parentIdList[0];
+    let parent: BlockDoc = await BlockModel.findById(rootId).exec();
+    parent = block.parentIdList
+      .slice(1)
+      .reduce(
+        (parent: BlockDoc, parentId: string): BlockDoc =>
+          (parent.children as any).id(parentId),
+        parent,
+      );
+    return (parent.children as any).id(block.id);
   }
+  return await BlockModel.findById(block.id).exec();
+};
+
+export const updateBlock = async (blockDTO: Block): Promise<BlockDoc> => {
+  const block = await getOne(blockDTO);
+  block.type = (blockDTO.type ?? block.type) as BlockType;
+  block.value = blockDTO.value ?? block.value;
+
+  await block.requestSave();
   return block;
 };
 
-export const update = async (params: {
-  id: string;
-  type: string | null;
-  value: string | null;
-}): Promise<Document> => {
-  const block: any = await getOne({ id: params.id });
-  block.type = params.type ?? block.type;
-  block.value = params.value ?? block.value;
-
-  if (block.parentId) {
-    await block.ownerDocument().save();
-  } else {
-    await block.save();
-  }
-  return block;
+export const moveToPage = async (params: {
+  pageId: string;
+  block: Block;
+  targetIndex: number;
+}): Promise<[BlockDoc, PageDoc]> => {
+  await remove(params.block);
+  const { block, page } = await createToPage(params);
+  return [block, page];
 };
 
-export const move = async (params: {
-  id: string;
-  targetId: any;
-}): Promise<any> => {
-  return;
+export const moveToBlock = async (params: {
+  parent: Block;
+  block: Block;
+  targetIndex: number;
+}): Promise<[BlockDoc, BlockDoc]> => {
+  await remove(params.block);
+  const { block, parent } = await createToBlock(params);
+  return [block, parent];
 };
 
-export const remove = async (params: { id: string }): Promise<void> => {
-  const block: any = await Block.findById(params.id);
+export const remove = async (blockDTO: Block): Promise<void> => {
+  const block = await getOne(blockDTO);
   if (!block) return;
 
-  if (block.parentId) {
-    const parent = block.parent();
-    parent.children = parent.children.filter(
-      (child: any) => child.id !== block.id,
-    );
-    await parent.ownerDocument().save();
+  if (block.parentIdList.length !== 0) {
+    await block.removeFromParent();
     return;
   }
 
-  const page: any = await Page.findById(block.pageId).exec();
-  page.blockList = page.blockList.filter(
-    (blockId: Types.ObjectId) => blockId.toHexString() !== block.id,
-  );
-  await page.save();
-  await Block.findByIdAndDelete(block.id).exec();
+  const page = await PageModel.findById(block.pageId).exec();
+  await page.removeBlock(block);
+  await BlockModel.findByIdAndDelete(block.id).exec();
 };
