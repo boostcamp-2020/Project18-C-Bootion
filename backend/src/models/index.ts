@@ -1,6 +1,6 @@
 import mongoose, { ConnectionOptions } from 'mongoose';
 
-export const connect = () => {
+export const connect = (): void => {
   const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_DATABASE } = process.env;
   let ip = 'mongo';
 
@@ -27,4 +27,7 @@ export const connect = () => {
     .catch((err) => console.log('MongoDB connection failed', err));
 };
 
-export { default as UserModel } from './user';
+export { PageModel } from './page';
+export type { Page, PageDoc } from './page';
+export { BlockModel } from './block';
+export type { BlockType, Block, BlockDoc } from './block';

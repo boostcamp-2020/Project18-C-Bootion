@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev:db": "docker-compose -f ../docker-compose.dev.yml up -d",
-    "start": "nodemon --watch src --delay 1 --exec ts-node src/www.ts",
+    "start": "nodemon --watch src --delay 1 --exec ts-node -r tsconfig-paths/register src/www.ts",
     "build": "webpack --config config/webpack.config.js"
   },
   "keywords": [],
