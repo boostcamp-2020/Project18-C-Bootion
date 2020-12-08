@@ -1,10 +1,12 @@
-import { useRecoilValue } from 'recoil';
+/* eslint-disable @typescript-eslint/indent */
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { blockState, pageState } from '@/stores';
-import { Block, Page, BlockType, BlockFamily } from '@/schemes';
+import { Block, BlockType, BlockFamily } from '@/schemes';
 
 interface FamilyFunc {
   getNextBlock: () => Block | null;
   getPrevBlock: () => Block | null;
+  makeNewBlock: () => Block | null;
 }
 
 const findLastDescendant = (targetBlock: Block) => {
@@ -16,15 +18,15 @@ const findLastDescendant = (targetBlock: Block) => {
 };
 
 const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
-  const block: Block = useRecoilValue(blockState(blockId));
-  const page: Page = useRecoilValue(pageState(block?.pageId));
-  const parent: Block = useRecoilValue(blockState(block?.parentBlockId));
+  const [block, setBlock] = useRecoilState(blockState(blockId));
+  const [page, setPage] = useRecoilState(pageState(block?.pageId));
+  const [parent, setParent] = useRecoilState(blockState(block?.parentBlockId));
   const grandParent: Block = useRecoilValue(blockState(parent?.parentBlockId));
   const children = block?.children;
   const siblings = parent?.children || page?.blockList;
   const parents = grandParent?.children || (parent && page?.blockList);
   const blockIndex = (parent?.children || page.blockList).findIndex(
-    (_block) => _block.id === block?.id,
+    (_block: Block) => _block.id === block?.id,
   );
   const parentIndex = (grandParent?.children || page.blockList).findIndex(
     (_block) => _block.id === parent?.id,
@@ -108,6 +110,40 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
       return null;
     }
   };
+  const makeNewBlock = (blockType: BlockType = BlockType.TEXT) => {
+    if (children.length) {
+      const newBlock: Block = {
+        id: `${block.id}${children.length + 1}_${Date.now()}`,
+        type: blockType,
+        value: '',
+        children: [],
+        parentBlockId: parent?.id ?? null,
+        pageId: page.id,
+      };
+      const copyChildren = [...children];
+      copyChildren.splice(0, 0, newBlock);
+      setBlock({ ...block, children: copyChildren });
+      return newBlock;
+    }
+    const newBlock: Block = {
+      id: `${parent?.id ?? ''}${siblings.length + 1}_${Date.now()}`,
+      type: blockType,
+      value: '',
+      children: [],
+      parentBlockId: parent?.id ?? null,
+      pageId: page.id,
+    };
+    const copySibling = [...siblings];
+    copySibling.splice(blockIndex + 1, 0, newBlock);
+    parent
+      ? setParent({ ...parent, children: copySibling })
+      : setPage({
+          ...page,
+          blockList: copySibling,
+          blockIdList: copySibling.map((sibling) => sibling.id),
+        });
+    return newBlock;
+  };
   return [
     {
       block,
@@ -123,6 +159,7 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
     {
       getNextBlock,
       getPrevBlock,
+      makeNewBlock,
     },
   ];
 };
