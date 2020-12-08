@@ -4,7 +4,6 @@ import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useEffect } from 'react';
 
 import { BlockContent } from '@atoms/index';
-import { useCommand } from '@/hooks';
 import { BlockHandler, HoverArea } from '@components/molecules';
 import { Block, BlockType } from '@/schemes';
 import { hoverState, focusState, blockState } from '@stores/page';
