@@ -47,6 +47,10 @@ const useCommand = () => {
         beforeCaretOffset !== null && setCaretOffset(0);
         break;
       }
+      case 'Enter': {
+        setFocus(familyFunc.makeNewBlock());
+        break;
+      }
     }
   };
   return [dispatcher];
