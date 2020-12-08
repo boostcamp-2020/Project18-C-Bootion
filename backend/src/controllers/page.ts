@@ -5,8 +5,9 @@ import { StatusCode, transactionHandler } from '@/aops';
 
 export const create = transactionHandler(
   async (req: Request, res: Response): Promise<void> => {
-    const page = await pageService.create({ title: req.body.title });
-    res.status(StatusCode.CREATED).json(page);
+    const page = await pageService.create();
+    const pages = await pageService.getAll();
+    res.status(StatusCode.CREATED).json({ page, pages });
   },
 );
 

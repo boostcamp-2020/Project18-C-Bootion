@@ -1,20 +1,18 @@
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 
-import { PageModel, BlockModel, Page, PageDoc } from '@/models';
+import { BlockModel, PageDoc, PageModel } from '@/models';
 import { ErrorMessage } from '@/aops';
 
-export const create = async (params: { title: string }): Promise<Document> => {
-  const page = new PageModel({ title: params.title });
+export const create = async (): Promise<Document> => {
+  const page = new PageModel();
   await page.save();
   return page;
 };
 
 export const getAll = async (): Promise<PageDoc[]> => {
-  const pages = await PageModel.find().exec();
-  for (const page of pages) {
-    await page.populateBlock();
-  }
-  return pages;
+  return await PageModel.find({}, 'id title')
+    .sort([['createdAt', -1]])
+    .exec();
 };
 
 export const getOne = async (params: { id: string }): Promise<Document> => {
@@ -23,6 +21,7 @@ export const getOne = async (params: { id: string }): Promise<Document> => {
   if (!page) {
     throw new Error(ErrorMessage.NOT_FOUND);
   }
+  await page.populateBlock();
   return page;
 };
 

@@ -5,12 +5,14 @@ import { Block, BlockDoc } from '@/models';
 export interface Page {
   id?: string;
   title?: string;
+  created: Date;
   blockIdList?: string[];
   blockList?: Block[];
 }
 
 export interface PageDoc extends Document {
   title?: string;
+  created: Date;
   blockIdList?: Types.ObjectId[];
   blockList?: BlockDoc[];
   addBlock?: (
@@ -21,18 +23,21 @@ export interface PageDoc extends Document {
   removeBlock?: (this: PageDoc, block: BlockDoc) => Promise<void>;
   populateBlock?: (this: PageDoc) => Promise<void>;
 }
-const PageSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  blockIdList: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Block',
+const PageSchema = new Schema(
+  {
+    title: {
+      type: String,
+      default: '',
     },
-  ],
-});
+    blockIdList: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Block',
+      },
+    ],
+  },
+  { timestamps: true },
+);
 
 PageSchema.methods.addBlock = async function (
   this: PageDoc,
