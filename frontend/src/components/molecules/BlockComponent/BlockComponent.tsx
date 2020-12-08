@@ -33,24 +33,9 @@ const descendantsCss = (block: Block): SerializedStyles => css`
 
 function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
   const [focusId, setFocusId] = useRecoilState<string>(focusState);
-  const [Dispatcher] = useCommand();
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
   const [hoverId, setHoverId] = useRecoilState(hoverState);
   const renderBlock = block ?? blockDTO;
-  const handleKeyPress = (ev: any) => {
-    const { focusNode, focusOffset } = window.getSelection();
-    if (
-      ev.key === 'ArrowUp' ||
-      ev.key === 'ArrowDown' ||
-      (ev.key === 'ArrowLeft' && focusOffset === 0) ||
-      (ev.key === 'ArrowRight' &&
-        focusOffset ===
-          ((focusNode as any).length ?? (focusNode as any).innerText.length))
-    ) {
-      ev.preventDefault();
-      Dispatcher(ev.key);
-    }
-  };
 
   useEffect(() => {
     setBlock(blockDTO);
@@ -65,9 +50,6 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
         css={{ position: 'relative' }}
         onMouseEnter={() => setHoverId(renderBlock.id)}
         onMouseLeave={() => setHoverId(null)}
-        role="input"
-        onKeyDown={handleKeyPress}
-        tabIndex={-1}
         onFocus={() => {
           if (focusId !== renderBlock.id) {
             setFocusId(renderBlock.id);

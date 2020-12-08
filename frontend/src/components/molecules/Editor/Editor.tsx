@@ -33,7 +33,7 @@ function Editor({ page }: Props): JSX.Element {
     <div>
       <div css={wrapperCss()}>
         <div css={titlePaddingTopCss()} />
-        <div css={titleCss()} contentEditable>
+        <div css={titleCss()} contentEditable suppressContentEditableWarning>
           {page?.title}
         </div>
       </div>
@@ -42,7 +42,7 @@ function Editor({ page }: Props): JSX.Element {
       </div>
       <div css={wrapperCss()}>
         {page?.blockList.map((block: Block) => (
-          <BlockComponent blockDTO={block} />
+          <BlockComponent key={block.id} blockDTO={block} />
         ))}
       </div>
     </div>

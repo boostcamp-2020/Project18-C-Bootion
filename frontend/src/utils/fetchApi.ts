@@ -129,7 +129,16 @@ export const getPage = (pageId: IdType): Promise<Page> =>
           value: 'Column Block 03',
           pageId: '1',
           parentBlockId: '3',
-          children: [],
+          children: [
+            {
+              id: '331',
+              type: BlockType.TEXT,
+              value: 'Row 01 - Col 03',
+              pageId: '1',
+              parentBlockId: '33',
+              children: [],
+            },
+          ],
         },
         {
           id: '34',
