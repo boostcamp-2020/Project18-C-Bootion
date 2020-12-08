@@ -91,5 +91,6 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --fix"
-  }
+  },
+  "proxy": "http://localhost:4000"
 }
