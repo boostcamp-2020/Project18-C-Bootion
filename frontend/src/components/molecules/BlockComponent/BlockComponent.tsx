@@ -1,16 +1,18 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useRef, useState, useEffect, FormEvent } from 'react';
-import { Heading } from '@components/atoms';
-import { HoverArea } from '@components/molecules';
+import { useEffect } from 'react';
+
+import { BlockContent } from '@atoms/index';
+import { useCommand } from '@/hooks';
+import { BlockHandler, HoverArea } from '@components/molecules';
 import { Block, BlockType } from '@/schemes';
-import pageState from '@stores/page';
+import { hoverState, focusState, blockState } from '@stores/page';
 import { useRecoilState } from 'recoil';
-import BlockHandler from '../BlockHandler';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
+
 const blockCss = (): SerializedStyles => css`
   width: 100%;
   max-width: 1000px;
@@ -21,31 +23,6 @@ const blockCss = (): SerializedStyles => css`
   color: inherit;
   fill: inherit;
 `;
-const contentsCss = (block: Block): SerializedStyles => css`
-  display: ${!isGridOrColumn(block) ? 'flex' : 'none'};
-  align-items: flex-start;
-  max-width: 100%;
-  width: 100%;
-  min-height: 30px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  caret-color: rgb(55, 53, 47);
-  padding: 3px 2px;
-  min-height: 1em;
-  color: rgb(55, 53, 47);
-  fill: inherit;
-  &:focus {
-    outline: 1px solid transparent;
-  }
-  &:focus:empty:before {
-    color: rgba(55, 53, 47, 0.4);
-    content: attr(placeholder);
-    display: block;
-  }
-  &:hover {
-    cursor: text;
-  }
-`;
 const descendantsCss = (block: Block): SerializedStyles => css`
   display: flex;
   padding-left: ${!isGridOrColumn(block) ? '1.5rem' : 0};
@@ -53,69 +30,45 @@ const descendantsCss = (block: Block): SerializedStyles => css`
   color: inherit;
   fill: inherit;
 `;
-const regex = {
-  h1: /^#\s[^\s.]*/gm,
-  h2: /^##\s[^\s.]*/gm,
-  h3: /^###\s[^\s.]*/gm,
-};
-interface Props {
-  block: Block;
-}
-const ConvertBlock = (
-  type: string,
-  handleValue: any,
-  content: any,
-  block: Block,
-): JSX.Element => {
-  const compoProps = {
-    handleValue,
-    content,
-  };
-  if (type === 'Heading1') return <Heading.Heading1 {...compoProps} />;
-  if (type === 'Heading2') return <Heading.Heading2 {...compoProps} />;
-  if (type === 'Heading3') return <Heading.Heading3 {...compoProps} />;
-  return (
-    <div
-      css={contentsCss(block)}
-      contentEditable
-      suppressContentEditableWarning
-      placeholder="Type '/' for commands"
-      onInput={handleValue}
-    >
-      {content.current}
-    </div>
-  );
-};
-function BlockComponent({ block }: Props): JSX.Element {
-  const content = useRef(block.value);
-  const [hoveredBlockId, setHoveredBlockId] = useRecoilState(
-    pageState.hoveredBlockState,
-  );
-  const [type, setType] = useState('');
-  const handleValue = (event: FormEvent<HTMLDivElement>) => {
-    content.current = event.currentTarget.textContent || '';
-    if (regex.h1.test(content.current)) setType('Heading1');
-    if (regex.h2.test(content.current)) setType('Heading2');
-    if (regex.h3.test(content.current)) setType('Heading3');
-  };
+
+function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
+  const [focusId, setFocusId] = useRecoilState<string>(focusState);
+  const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
+  const [hoverId, setHoverId] = useRecoilState(hoverState);
+  const renderBlock = block ?? blockDTO;
+
+  useEffect(() => {
+    setBlock(blockDTO);
+    return () => {
+      setBlock(null);
+    };
+  }, []);
+
   return (
     <div css={blockCss()}>
       <div
         css={{ position: 'relative' }}
-        onMouseEnter={() => setHoveredBlockId(block.id)}
-        onMouseLeave={() => setHoveredBlockId(null)}
+        onMouseEnter={() => setHoverId(renderBlock.id)}
+        onMouseLeave={() => setHoverId(null)}
+        onFocus={() => {
+          if (focusId !== renderBlock.id) {
+            setFocusId(renderBlock.id);
+          }
+        }}
       >
-        {ConvertBlock(type, handleValue, content, block)}
+        <BlockContent {...renderBlock} />
         <HoverArea />
-        {hoveredBlockId === block.id && <BlockHandler />}
+        {hoverId === renderBlock.id && <BlockHandler />}
       </div>
 
-      {block?.children?.length && (
-        <div css={descendantsCss(block)}>
-          {block.children.map((_block: Block) => (
-            <BlockComponent key={block.id} block={_block} />
+      {renderBlock.children.length ? (
+        <div css={descendantsCss(renderBlock)}>
+          {renderBlock.children.map((_block: Block) => (
+            <BlockComponent key={_block.id} blockDTO={_block} />
           ))}
         </div>
+      ) : (
+        ''
       )}
     </div>
   );
