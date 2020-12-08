@@ -1,10 +1,7 @@
-import { config } from 'dotenv';
 import mongoose, { ConnectionOptions } from 'mongoose';
 
-config();
-
-export const connect = () => {
-  let { MONGO_USERNAME, MONGO_PASSWORD, MONGO_DATABASE } = process.env;
+export const connect = (): void => {
+  const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_DATABASE } = process.env;
   let ip = 'mongo';
 
   if (process.env.NODE_ENV !== 'production') {
@@ -30,4 +27,7 @@ export const connect = () => {
     .catch((err) => console.log('MongoDB connection failed', err));
 };
 
-export { default as UserModel } from './user';
+export { PageModel } from './page';
+export type { Page, PageDoc } from './page';
+export { BlockModel } from './block';
+export type { BlockType, Block, BlockDoc } from './block';
