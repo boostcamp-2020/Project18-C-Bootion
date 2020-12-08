@@ -2,7 +2,7 @@
 /** @jsx jsx */
 import { jsx, css, Global } from '@emotion/react';
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { getPage } from '@/utils';
+import { fetchDummyData } from '@/utils';
 
 const PageComponent = lazy(() => import('@components/pages/PageComponent'));
 
@@ -10,7 +10,7 @@ function App(): JSX.Element {
   const [page, setPage] = useState(null);
   useEffect(() => {
     (async () => {
-      setPage(await getPage('1'));
+      setPage(await fetchDummyData('1'));
     })();
   }, []);
   return (

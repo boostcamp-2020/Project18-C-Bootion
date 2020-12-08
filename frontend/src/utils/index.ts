@@ -1,2 +1,2 @@
-export { getPage } from './fetchApi';
+export { fetchDummyData } from './fetchDummyData';
 export { regex, fontSize, placeHolder, listComponent } from './blockContent';

@@ -1,7 +1,7 @@
 import { atom, atomFamily } from 'recoil';
 
 import { IdType } from '@/schemes';
-import { getPage } from '@/utils';
+import { fetchDummyData } from '@/utils';
 
 enum StateType {
   PAGE_STATE = 'pageState',
@@ -14,7 +14,7 @@ enum StateType {
 
 export const pageState = atomFamily({
   key: StateType.PAGE_STATE,
-  default: async (id: IdType) => getPage(id),
+  default: async (id: IdType) => fetchDummyData(id),
 });
 
 export const blockState = atomFamily({
