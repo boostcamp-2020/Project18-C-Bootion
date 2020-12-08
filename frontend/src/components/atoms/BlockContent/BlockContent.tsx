@@ -55,33 +55,6 @@ function BlockContent(blockDTO: Block) {
   const setBlockRef = useSetRecoilState(blockRefState);
   const renderBlock: Block = block ?? blockDTO;
   const [Dispatcher] = useCommand();
-  const handleKeyDown = (ev: any) => {
-    const { focusNode, focusOffset } = window.getSelection();
-    if (
-      ev.key === 'ArrowUp' ||
-      ev.key === 'ArrowDown' ||
-      (ev.key === 'ArrowLeft' && focusOffset === 0) ||
-      (ev.key === 'ArrowRight' &&
-        focusOffset ===
-          ((focusNode as any).length ?? (focusNode as any).innerText.length))
-    ) {
-      ev.preventDefault();
-      Dispatcher(ev.key);
-    }
-  };
-
-  useEffect(() => {
-    const newType = Object.entries(regex).find((testRegex) =>
-      testRegex[1].test(renderBlock.value),
-    );
-    if (newType) {
-      setBlock({
-        ...renderBlock,
-        type: newType[0],
-        value: '',
-      });
-    }
-  }, [renderBlock.value]);
 
   useEffect(() => {
     setBlockRef((data: any) => ({
@@ -97,10 +70,21 @@ function BlockContent(blockDTO: Block) {
   }, []);
 
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
-    setBlock({
-      ...block,
-      value: event.currentTarget.textContent,
-    });
+    const newType = Object.entries(regex).find((testRegex) =>
+      testRegex[1].test(event.currentTarget.textContent),
+    );
+    if (newType) {
+      setBlock({
+        ...renderBlock,
+        type: newType[0],
+        value: '',
+      });
+    } else {
+      setBlock({
+        ...block,
+        value: event.currentTarget.textContent,
+      });
+    }
   };
 
   const handleBackSpace = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -109,6 +93,21 @@ function BlockContent(blockDTO: Block) {
         ...renderBlock,
         type: BlockType.TEXT,
       });
+    }
+  };
+
+  const handleKeyDown = (ev: any) => {
+    const { focusNode, focusOffset } = window.getSelection();
+    if (
+      ev.key === 'ArrowUp' ||
+      ev.key === 'ArrowDown' ||
+      (ev.key === 'ArrowLeft' && focusOffset === 0) ||
+      (ev.key === 'ArrowRight' &&
+        focusOffset ===
+          ((focusNode as any).length ?? (focusNode as any).innerText.length))
+    ) {
+      ev.preventDefault();
+      Dispatcher(ev.key);
     }
   };
 
