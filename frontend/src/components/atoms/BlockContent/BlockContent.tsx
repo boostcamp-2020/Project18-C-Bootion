@@ -2,7 +2,7 @@
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useEffect, useRef, FormEvent, KeyboardEvent } from 'react';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { blockState, blockRefState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
@@ -13,6 +13,7 @@ import {
   listComponent,
 } from '@utils/blockContent';
 import { useCommand } from '@/hooks';
+import { focusState } from '@/stores/dist/page';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
@@ -51,6 +52,7 @@ const editableDivCSS = (block: Block): SerializedStyles => css`
 
 function BlockContent(blockDTO: Block) {
   const contentEditableRef = useRef(null);
+  const focusId = useRecoilValue(focusState);
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
   const setBlockRef = useSetRecoilState(blockRefState);
   const renderBlock: Block = block ?? blockDTO;
@@ -63,7 +65,8 @@ function BlockContent(blockDTO: Block) {
       (ev.key === 'ArrowLeft' && focusOffset === 0) ||
       (ev.key === 'ArrowRight' &&
         focusOffset ===
-          ((focusNode as any).length ?? (focusNode as any).innerText.length))
+          ((focusNode as any).length ?? (focusNode as any).innerText.length)) ||
+      (ev.key === 'Enter' && !ev.shiftKey)
     ) {
       ev.preventDefault();
       Dispatcher(ev.key);
@@ -95,6 +98,10 @@ function BlockContent(blockDTO: Block) {
       }));
     };
   }, []);
+
+  useEffect(() => {
+    if (focusId === renderBlock.id) contentEditableRef.current.focus();
+  }, [focusId]);
 
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     setBlock({
