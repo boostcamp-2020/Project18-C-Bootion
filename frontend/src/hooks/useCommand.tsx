@@ -1,63 +1,55 @@
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { focusState } from '@/stores';
+import { focusState, blockRefState } from '@/stores';
 import { useFamily } from '@/hooks';
 import { Block } from '@/schemes';
-import { blockRefState } from '@/stores/page';
 
 const useCommand = () => {
   const [focusId, setFocusId] = useRecoilState(focusState);
   const [, familyFunc] = useFamily(focusId);
-  const blockRef: any = useRecoilValue(blockRefState);
+  const blockRef = useRecoilValue(blockRefState);
 
-  const Dispatcher = (key: String) => {
+  const setFocus = (block: Block) => {
+    if (block) {
+      const beforeOffset = window.getSelection().focusOffset;
+      setFocusId(block.id);
+      blockRef[block.id]?.current.focus();
+      return beforeOffset;
+    }
+    return null;
+  };
+
+  const setCaretOffset = (offset: number) => {
     const sel = window.getSelection();
-    const range = document.createRange();
+    const { focusNode: node } = sel;
+    const { length } = node as any;
+    sel.collapse(node, offset > length ? length : offset);
+  };
+
+  const dispatcher = (key: String) => {
     switch (key) {
-      case 'ArrowUp':
-      case 'ArrowLeft': {
-        const prevBlock: Block = familyFunc.getPrevBlock();
-        if (prevBlock) {
-          const ref = blockRef[prevBlock.id].current;
-          const { focusOffset } = window.getSelection();
-          ref.focus();
-          const { focusNode } = window.getSelection();
-          const { length } = ref.innerText;
-          setFocusId(prevBlock.id);
-          if (key === 'ArrowLeft') {
-            range.setStart(focusNode ?? ref, length);
-          } else if (focusOffset > length) {
-            range.setStart(focusNode ?? ref, length);
-          } else range.setStart(focusNode ?? ref, focusOffset);
-          range.collapse(true);
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
+      case 'ArrowUp': {
+        const beforeCaretOffset = setFocus(familyFunc.getPrevBlock());
+        beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset);
         break;
       }
-      case 'ArrowDown':
+      case 'ArrowLeft': {
+        const beforeCaretOffset = setFocus(familyFunc.getPrevBlock());
+        beforeCaretOffset !== null && setCaretOffset(Infinity);
+        break;
+      }
+      case 'ArrowDown': {
+        const beforeCaretOffset = setFocus(familyFunc.getNextBlock());
+        beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset);
+        break;
+      }
       case 'ArrowRight': {
-        const nextBlock: Block = familyFunc.getNextBlock();
-        if (nextBlock) {
-          const ref = blockRef[nextBlock.id].current;
-          const { focusOffset } = window.getSelection();
-          ref.focus();
-          const { focusNode } = window.getSelection();
-          const { length } = ref.innerText;
-          setFocusId(nextBlock.id);
-          if (key === 'ArrowRight') {
-            range.setStart(focusNode ?? ref, 0);
-          } else if (focusOffset > length) {
-            range.setStart(focusNode ?? ref, length);
-          } else range.setStart(focusNode ?? ref, focusOffset);
-          range.collapse(true);
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
+        const beforeCaretOffset = setFocus(familyFunc.getNextBlock());
+        beforeCaretOffset !== null && setCaretOffset(0);
         break;
       }
     }
   };
-  return [Dispatcher];
+  return [dispatcher];
 };
 
 export default useCommand;
