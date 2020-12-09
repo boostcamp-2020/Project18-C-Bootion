@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/indent */
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { blockState, pageState } from '@/stores';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { blockState, pageState, blockMapState } from '@/stores';
 import { Block, BlockType, BlockFamily } from '@/schemes';
 
-interface FamilyFunc {
+interface ManagerFunc {
   getNextBlock: () => Block | null;
   getPrevBlock: () => Block | null;
   makeNewBlock: () => Block | null;
@@ -17,10 +17,11 @@ const findLastDescendant = (targetBlock: Block) => {
   return currentBlock;
 };
 
-const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
+const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
   const [block, setBlock] = useRecoilState(blockState(blockId));
   const [page, setPage] = useRecoilState(pageState(block?.pageId));
-  const [parent, setParent] = useRecoilState(blockState(block?.parentBlockId));
+  const setParent = useSetRecoilState(blockState(block?.parentBlockId));
+  const parent = blockMapState[block?.parentBlockId];
   const grandParent: Block = useRecoilValue(blockState(parent?.parentBlockId));
   const children = block?.children;
   const siblings = parent?.children || page?.blockList;
@@ -164,4 +165,4 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
   ];
 };
 
-export default useFamily;
+export default useManger;
