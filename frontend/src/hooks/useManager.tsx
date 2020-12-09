@@ -6,7 +6,10 @@ import { Block, BlockType, BlockFamily } from '@/schemes';
 interface ManagerFunc {
   getNextBlock: () => Block | null;
   getPrevBlock: () => Block | null;
-  makeNewBlock: (option?: any, blockType?: BlockType) => Block | null;
+  makeNewBlock: (
+    option?: { value: object },
+    blockType?: BlockType,
+  ) => Block | null;
   setBlockValue: (value: string) => void;
 }
 
@@ -42,7 +45,7 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
     }
     if (blockIndex === siblings.length - 1) {
       /* block이 마지막 자식일 때. 다음 부모가 다음 Block 이다. */
-      const targetParentBlock = parents[parentIndex + 1];
+      const targetParentBlock = blockMapState[parents[parentIndex + 1]?.id];
       if (targetParentBlock) {
         switch (targetParentBlock.type) {
           case BlockType.COLUMN:
@@ -50,7 +53,7 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
             return targetParentBlock.children[0];
           case BlockType.GRID:
             /** 다음 부모의 Type이 Grid 일때 첫번째 자식(Column)의 자식이 다음 Block 이다. */
-            return targetParentBlock.children[0].children[0];
+            return blockMapState[targetParentBlock.children[0].id].children[0];
           default:
             /** 다음 부모의 타입이 COLUMN이나 GRID가 아니면 다음 Block 이다. */
             return targetParentBlock;
@@ -68,8 +71,8 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
   const getPrevBlock = () => {
     if (blockIndex) {
       /** blockIndex가 0이 아니면 이전 형제에서 prev block을 찾을 수 있다. */
-      const prevSibling = siblings[blockIndex - 1];
-      if (prevSibling.children.length) {
+      const prevSibling = blockMapState[siblings[blockIndex - 1]?.id];
+      if (prevSibling?.children.length) {
         /* 이전 형제에게 자식이 있다면 마지막 자식이 prev block 이다.  */
         return prevSibling.children[prevSibling.children.length - 1];
       }
@@ -83,7 +86,8 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
           /** 부모의 Type이 Column 이면 부모의 이전 형제의 마지막 자식이 이전 Block 이다. */
           if (parentIndex) {
             /** 부모의 index가 0이 아니면 이전 부모의 마지막 */
-            const prevParentChildren = parents[parentIndex - 1].children;
+            const prevParentChildren =
+              blockMapState[parents[parentIndex - 1].id].children;
             return prevParentChildren[prevParentChildren.length - 1];
           }
           /** 부모의 index가 0이면 조부모에 이전 Block이 있다. */
@@ -122,40 +126,51 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
   };
 
   const makeNewBlock = (
-    option: any = {},
+    { value }: any = {},
     blockType: BlockType = BlockType.TEXT,
   ) => {
-    if (children.length) {
+    if (block) {
+      if (children.length) {
+        const newBlock: Block = {
+          id: `${block.id}${children.length + 1}_${Date.now()}`,
+          type: blockType,
+          value: value?.after ?? '',
+          children: [],
+          parentBlockId: block?.id ?? null,
+          pageId: page.id,
+        };
+        const copyChildren = [...children];
+        setBlock({
+          ...block,
+          value: value?.before,
+          children: [newBlock, ...copyChildren],
+        });
+        return newBlock;
+      }
       const newBlock: Block = {
-        id: `${block.id}${children.length + 1}_${Date.now()}`,
+        id: `${parent?.id ?? ''}${siblings.length + 1}_${Date.now()}`,
         type: blockType,
-        value: option.value ?? '',
+        value: value?.after ?? '',
         children: [],
         parentBlockId: parent?.id ?? null,
         pageId: page.id,
       };
-      const copyChildren = [...children];
-      setBlock({ ...block, children: [newBlock, ...copyChildren] });
+      const copySibling = [...siblings];
+      copySibling.splice(blockIndex, 1, {
+        ...copySibling[blockIndex],
+        value: value?.before,
+      });
+      copySibling.splice(blockIndex + 1, 0, newBlock);
+      parent
+        ? setParent({ ...parent, children: copySibling })
+        : setPage({
+            ...page,
+            blockList: copySibling,
+            blockIdList: copySibling.map((sibling) => sibling.id),
+          });
       return newBlock;
     }
-    const newBlock: Block = {
-      id: `${parent?.id ?? ''}${siblings.length + 1}_${Date.now()}`,
-      type: blockType,
-      value: option.value ?? '',
-      children: [],
-      parentBlockId: parent?.id ?? null,
-      pageId: page.id,
-    };
-    const copySibling = [...siblings];
-    copySibling.splice(blockIndex + 1, 0, newBlock);
-    parent
-      ? setParent({ ...parent, children: copySibling })
-      : setPage({
-          ...page,
-          blockList: copySibling,
-          blockIdList: copySibling.map((sibling) => sibling.id),
-        });
-    return newBlock;
+    return null;
   };
 
   return [
