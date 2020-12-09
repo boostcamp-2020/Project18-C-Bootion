@@ -1,9 +1,7 @@
-import { Document } from 'mongoose';
-
 import { BlockModel, PageDoc, PageModel } from '@/models';
 import { ErrorMessage } from '@/aops';
 
-export const create = async (): Promise<Document> => {
+export const create = async (): Promise<PageDoc> => {
   const page = new PageModel();
   await page.save();
   return page;
@@ -15,7 +13,7 @@ export const getAll = async (): Promise<PageDoc[]> => {
     .exec();
 };
 
-export const getOne = async (params: { id: string }): Promise<Document> => {
+export const getOne = async (params: { id: string }): Promise<PageDoc> => {
   const page = await PageModel.findById(params.id).populate('blockList').exec();
 
   if (!page) {
@@ -28,10 +26,10 @@ export const getOne = async (params: { id: string }): Promise<Document> => {
 export const update = async (params: {
   id: string;
   title: string;
-}): Promise<Document> => {
+}): Promise<PageDoc> => {
   const page = await PageModel.findByIdAndUpdate(
     params.id,
-    { title: params.title },
+    { title: params.title ?? '' },
     { new: true },
   ).exec();
 
@@ -42,7 +40,7 @@ export const update = async (params: {
 };
 
 export const remove = async (params: { id: string }): Promise<void> => {
-  const page: any = await PageModel.findById(params.id).exec();
+  const page = await PageModel.findById(params.id).exec();
   page && (await BlockModel.deleteMany({ pageId: { $eq: page.id } }));
   await PageModel.findByIdAndDelete(page.id).exec();
 };
