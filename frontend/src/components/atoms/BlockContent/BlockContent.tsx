@@ -57,6 +57,11 @@ function BlockContent(blockDTO: Block) {
   const renderBlock: Block = block ?? blockDTO;
   const [Dispatcher] = useCommand();
 
+  const handleBlock = (value: string, type?: string) => {
+    if (type) setBlock({ ...renderBlock, value, type });
+    setBlock({ ...renderBlock, value });
+  };
+
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     const content = event.currentTarget.textContent;
     const newType = Object.entries(regex).find((testRegex) =>
@@ -64,20 +69,16 @@ function BlockContent(blockDTO: Block) {
     );
     /* blockType이 안 바뀔 경우: 기존의 caret위치 유지 */
     if (!newType) {
-      setBlock({
-        ...renderBlock,
-        value: content,
-      });
+      handleBlock(content);
       const selection = window.getSelection();
       setCaret(selection.focusOffset);
       return;
     }
     /* 바뀐 blockType의 내용이 있을 때: 타입을 바꾼 뒤 content의 끝에 caret 위치 */
-    setBlock({
-      ...renderBlock,
-      type: newType[0],
-      value: content.slice(content.indexOf(' ') + 1, content.length),
-    });
+    handleBlock(
+      content.slice(content.indexOf(' ') + 1, content.length),
+      newType[0],
+    );
     if (newType[0] === BlockType.HEADING2) {
       setCaret(content.length - 3);
       return;
@@ -93,18 +94,11 @@ function BlockContent(blockDTO: Block) {
     if (
       event.key === 'Backspace' &&
       (!renderBlock.value || !window.getSelection().focusOffset)
-    ) {
-      setBlock({
-        ...renderBlock,
-        type: BlockType.TEXT,
-      });
-    }
+    )
+      handleBlock(event.currentTarget.textContent, BlockType.TEXT);
 
     if (event.key === 'Enter' && event.shiftKey) {
-      setBlock({
-        ...renderBlock,
-        value: event.currentTarget.textContent,
-      });
+      handleBlock(event.currentTarget.textContent);
       setCaret(window.getSelection().focusOffset);
     }
   };
@@ -139,7 +133,6 @@ function BlockContent(blockDTO: Block) {
 
   useEffect(() => {
     const selection = window.getSelection();
-    console.log('>>>', selection);
     selection.collapse(selection.focusNode, caret);
   }, [renderBlock.value, block.value]);
 
