@@ -1,6 +1,6 @@
 import { atom, atomFamily } from 'recoil';
 
-import { IdType } from '@/schemes';
+import { Block, IdType } from '@/schemes';
 import { getPage } from '@/utils';
 
 enum StateType {
@@ -10,6 +10,7 @@ enum StateType {
   FOCUS_STATE = 'focusState',
   CARET_STATE = 'caretState',
   BLOCK_REF_STATE = 'blockRefState',
+  BLOCK_MAP_STATE = 'blockMapState',
 }
 
 export const pageState = atomFamily({
@@ -17,9 +18,18 @@ export const pageState = atomFamily({
   default: async (id: IdType) => getPage(id),
 });
 
+export const blockMapState: { [id: string]: Block } = {};
+
 export const blockState = atomFamily({
   key: StateType.BLOCK_STATE,
   default: null,
+  effects_UNSTABLE: (blockId: string) => [
+    ({ onSet }) => {
+      onSet((newValue) => {
+        blockMapState[blockId] = newValue;
+      });
+    },
+  ],
 });
 
 export const blockRefState = atom<any>({
