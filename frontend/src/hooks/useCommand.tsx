@@ -1,11 +1,11 @@
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { focusState, blockRefState } from '@/stores';
-import { useFamily } from '@/hooks';
+import { useManager } from '@/hooks';
 import { Block } from '@/schemes';
 
 const useCommand = () => {
   const [focusId, setFocusId] = useRecoilState(focusState);
-  const [, familyFunc] = useFamily(focusId);
+  const [, familyFunc] = useManager(focusId);
   const blockRef = useRecoilValue(blockRefState);
 
   const setFocus = (block: Block) => {
