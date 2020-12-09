@@ -26,7 +26,7 @@ export const getOne = async (block: Block): Promise<BlockDoc> => {
 export const createToPage = async (params: {
   pageId: string;
   block: Block;
-  targetIndex: number | null;
+  targetIndex?: number;
 }): Promise<{ block: BlockDoc; page: PageDoc; parent: null }> => {
   const page: PageDoc = await PageModel.findById(params.pageId).exec();
   const block = new BlockModel(params.block ?? {});
@@ -39,7 +39,7 @@ export const createToPage = async (params: {
 export const createToBlock = async (params: {
   parent: Block;
   block: Block;
-  targetIndex: number | null;
+  targetIndex?: number;
 }): Promise<{ block: BlockDoc; parent: BlockDoc; page: null }> => {
   const parent: BlockDoc = await getOne(params.parent);
   const block: BlockDoc = new BlockModel(params.block ?? {});
