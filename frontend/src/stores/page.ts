@@ -1,7 +1,7 @@
-import { atom, atomFamily } from 'recoil';
+import { atom, atomFamily, RecoilState } from 'recoil';
 
-import { IdType } from '@/schemes';
-import { fetchDummyData } from '@/utils';
+import { IdType, Page } from '@/schemes';
+import { fetchDummyData, readPages } from '@/utils';
 
 enum StateType {
   PAGE_STATE = 'pageState',
@@ -10,6 +10,7 @@ enum StateType {
   FOCUS_STATE = 'focusState',
   CARET_STATE = 'caretState',
   BLOCK_REF_STATE = 'blockRefState',
+  PAGES_STATE = 'pagesState',
 }
 
 export const pageState = atomFamily({
@@ -40,4 +41,9 @@ export const caretState = atom({
 export const focusState = atom({
   key: StateType.FOCUS_STATE,
   default: null,
+});
+
+export const pagesState = atom({
+  key: StateType.PAGES_STATE,
+  default: readPages(),
 });
