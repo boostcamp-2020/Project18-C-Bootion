@@ -103,7 +103,7 @@ function BlockContent(blockDTO: Block) {
     }
   };
 
-  const handleKeyDown = (event: any) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const { focusNode, focusOffset } = window.getSelection();
     if (
       event.key === 'ArrowUp' ||
