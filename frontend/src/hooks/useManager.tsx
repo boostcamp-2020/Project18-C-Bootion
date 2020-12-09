@@ -122,8 +122,7 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
         pageId: page.id,
       };
       const copyChildren = [...children];
-      copyChildren.splice(0, 0, newBlock);
-      setBlock({ ...block, children: copyChildren });
+      setBlock({ ...block, children: [newBlock, ...copyChildren] });
       return newBlock;
     }
     const newBlock: Block = {
