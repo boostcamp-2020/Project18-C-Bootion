@@ -59,10 +59,10 @@ function BlockContent(blockDTO: Block) {
   const renderBlock: Block = block ?? blockDTO;
   const [Dispatcher] = useCommand();
 
-  const handleBlock = (value: string, type?: string) => {
-    if (type) setBlock({ ...renderBlock, value, type });
-    setBlock({ ...renderBlock, value });
-  };
+  const handleBlock = (value: string, type?: string) =>
+    type
+      ? setBlock({ ...renderBlock, value, type })
+      : setBlock({ ...renderBlock, value });
 
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     const content = event.currentTarget.textContent;
@@ -96,8 +96,9 @@ function BlockContent(blockDTO: Block) {
     if (
       event.key === 'Backspace' &&
       (!renderBlock.value || !window.getSelection().focusOffset)
-    )
+    ) {
       handleBlock(event.currentTarget.textContent, BlockType.TEXT);
+    }
 
     if (event.key === 'Enter' && event.shiftKey) {
       handleBlock(event.currentTarget.textContent);
@@ -141,7 +142,7 @@ function BlockContent(blockDTO: Block) {
   useEffect(() => {
     const selection = window.getSelection();
     selection.collapse(selection.focusNode, caret);
-  }, [renderBlock.value, block?.value]);
+  }, [renderBlock.value]);
 
   return (
     <div css={blockContentCSS}>
