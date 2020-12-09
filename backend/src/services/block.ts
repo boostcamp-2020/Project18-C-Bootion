@@ -7,6 +7,22 @@ import {
   PageModel,
 } from '@/models';
 
+export const getOne = async (block: Block): Promise<BlockDoc> => {
+  if (block?.parentIdList.length) {
+    const rootId = block.parentIdList[0];
+    let parent: BlockDoc = await BlockModel.findById(rootId).exec();
+    parent = block.parentIdList
+      .slice(1)
+      .reduce(
+        (parent: BlockDoc, parentId: string): BlockDoc =>
+          (parent.children as any).id(parentId),
+        parent,
+      );
+    return (parent.children as any).id(block.id);
+  }
+  return await BlockModel.findById(block.id).exec();
+};
+
 export const createToPage = async (params: {
   pageId: string;
   block: Block;
@@ -31,23 +47,6 @@ export const createToBlock = async (params: {
   await parent.addChild(block, params.targetIndex);
   await parent.requestSave();
   return { block, parent, page: null };
-};
-
-export const getOne = async (block: Block): Promise<BlockDoc> => {
-  block.id = block._id;
-  if (block?.parentIdList.length) {
-    const rootId = block.parentIdList[0];
-    let parent: BlockDoc = await BlockModel.findById(rootId).exec();
-    parent = block.parentIdList
-      .slice(1)
-      .reduce(
-        (parent: BlockDoc, parentId: string): BlockDoc =>
-          (parent.children as any).id(parentId),
-        parent,
-      );
-    return (parent.children as any).id(block.id);
-  }
-  return await BlockModel.findById(block.id).exec();
 };
 
 export const updateBlock = async (blockDTO: Block): Promise<BlockDoc> => {
