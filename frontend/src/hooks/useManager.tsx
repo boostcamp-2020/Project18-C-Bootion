@@ -6,7 +6,8 @@ import { Block, BlockType, BlockFamily } from '@/schemes';
 interface ManagerFunc {
   getNextBlock: () => Block | null;
   getPrevBlock: () => Block | null;
-  makeNewBlock: () => Block | null;
+  makeNewBlock: (option?: any, blockType?: BlockType) => Block | null;
+  setBlockValue: (value: string) => void;
 }
 
 const findLastDescendant = (targetBlock: Block) => {
@@ -32,6 +33,7 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
   const parentIndex = (grandParent?.children || page.blockList).findIndex(
     (_block) => _block.id === parent?.id,
   );
+
   const getNextBlock = () => {
     if (children.length) {
       /* 자식이 있을 때 첫번째 자식이 다음 block 이다.  */
@@ -61,6 +63,7 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
       return siblings[blockIndex + 1];
     }
   };
+
   const getPrevBlock = () => {
     if (blockIndex) {
       /** blockIndex가 0이 아니면 이전 형제에서 prev block을 찾을 수 있다. */
@@ -111,12 +114,20 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
       return null;
     }
   };
-  const makeNewBlock = (blockType: BlockType = BlockType.TEXT) => {
+
+  const setBlockValue = (value: string) => {
+    setBlock({ ...block, value });
+  };
+
+  const makeNewBlock = (
+    option: any = {},
+    blockType: BlockType = BlockType.TEXT,
+  ) => {
     if (children.length) {
       const newBlock: Block = {
         id: `${block.id}${children.length + 1}_${Date.now()}`,
         type: blockType,
-        value: '',
+        value: option.value ?? '',
         children: [],
         parentBlockId: parent?.id ?? null,
         pageId: page.id,
@@ -128,7 +139,7 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
     const newBlock: Block = {
       id: `${parent?.id ?? ''}${siblings.length + 1}_${Date.now()}`,
       type: blockType,
-      value: '',
+      value: option.value ?? '',
       children: [],
       parentBlockId: parent?.id ?? null,
       pageId: page.id,
@@ -144,6 +155,7 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
         });
     return newBlock;
   };
+
   return [
     {
       block,
@@ -160,6 +172,7 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
       getNextBlock,
       getPrevBlock,
       makeNewBlock,
+      setBlockValue,
     },
   ];
 };

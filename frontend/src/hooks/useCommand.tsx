@@ -25,6 +25,14 @@ const useCommand = () => {
     sel.collapse(node, offset > length ? length : offset);
   };
 
+  const getSlicedValueToCaretOffset = () => {
+    const { focusNode, focusOffset } = window.getSelection();
+    return [
+      focusNode.textContent.slice(0, focusOffset),
+      focusNode.textContent.slice(focusOffset, Infinity),
+    ];
+  };
+
   const dispatcher = (key: String) => {
     switch (key) {
       case 'ArrowUp': {
@@ -48,7 +56,9 @@ const useCommand = () => {
         break;
       }
       case 'Enter': {
-        setFocus(familyFunc.makeNewBlock());
+        const [before, after] = getSlicedValueToCaretOffset();
+        familyFunc.setBlockValue(before);
+        setFocus(familyFunc.makeNewBlock({ value: after }));
         break;
       }
     }
