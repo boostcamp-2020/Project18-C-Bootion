@@ -135,9 +135,13 @@ function BlockContent(blockDTO: Block) {
   }, []);
 
   useEffect(() => {
+    if (focusId === renderBlock.id) contentEditableRef.current.focus();
+  }, [focusId]);
+
+  useEffect(() => {
     const selection = window.getSelection();
     selection.collapse(selection.focusNode, caret);
-  }, [renderBlock.value, block.value]);
+  }, [renderBlock.value, block?.value]);
 
   return (
     <div css={blockContentCSS}>
