@@ -1,6 +1,6 @@
-import { atom, atomFamily, RecoilState } from 'recoil';
+import { atom, atomFamily, useRecoilValue } from 'recoil';
 
-import { IdType, Block } from '@/schemes';
+import { IdType, Block, Page } from '@/schemes';
 import { createPage, fetchDummyData, readPage, readPages } from '@/utils';
 
 enum StateType {
@@ -13,6 +13,7 @@ enum StateType {
   PAGES_STATE = 'pagesState',
   BLOCK_MAP_STATE = 'blockMapState',
   STATIC_MENU_TOGGLE_STATE = 'staticMenuToggleState',
+  SELECTED_PAGE_STATE = 'selectedPageState',
 }
 
 export const pageState = atomFamily({
@@ -68,4 +69,12 @@ export const pagesState = atom({
 export const staticMenuToggleState = atom({
   key: StateType.STATIC_MENU_TOGGLE_STATE,
   default: false,
+});
+
+export const selectedPageState = atom({
+  key: StateType.SELECTED_PAGE_STATE,
+  default: (async () => {
+    const pages = await readPages();
+    return readPage({ id: pages[0].id });
+  })(),
 });
