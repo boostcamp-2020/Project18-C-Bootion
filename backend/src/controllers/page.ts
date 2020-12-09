@@ -30,5 +30,6 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 
 export const remove = async (req: Request, res: Response): Promise<void> => {
   await pageService.remove({ id: req.params.id });
-  res.status(StatusCode.NO_CONTENT).json();
+  const pages = await pageService.getAll();
+  res.status(StatusCode.OK).json(pages);
 };
