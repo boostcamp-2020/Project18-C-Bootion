@@ -90,12 +90,16 @@ function BlockContent(blockDTO: Block) {
   };
 
   const handleKeyUp = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Backspace' && !renderBlock.value) {
+    if (
+      event.key === 'Backspace' &&
+      (!renderBlock.value || !window.getSelection().focusOffset)
+    ) {
       setBlock({
         ...renderBlock,
         type: BlockType.TEXT,
       });
     }
+
     if (event.key === 'Enter' && event.shiftKey) {
       setBlock({
         ...renderBlock,
