@@ -9,13 +9,13 @@ const useCommand = () => {
   const blockRef = useRecoilValue(blockRefState);
 
   const setFocus = (block: Block) => {
-    if (block) {
-      const beforeOffset = window.getSelection().focusOffset;
-      setFocusId(block.id);
-      blockRef[block.id]?.current.focus();
-      return beforeOffset;
+    if (!block) {
+      return null;
     }
-    return null;
+    const beforeOffset = window.getSelection().focusOffset;
+    setFocusId(block.id);
+    blockRef[block.id]?.current.focus();
+    return beforeOffset;
   };
 
   const setCaretOffset = (offset: number) => {
