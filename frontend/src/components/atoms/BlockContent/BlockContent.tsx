@@ -1,7 +1,7 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useEffect, useRef, FormEvent, KeyboardEvent } from 'react';
+import { useEffect, useRef, FormEvent, KeyboardEvent, useState } from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 
 import { blockState, blockRefState } from '@/stores';
@@ -52,36 +52,71 @@ const editableDivCSS = (block: Block): SerializedStyles => css`
 function BlockContent(blockDTO: Block) {
   const contentEditableRef = useRef(null);
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
+  const [caret, setCaret] = useState<number>();
   const setBlockRef = useSetRecoilState(blockRefState);
   const renderBlock: Block = block ?? blockDTO;
   const [Dispatcher] = useCommand();
-  const handleKeyDown = (ev: any) => {
-    const { focusNode, focusOffset } = window.getSelection();
+
+  const handleBlock = (value: string, type?: string) => {
+    if (type) setBlock({ ...renderBlock, value, type });
+    setBlock({ ...renderBlock, value });
+  };
+
+  const handleValue = (event: FormEvent<HTMLDivElement>) => {
+    const content = event.currentTarget.textContent;
+    const newType = Object.entries(regex).find((testRegex) =>
+      testRegex[1].test(content),
+    );
+    /* blockType이 안 바뀔 경우: 기존의 caret위치 유지 */
+    if (!newType) {
+      handleBlock(content);
+      const selection = window.getSelection();
+      setCaret(selection.focusOffset);
+      return;
+    }
+    /* 바뀐 blockType의 내용이 있을 때: 타입을 바꾼 뒤 content의 끝에 caret 위치 */
+    handleBlock(
+      content.slice(content.indexOf(' ') + 1, content.length),
+      newType[0],
+    );
+    if (newType[0] === BlockType.HEADING2) {
+      setCaret(content.length - 3);
+      return;
+    }
+    if (newType[0] === BlockType.HEADING3) {
+      setCaret(content.length - 4);
+      return;
+    }
+    setCaret(content.length - 2);
+  };
+
+  const handleKeyUp = (event: KeyboardEvent<HTMLDivElement>) => {
     if (
-      ev.key === 'ArrowUp' ||
-      ev.key === 'ArrowDown' ||
-      (ev.key === 'ArrowLeft' && focusOffset === 0) ||
-      (ev.key === 'ArrowRight' &&
-        focusOffset ===
-          ((focusNode as any).length ?? (focusNode as any).innerText.length))
-    ) {
-      ev.preventDefault();
-      Dispatcher(ev.key);
+      event.key === 'Backspace' &&
+      (!renderBlock.value || !window.getSelection().focusOffset)
+    )
+      handleBlock(event.currentTarget.textContent, BlockType.TEXT);
+
+    if (event.key === 'Enter' && event.shiftKey) {
+      handleBlock(event.currentTarget.textContent);
+      setCaret(window.getSelection().focusOffset);
     }
   };
 
-  useEffect(() => {
-    const newType = Object.entries(regex).find((testRegex) =>
-      testRegex[1].test(renderBlock.value),
-    );
-    if (newType) {
-      setBlock({
-        ...renderBlock,
-        type: newType[0],
-        value: '',
-      });
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const { focusNode, focusOffset } = window.getSelection();
+    if (
+      event.key === 'ArrowUp' ||
+      event.key === 'ArrowDown' ||
+      (event.key === 'ArrowLeft' && focusOffset === 0) ||
+      (event.key === 'ArrowRight' &&
+        focusOffset ===
+          ((focusNode as any).length ?? (focusNode as any).innerText.length))
+    ) {
+      event.preventDefault();
+      Dispatcher(event.key);
     }
-  }, [renderBlock.value]);
+  };
 
   useEffect(() => {
     setBlockRef((data: any) => ({
@@ -96,21 +131,10 @@ function BlockContent(blockDTO: Block) {
     };
   }, []);
 
-  const handleValue = (event: FormEvent<HTMLDivElement>) => {
-    setBlock({
-      ...block,
-      value: event.currentTarget.textContent,
-    });
-  };
-
-  const handleBackSpace = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Backspace' && !renderBlock.value) {
-      setBlock({
-        ...renderBlock,
-        type: BlockType.TEXT,
-      });
-    }
-  };
+  useEffect(() => {
+    const selection = window.getSelection();
+    selection.collapse(selection.focusNode, caret);
+  }, [renderBlock.value, block.value]);
 
   return (
     <div css={blockContentCSS}>
@@ -123,7 +147,7 @@ function BlockContent(blockDTO: Block) {
         suppressContentEditableWarning
         placeholder={placeHolder[renderBlock.type]}
         onInput={handleValue}
-        onKeyUp={handleBackSpace}
+        onKeyUp={handleKeyUp}
       >
         {renderBlock.value}
       </div>
