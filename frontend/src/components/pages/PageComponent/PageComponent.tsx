@@ -2,7 +2,7 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 
-import { Header, Editor } from '@components/molecules';
+import { Header, Title, Editor } from '@components/molecules';
 import { HeaderMenu } from '@components/organisms';
 
 const staticMenuAreaCss = () => css`
@@ -42,6 +42,7 @@ function PageComponent({}: Props): JSX.Element {
         <Header />
       </div>
       <div css={staticScrollAreaCss()}>
+        <Title />
         <Editor />
         <div css={bottomMarginCss()} />
       </div>
