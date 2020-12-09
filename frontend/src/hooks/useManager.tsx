@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/indent */
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { blockState, pageState, blockMapState } from '@/stores';
 import { Block, BlockType, BlockFamily } from '@/schemes';
@@ -31,7 +30,7 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
     (_block: Block) => _block.id === block?.id,
   );
   const parentIndex = (grandParent?.children || page.blockList).findIndex(
-    (_block) => _block.id === parent?.id,
+    (_block: Block) => _block.id === parent?.id,
   );
 
   const getNextBlock = () => {
@@ -91,7 +90,7 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
             if (grandParent.type === BlockType.GRID) {
               /** 조부모가 GRID 타입인 경우 조부모의 부모는 Page 이다. */
               const grandParentIndex = page.blockList.findIndex(
-                (_block) => _block.id === grandParent.id,
+                (_block: Block) => _block.id === grandParent.id,
               );
               if (grandParentIndex) {
                 /** grandParentIndex 가 0이 아니면 prevGrandParent의 마지막 후손이 prev 블록이다. */
