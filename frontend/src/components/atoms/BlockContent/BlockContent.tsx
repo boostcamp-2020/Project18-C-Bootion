@@ -13,7 +13,7 @@ import {
   listComponent,
 } from '@utils/blockContent';
 import { useCommand } from '@/hooks';
-import { focusState } from '@/stores/dist/page';
+import { focusState } from '@/stores/page';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
@@ -57,6 +57,7 @@ function BlockContent(blockDTO: Block) {
   const setBlockRef = useSetRecoilState(blockRefState);
   const renderBlock: Block = block ?? blockDTO;
   const [Dispatcher] = useCommand();
+
   const handleKeyDown = (ev: any) => {
     const { focusNode, focusOffset } = window.getSelection();
     if (
