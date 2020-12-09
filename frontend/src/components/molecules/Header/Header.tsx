@@ -2,12 +2,11 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 
-import { Page } from '@/schemes';
-import { HeaderLink, HeaderButton } from '@components/atoms';
 import { ReactComponent as Dots } from '@assets/dots.svg';
 import { ReactComponent as Check } from '@assets/check.svg';
+import { HeaderLink, HeaderButton } from '@components/atoms';
 import { useRecoilValue } from 'recoil';
-import { staticMenuToggleState } from '@/stores';
+import { pageState, staticMenuToggleState } from '@/stores';
 
 const headerCss = () => css`
   width: 100%;
@@ -35,12 +34,11 @@ const menuMarginCss = () => css`
   width: 30px;
 `;
 
-interface Props {
-  page: Page;
-}
+interface Props {}
 
-function Header({ page }: Props): JSX.Element {
+function Header({}: Props): JSX.Element {
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
+  const page = useRecoilValue(pageState('1'));
 
   return (
     <div css={headerCss()}>

@@ -2,7 +2,6 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 
-import { Page } from '@/schemes';
 import { Header, Editor } from '@components/molecules';
 import { HeaderMenu } from '@components/organisms';
 
@@ -31,21 +30,19 @@ const bottomMarginCss = () => css`
   height: 45%;
 `;
 
-interface Props {
-  page: Page;
-}
+interface Props {}
 
-function PageComponent({ page }: Props): JSX.Element {
+function PageComponent({}: Props): JSX.Element {
   return (
     <div>
       <div css={staticMenuAreaCss()}>
         <HeaderMenu />
       </div>
       <div css={staticHeaderAreaCss()}>
-        <Header page={page} />
+        <Header />
       </div>
       <div css={staticScrollAreaCss()}>
-        <Editor page={page} />
+        <Editor />
         <div css={bottomMarginCss()} />
       </div>
     </div>

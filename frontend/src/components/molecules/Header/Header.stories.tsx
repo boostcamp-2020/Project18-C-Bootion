@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-import { fetchDummyData } from '@/utils';
 import Header from '.';
 
 const desc = {
@@ -9,23 +8,11 @@ const desc = {
 };
 
 export const Default = (): JSX.Element => {
-  const [page, setPage] = useState(null);
-  useEffect(() => {
-    (async () => {
-      setPage(await fetchDummyData('1'));
-    })();
-  });
-  return <Header page={page} />;
+  return <Header />;
 };
 
 export const MenuOpened = (): JSX.Element => {
-  const [page, setPage] = useState(null);
-  useEffect(() => {
-    (async () => {
-      setPage(await fetchDummyData('1'));
-    })();
-  }, []);
-  return <Header page={page} />;
+  return <Header />;
 };
 
 export default desc;

@@ -9,13 +9,7 @@ const desc = {
 };
 
 export const Default = (): JSX.Element => {
-  const [page, setPage] = useState(null);
-  useEffect(() => {
-    (async () => {
-      setPage(await fetchDummyData('1'));
-    })();
-  });
-  return <PageComponent page={page} />;
+  return <PageComponent />;
 };
 
 export default desc;
