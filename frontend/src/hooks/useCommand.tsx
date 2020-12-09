@@ -1,11 +1,11 @@
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { focusState, blockRefState } from '@/stores';
-import { useFamily } from '@/hooks';
+import { useManager } from '@/hooks';
 import { Block } from '@/schemes';
 
 const useCommand = () => {
   const [focusId, setFocusId] = useRecoilState(focusState);
-  const [, familyFunc] = useFamily(focusId);
+  const [, managerFunc] = useManager(focusId);
   const blockRef = useRecoilValue(blockRefState);
 
   const setFocus = (block: Block) => {
@@ -22,7 +22,8 @@ const useCommand = () => {
     const sel = window.getSelection();
     const { focusNode: node } = sel;
     const { length } = node as any;
-    sel.collapse(node, offset > length ? length : offset);
+    !(node instanceof HTMLElement) &&
+      sel.collapse(node, offset > length ? length : offset);
   };
 
   const getSlicedValueToCaretOffset = () => {
@@ -36,29 +37,28 @@ const useCommand = () => {
   const dispatcher = (key: String) => {
     switch (key) {
       case 'ArrowUp': {
-        const beforeCaretOffset = setFocus(familyFunc.getPrevBlock());
+        const beforeCaretOffset = setFocus(managerFunc.getPrevBlock());
         beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset);
         break;
       }
       case 'ArrowLeft': {
-        const beforeCaretOffset = setFocus(familyFunc.getPrevBlock());
+        const beforeCaretOffset = setFocus(managerFunc.getPrevBlock());
         beforeCaretOffset !== null && setCaretOffset(Infinity);
         break;
       }
       case 'ArrowDown': {
-        const beforeCaretOffset = setFocus(familyFunc.getNextBlock());
+        const beforeCaretOffset = setFocus(managerFunc.getNextBlock());
         beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset);
         break;
       }
       case 'ArrowRight': {
-        const beforeCaretOffset = setFocus(familyFunc.getNextBlock());
+        const beforeCaretOffset = setFocus(managerFunc.getNextBlock());
         beforeCaretOffset !== null && setCaretOffset(0);
         break;
       }
       case 'Enter': {
         const [before, after] = getSlicedValueToCaretOffset();
-        familyFunc.setBlockValue(before);
-        setFocus(familyFunc.makeNewBlock({ value: after }));
+        setFocus(managerFunc.makeNewBlock({ value: { before, after } }));
         break;
       }
     }
