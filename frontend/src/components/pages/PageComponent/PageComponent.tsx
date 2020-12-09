@@ -1,24 +1,23 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useState } from 'react';
+import { jsx, css } from '@emotion/react';
 
 import { Page } from '@/schemes';
 import { Header, Editor } from '@components/molecules';
 import { HeaderMenu } from '@components/organisms';
 
-const staticMenuAreaCss = (): SerializedStyles => css`
+const staticMenuAreaCss = () => css`
   position: fixed;
   z-index: 2;
 `;
-const staticHeaderAreaCss = (): SerializedStyles => css`
+const staticHeaderAreaCss = () => css`
   position: fixed;
   right: 0;
   width: 100%;
   background-color: #ffffff;
   z-index: 1;
 `;
-const staticScrollAreaCss = (): SerializedStyles => css`
+const staticScrollAreaCss = () => css`
   position: fixed;
   top: 45px;
   right: 0;
@@ -26,7 +25,7 @@ const staticScrollAreaCss = (): SerializedStyles => css`
   height: calc(100% - 45px);
   overflow: auto;
 `;
-const bottomMarginCss = (): SerializedStyles => css`
+const bottomMarginCss = () => css`
   display: inline-block;
   width: 100%;
   height: 45%;
@@ -34,18 +33,16 @@ const bottomMarginCss = (): SerializedStyles => css`
 
 interface Props {
   page: Page;
-  menuClosed: boolean;
 }
 
-function PageComponent({ page, menuClosed }: Props): JSX.Element {
-  const [isMenuClosed, setIsMenuClosed] = useState<boolean>(menuClosed);
+function PageComponent({ page }: Props): JSX.Element {
   return (
     <div>
       <div css={staticMenuAreaCss()}>
-        <HeaderMenu isMenuClosed />
+        <HeaderMenu />
       </div>
       <div css={staticHeaderAreaCss()}>
-        <Header page={page} menuClosed={isMenuClosed} />
+        <Header page={page} />
       </div>
       <div css={staticScrollAreaCss()}>
         <Editor page={page} />

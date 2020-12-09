@@ -12,6 +12,7 @@ enum StateType {
   BLOCK_REF_STATE = 'blockRefState',
   PAGES_STATE = 'pagesState',
   BLOCK_MAP_STATE = 'blockMapState',
+  STATIC_MENU_TOGGLE_STATE = 'staticMenuToggleState',
 }
 
 export const pageState = atomFamily({
@@ -56,4 +57,9 @@ export const focusState = atom({
 export const pagesState = atom({
   key: StateType.PAGES_STATE,
   default: readPages(),
+});
+
+export const staticMenuToggleState = atom({
+  key: StateType.STATIC_MENU_TOGGLE_STATE,
+  default: false,
 });

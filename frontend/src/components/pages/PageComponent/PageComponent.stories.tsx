@@ -15,7 +15,7 @@ export const Default = (): JSX.Element => {
       setPage(await fetchDummyData('1'));
     })();
   });
-  return <PageComponent page={page} menuClosed />;
+  return <PageComponent page={page} />;
 };
 
 export default desc;

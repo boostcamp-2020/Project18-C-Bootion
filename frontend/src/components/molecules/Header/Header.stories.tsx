@@ -15,7 +15,7 @@ export const Default = (): JSX.Element => {
       setPage(await fetchDummyData('1'));
     })();
   });
-  return <Header page={page} menuClosed />;
+  return <Header page={page} />;
 };
 
 export const MenuOpened = (): JSX.Element => {
@@ -24,8 +24,8 @@ export const MenuOpened = (): JSX.Element => {
     (async () => {
       setPage(await fetchDummyData('1'));
     })();
-  });
-  return <Header page={page} menuClosed={false} />;
+  }, []);
+  return <Header page={page} />;
 };
 
 export default desc;

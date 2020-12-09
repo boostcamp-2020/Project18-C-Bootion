@@ -1,14 +1,15 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useState } from 'react';
+import { jsx, css } from '@emotion/react';
 
 import { Page } from '@/schemes';
 import { HeaderLink, HeaderButton } from '@components/atoms';
 import { ReactComponent as Dots } from '@assets/dots.svg';
 import { ReactComponent as Check } from '@assets/check.svg';
+import { useRecoilValue } from 'recoil';
+import { staticMenuToggleState } from '@/stores';
 
-const headerCss = (): SerializedStyles => css`
+const headerCss = () => css`
   width: 100%;
   max-width: 100vw;
   height: 45px;
@@ -20,7 +21,7 @@ const headerCss = (): SerializedStyles => css`
   padding-left: 12px;
   padding-right: 10px;
 `;
-const wrapperCss = (): SerializedStyles => css`
+const wrapperCss = () => css`
   display: flex;
   align-items: center;
   line-height: 1.2;
@@ -30,22 +31,21 @@ const wrapperCss = (): SerializedStyles => css`
   margin-right: 8px;
   min-width: 0;
 `;
-const menuMarginCss = (): SerializedStyles => css`
+const menuMarginCss = () => css`
   width: 30px;
 `;
 
 interface Props {
   page: Page;
-  menuClosed: boolean;
 }
 
-function Header({ page, menuClosed }: Props): JSX.Element {
-  const [isMenuClosed, setIsMenuClosed] = useState<boolean>(menuClosed);
+function Header({ page }: Props): JSX.Element {
+  const staticMenuToggle = useRecoilValue(staticMenuToggleState);
+
   return (
     <div css={headerCss()}>
       <div css={wrapperCss()}>
-        {/* {isMenuClosed && <HeaderMenu isMenuClosed />} */}
-        {isMenuClosed && <div css={menuMarginCss()} />}
+        {!staticMenuToggle && <div css={menuMarginCss()} />}
         <HeaderLink>{page?.title}</HeaderLink>
         <span>/</span>
         <HeaderLink>temp</HeaderLink>

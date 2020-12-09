@@ -1,11 +1,10 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx, css, Global } from '@emotion/react';
-import { lazy } from 'react';
 import { useRecoilValue } from 'recoil';
-import { pageState } from './stores';
 
-const PageComponent = lazy(() => import('@components/pages/PageComponent'));
+import { PageComponent } from '@components/pages';
+import { pageState } from '@/stores';
 
 function App(): JSX.Element {
   const page = useRecoilValue(pageState('1'));
@@ -23,7 +22,7 @@ function App(): JSX.Element {
           }
         `}
       />
-      <PageComponent page={page} menuClosed />
+      <PageComponent page={page} />
     </div>
   );
 }

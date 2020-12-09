@@ -1,16 +1,18 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css, SerializedStyles } from '@emotion/react';
+import { jsx, css } from '@emotion/react';
 import { useState } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { HeaderButton } from '@components/atoms';
 import { Menu } from '@components/molecules';
 import { ReactComponent as HamburgerMenu } from '@assets/hamburgerMenu.svg';
 import { ReactComponent as DoubleChevronRight } from '@assets/doubleChevronRight.svg';
+import { staticMenuToggleState } from '@/stores';
 
-const wrapperCss = (isMenuClosed: boolean): SerializedStyles => css`
+const wrapperCss = (staticMenuToggle: boolean) => css`
   position: relative;
-  display: ${isMenuClosed ? 'flex' : 'none'};
+  display: ${staticMenuToggle ? 'none' : 'flex'};
   align-items: center;
   line-height: 1.2;
   font-size: 14px;
@@ -20,7 +22,7 @@ const wrapperCss = (isMenuClosed: boolean): SerializedStyles => css`
   margin-right: 8px;
   min-width: 0;
 `;
-const hoverAreaCss = (): SerializedStyles => css`
+const hoverAreaCss = () => css`
   position: absolute;
   display: inline-block;
   top: 45px;
@@ -28,7 +30,7 @@ const hoverAreaCss = (): SerializedStyles => css`
   width: 100%;
   height: 100vh;
 `;
-const menuCss = (): SerializedStyles => css`
+const menuCss = () => css`
   position: absolute;
   display: inline-block;
   top: 50px;
@@ -36,24 +38,24 @@ const menuCss = (): SerializedStyles => css`
   margin-top: 10px;
 `;
 
-interface Props {
-  isMenuClosed: boolean;
-}
+interface Props {}
 
-function HeaderMenu({ isMenuClosed }: Props): JSX.Element {
-  const [menuClosed, setMenuClosed] = useState<boolean>(isMenuClosed);
-  const [menuHovered, setMenuHorvered] = useState<boolean>(false);
+function HeaderMenu({}: Props): JSX.Element {
+  const staticMenuToggle = useRecoilValue(staticMenuToggleState);
+  const [menuHovered, setMenuHovered] = useState<boolean>(false);
+
   return (
     <div
-      css={wrapperCss(isMenuClosed)}
-      onMouseEnter={() => setMenuHorvered(true)}
-      onMouseLeave={() => setMenuHorvered(false)}
+      css={wrapperCss(staticMenuToggle)}
+      onMouseEnter={() => staticMenuToggle || setMenuHovered(true)}
+      onMouseLeave={() => staticMenuToggle || setMenuHovered(false)}
     >
       <HeaderButton>
-        {!menuHovered ? <HamburgerMenu /> : <DoubleChevronRight />}
+        {staticMenuToggle ||
+          (!menuHovered ? <HamburgerMenu /> : <DoubleChevronRight />)}
       </HeaderButton>
       <div css={hoverAreaCss()} />
-      {menuHovered && (
+      {(staticMenuToggle || menuHovered) && (
         <div css={menuCss()}>
           <Menu />
         </div>
