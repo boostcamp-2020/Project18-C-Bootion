@@ -3,16 +3,20 @@
 import { jsx, css, SerializedStyles } from '@emotion/react';
 
 const buttonCss = (): SerializedStyles => css`
-  display: flex;
+  display: flow-root;
+  max-width: 150px;
+  padding: 6px;
+  margin: auto;
+  border-radius: 3px;
+  font-size: inherit;
+  color: inherit;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   text-decoration: none;
   user-select: none;
   cursor: pointer;
-  color: inherit;
-  minwidth: 0px;
-  padding: 6px;
-  white-space: nowrap;
-  border-radius: 3px;
-  font-size: inherit;
+
   &:hover {
     background-color: #cccccc;
   }

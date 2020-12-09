@@ -6,7 +6,7 @@ import { ReactComponent as Dots } from '@assets/dots.svg';
 import { ReactComponent as Check } from '@assets/check.svg';
 import { HeaderLink, HeaderButton } from '@components/atoms';
 import { useRecoilValue } from 'recoil';
-import { pageState, staticMenuToggleState } from '@/stores';
+import { selectedPageState, staticMenuToggleState } from '@/stores';
 
 const headerCss = () => css`
   width: 100%;
@@ -38,15 +38,15 @@ interface Props {}
 
 function Header({}: Props): JSX.Element {
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
-  const page = useRecoilValue(pageState('1'));
+  const selectedPage = useRecoilValue(selectedPageState);
 
   return (
     <div css={headerCss()}>
       <div css={wrapperCss()}>
         {!staticMenuToggle && <div css={menuMarginCss()} />}
-        <HeaderLink>{page?.title}</HeaderLink>
-        <span>/</span>
-        <HeaderLink>temp</HeaderLink>
+        <HeaderLink>
+          {`${selectedPage?.title || 'Untitled'} - ${selectedPage?.id}`}
+        </HeaderLink>
       </div>
       <div css={wrapperCss()}>
         <HeaderButton>Share</HeaderButton>
