@@ -31,16 +31,12 @@ export const updateOrRemove = transactionHandler(
       remove: req.body.remove, // 삭제할 때
     };
     let block: BlockDoc = null,
-      parent: BlockDoc | null = null,
-      page: PageDoc | null = null;
+      page: PageDoc | null = null,
+      parent: BlockDoc | null = null;
 
     if (params.remove) {
-      await blockService.remove(params.block);
-      res.status(StatusCode.NO_CONTENT).json();
-      return;
-    }
-
-    if (!params.pageId && !params.parent) {
+      [page, parent] = await blockService.remove(params.block);
+    } else if (!params.pageId && !params.parent) {
       block = await blockService.updateBlock(params.block);
     } else if (params.pageId && !params.parent) {
       delete params.parent;
@@ -50,6 +46,6 @@ export const updateOrRemove = transactionHandler(
     } else {
       throw new Error(ErrorMessage.BAD_REQUEST);
     }
-    res.status(StatusCode.OK).json({ block, parent, page });
+    res.status(StatusCode.OK).json({ block, page, parent });
   },
 );

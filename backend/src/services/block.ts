@@ -78,16 +78,18 @@ export const moveToBlock = async (params: {
   return [block, parent];
 };
 
-export const remove = async (blockDTO: Block): Promise<void> => {
+export const remove = async (blockDTO: Block): Promise<[PageDoc, BlockDoc]> => {
   const block = await getOne(blockDTO);
   if (!block) return;
 
   if (block.parentIdList.length !== 0) {
+    const parent = (block as any).parent();
     await block.removeFromParent();
-    return;
+    return [null, parent];
   }
 
   const page = await PageModel.findById(block.pageId).exec();
   await page.removeBlock(block);
   await BlockModel.findByIdAndDelete(block.id).exec();
+  return [page, null];
 };
