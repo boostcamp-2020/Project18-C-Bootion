@@ -81,7 +81,10 @@ function BlockContent(blockDTO: Block) {
       content.slice(content.indexOf(' ') + 1, content.length),
       newType[0],
     );
-    if (newType[0] === BlockType.HEADING2) {
+    if (
+      newType[0] === BlockType.HEADING2 ||
+      newType[0] === BlockType.NUMBEREDLIST
+    ) {
       setCaret(content.length - 3);
       return;
     }
