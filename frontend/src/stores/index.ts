@@ -5,4 +5,5 @@ export {
   focusState,
   caretState,
   blockRefState,
+  blockMapState,
 } from './page';
