@@ -1,6 +1,6 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import logger from 'morgan';
-import createHttpError from 'http-errors';
+import createHttpError, { HttpError } from 'http-errors';
 
 import { connect } from '@/models';
 import { apiRouter } from '@/routes';
@@ -28,7 +28,7 @@ export class App {
     );
 
     this.app.use(
-      (err: any, req: Request, res: Response, next: NextFunction) => {
+      (err: HttpError, req: Request, res: Response, next: NextFunction) => {
         const { status, message } = err;
         res.status(status).json({ error: 1, message });
       },

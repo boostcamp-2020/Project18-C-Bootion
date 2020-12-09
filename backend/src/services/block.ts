@@ -7,34 +7,7 @@ import {
   PageModel,
 } from '@/models';
 
-export const createToPage = async (params: {
-  pageId: string;
-  block: Block;
-  targetIndex: number | null;
-}): Promise<{ block: BlockDoc; page: PageDoc; parent: null }> => {
-  const page: PageDoc = await PageModel.findById(params.pageId).exec();
-  const block = new BlockModel(params.block ?? {});
-
-  await page.addBlock(block, params.targetIndex);
-  await page.populateBlock();
-  return { block, page, parent: null };
-};
-
-export const createToBlock = async (params: {
-  parent: Block;
-  block: Block;
-  targetIndex: number | null;
-}): Promise<{ block: BlockDoc; parent: BlockDoc; page: null }> => {
-  const parent: BlockDoc = await getOne(params.parent);
-  const block: BlockDoc = new BlockModel(params.block ?? {});
-
-  await parent.addChild(block, params.targetIndex);
-  await parent.requestSave();
-  return { block, parent, page: null };
-};
-
 export const getOne = async (block: Block): Promise<BlockDoc> => {
-  block.id = block._id;
   if (block?.parentIdList.length) {
     const rootId = block.parentIdList[0];
     let parent: BlockDoc = await BlockModel.findById(rootId).exec();
@@ -48,6 +21,32 @@ export const getOne = async (block: Block): Promise<BlockDoc> => {
     return (parent.children as any).id(block.id);
   }
   return await BlockModel.findById(block.id).exec();
+};
+
+export const createToPage = async (params: {
+  pageId: string;
+  block: Block;
+  targetIndex?: number;
+}): Promise<{ block: BlockDoc; page: PageDoc; parent: null }> => {
+  const page: PageDoc = await PageModel.findById(params.pageId).exec();
+  const block = new BlockModel(params.block ?? {});
+
+  await page.addBlock(block, params.targetIndex);
+  await page.populateBlock();
+  return { block, page, parent: null };
+};
+
+export const createToBlock = async (params: {
+  parent: Block;
+  block: Block;
+  targetIndex?: number;
+}): Promise<{ block: BlockDoc; parent: BlockDoc; page: null }> => {
+  const parent: BlockDoc = await getOne(params.parent);
+  const block: BlockDoc = new BlockModel(params.block ?? {});
+
+  await parent.addChild(block, params.targetIndex);
+  await parent.requestSave();
+  return { block, parent, page: null };
 };
 
 export const updateBlock = async (blockDTO: Block): Promise<BlockDoc> => {
@@ -79,16 +78,18 @@ export const moveToBlock = async (params: {
   return [block, parent];
 };
 
-export const remove = async (blockDTO: Block): Promise<void> => {
+export const remove = async (blockDTO: Block): Promise<[PageDoc, BlockDoc]> => {
   const block = await getOne(blockDTO);
   if (!block) return;
 
   if (block.parentIdList.length !== 0) {
+    const parent = (block as any).parent();
     await block.removeFromParent();
-    return;
+    return [null, parent];
   }
 
   const page = await PageModel.findById(block.pageId).exec();
   await page.removeBlock(block);
   await BlockModel.findByIdAndDelete(block.id).exec();
+  return [page, null];
 };
