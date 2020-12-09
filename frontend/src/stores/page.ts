@@ -73,8 +73,5 @@ export const staticMenuToggleState = atom({
 
 export const selectedPageState = atom({
   key: StateType.SELECTED_PAGE_STATE,
-  default: (async () => {
-    const pages = await readPages();
-    return readPage({ id: pages[0].id });
-  })(),
+  default: (async () => (await readPages())[0])(),
 });
