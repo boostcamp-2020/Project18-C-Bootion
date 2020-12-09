@@ -1,4 +1,4 @@
-import { Document, Schema, model } from 'mongoose';
+import { Document, Schema, model, Types } from 'mongoose';
 
 export enum BlockType {
   TEXT = 'text',
@@ -53,6 +53,12 @@ BlockSchema.add({
   ],
   children: [BlockSchema],
 });
+
+BlockSchema.virtual('id').get(function (this: BlockDoc) {
+  return this._id.toHexString();
+});
+
+BlockSchema.set('toJSON', { virtuals: true });
 
 BlockSchema.methods.addChild = async function (
   this: BlockDoc,

@@ -39,6 +39,12 @@ const PageSchema = new Schema(
   { timestamps: true },
 );
 
+PageSchema.virtual('id').get(function (this: PageDoc) {
+  return this._id.toHexString();
+});
+
+PageSchema.set('toJSON', { virtuals: true });
+
 PageSchema.methods.addBlock = async function (
   this: PageDoc,
   block: BlockDoc,
