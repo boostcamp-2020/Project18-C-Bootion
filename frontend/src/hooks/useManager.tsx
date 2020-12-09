@@ -23,7 +23,8 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
   const [page, setPage] = useRecoilState(pageState(block?.pageId));
   const setParent = useSetRecoilState(blockState(block?.parentBlockId));
   const parent = blockMapState[block?.parentBlockId];
-  const grandParent: Block = useRecoilValue(blockState(parent?.parentBlockId));
+  const setGrandParent = useSetRecoilState(blockState(parent?.parentBlockId));
+  const grandParent = blockMapState[parent?.parentBlockId];
   const children = block?.children;
   const siblings = parent?.children || page?.blockList;
   const parents = grandParent?.children || (parent && page?.blockList);
@@ -95,7 +96,8 @@ const useManger = (blockId: string): [BlockFamily, ManagerFunc] => {
               );
               if (grandParentIndex) {
                 /** grandParentIndex 가 0이 아니면 prevGrandParent의 마지막 후손이 prev 블록이다. */
-                const prevGrandParent = page.blockList[grandParentIndex - 1];
+                const prevGrandParent =
+                  blockMapState[page.blockList[grandParentIndex - 1].id];
                 return findLastDescendant(prevGrandParent);
               }
               /** grandParentIndex가 0이면 page의 blockList 중 맨 앞이라는 의미이므로 prev 블록이 없다. */
