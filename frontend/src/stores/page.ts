@@ -1,6 +1,6 @@
 import { atom, atomFamily, RecoilState } from 'recoil';
 
-import { IdType, Page } from '@/schemes';
+import { IdType, Page, Block } from '@/schemes';
 import { fetchDummyData, readPages } from '@/utils';
 
 enum StateType {
@@ -11,6 +11,7 @@ enum StateType {
   CARET_STATE = 'caretState',
   BLOCK_REF_STATE = 'blockRefState',
   PAGES_STATE = 'pagesState',
+  BLOCK_MAP_STATE = 'blockMapState',
 }
 
 export const pageState = atomFamily({
@@ -18,9 +19,18 @@ export const pageState = atomFamily({
   default: async (id: IdType) => fetchDummyData(id),
 });
 
+export const blockMapState: { [id: string]: Block } = {};
+
 export const blockState = atomFamily({
   key: StateType.BLOCK_STATE,
   default: null,
+  effects_UNSTABLE: (blockId: string) => [
+    ({ onSet }) => {
+      onSet((newValue) => {
+        blockMapState[blockId] = newValue;
+      });
+    },
+  ],
 });
 
 export const blockRefState = atom<any>({

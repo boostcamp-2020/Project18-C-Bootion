@@ -1,6 +1,7 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
+import { MouseEvent } from 'react';
 
 const LeftHoverAreaCss = css`
   position: absolute;
@@ -16,9 +17,20 @@ const RightHoverAreaCss = css`
   width: 10%;
   height: 100%;
 `;
-function HoverArea(): React.ReactElement {
+const CommonHoverAreaCss = css`
+  &:hover {
+    cursor: text;
+  }
+`;
+function HoverArea({
+  handleClick,
+}: {
+  handleClick: (
+    event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
+  ) => void;
+}): React.ReactElement {
   return (
-    <div>
+    <div css={CommonHoverAreaCss} onClick={handleClick} onKeyDown={() => {}}>
       <div css={LeftHoverAreaCss} />
       <div css={RightHoverAreaCss} />
     </div>

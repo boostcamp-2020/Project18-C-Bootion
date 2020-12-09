@@ -4,11 +4,15 @@ import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useEffect } from 'react';
 
 import { BlockContent } from '@atoms/index';
-import { useCommand } from '@/hooks';
 import { BlockHandler, HoverArea } from '@components/molecules';
 import { Block, BlockType } from '@/schemes';
-import { hoverState, focusState, blockState } from '@stores/page';
-import { useRecoilState } from 'recoil';
+import {
+  hoverState,
+  focusState,
+  blockState,
+  blockRefState,
+} from '@stores/page';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
@@ -36,6 +40,7 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
   const [hoverId, setHoverId] = useRecoilState(hoverState);
   const renderBlock = block ?? blockDTO;
+  const blockRef: any = useRecoilValue(blockRefState)[renderBlock.id];
 
   useEffect(() => {
     setBlock(blockDTO);
@@ -51,13 +56,11 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
         onMouseEnter={() => setHoverId(renderBlock.id)}
         onMouseLeave={() => setHoverId(null)}
         onFocus={() => {
-          if (focusId !== renderBlock.id) {
-            setFocusId(renderBlock.id);
-          }
+          if (focusId !== renderBlock.id) setFocusId(renderBlock.id);
         }}
       >
         <BlockContent {...renderBlock} />
-        <HoverArea />
+        <HoverArea handleClick={() => blockRef.current.focus()} />
         {hoverId === renderBlock.id && <BlockHandler />}
       </div>
 

@@ -1,18 +1,14 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx, css, Global } from '@emotion/react';
-import { lazy, Suspense, useEffect, useState } from 'react';
-import { fetchDummyData } from '@/utils';
+import { lazy } from 'react';
+import { useRecoilValue } from 'recoil';
+import { pageState } from './stores';
 
 const PageComponent = lazy(() => import('@components/pages/PageComponent'));
 
 function App(): JSX.Element {
-  const [page, setPage] = useState(null);
-  useEffect(() => {
-    (async () => {
-      setPage(await fetchDummyData('1'));
-    })();
-  }, []);
+  const page = useRecoilValue(pageState('1'));
   return (
     <div>
       <Global
@@ -27,9 +23,7 @@ function App(): JSX.Element {
           }
         `}
       />
-      <Suspense fallback={<div />}>
-        <PageComponent page={page} menuClosed />
-      </Suspense>
+      <PageComponent page={page} menuClosed />
     </div>
   );
 }
