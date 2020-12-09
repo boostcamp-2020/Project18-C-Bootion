@@ -1,7 +1,7 @@
 import { atom, atomFamily, RecoilState } from 'recoil';
 
-import { IdType, Page, Block } from '@/schemes';
-import { fetchDummyData, readPages } from '@/utils';
+import { IdType, Block } from '@/schemes';
+import { createPage, fetchDummyData, readPage, readPages } from '@/utils';
 
 enum StateType {
   PAGE_STATE = 'pageState',
@@ -56,7 +56,13 @@ export const focusState = atom({
 
 export const pagesState = atom({
   key: StateType.PAGES_STATE,
-  default: readPages(),
+  default: (async () => {
+    const pages = await readPages();
+    if (pages.length) {
+      return pages;
+    }
+    return (await createPage())?.pages;
+  })(),
 });
 
 export const staticMenuToggleState = atom({
