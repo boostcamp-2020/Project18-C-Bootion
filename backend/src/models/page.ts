@@ -5,14 +5,14 @@ import { Block, BlockDoc } from '@/models';
 export interface Page {
   id?: string;
   title?: string;
-  created: Date;
+  createdAt: Date;
   blockIdList?: string[];
   blockList?: Block[];
 }
 
 export interface PageDoc extends Document {
   title?: string;
-  created: Date;
+  createdAt: Date;
   blockIdList?: Types.ObjectId[];
   blockList?: BlockDoc[];
   addBlock?: (
