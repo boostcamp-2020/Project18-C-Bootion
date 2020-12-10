@@ -76,7 +76,6 @@ function Title({}: Props): JSX.Element {
     <div css={wrapperCss()}>
       <div css={titlePaddingTopCss()} />
       <div
-        placeholder="Untitled"
         contentEditable
         suppressContentEditableWarning
         css={titleCss()}
