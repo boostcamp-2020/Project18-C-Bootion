@@ -4,7 +4,7 @@ import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useEffect, useRef, FormEvent, KeyboardEvent, useState } from 'react';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
-import { blockState, blockRefState } from '@/stores';
+import { blockState, blockRefState, throttleState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
   regex,
@@ -100,7 +100,9 @@ function BlockContent(blockDTO: Block) {
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const { focusNode, focusOffset } = window.getSelection();
-    if (
+    if (throttleState.isThrottle) {
+      event.preventDefault();
+    } else if (
       event.key === 'ArrowUp' ||
       event.key === 'ArrowDown' ||
       (event.key === 'ArrowLeft' && focusOffset === 0) ||
@@ -109,8 +111,12 @@ function BlockContent(blockDTO: Block) {
           ((focusNode as any).length ?? (focusNode as any).innerText.length)) ||
       (event.key === 'Enter' && !event.shiftKey)
     ) {
+      throttleState.isThrottle = true;
       event.preventDefault();
-      Dispatcher(event.key);
+      setImmediate(() => {
+        Dispatcher(event.key);
+        throttleState.isThrottle = false;
+      });
     }
   };
 

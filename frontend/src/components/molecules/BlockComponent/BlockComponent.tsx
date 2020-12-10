@@ -47,7 +47,7 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
     return () => {
       setBlock(null);
     };
-  }, []);
+  }, [blockDTO]);
 
   return (
     <div css={blockCss()}>

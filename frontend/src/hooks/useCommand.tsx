@@ -5,16 +5,16 @@ import { Block } from '@/schemes';
 
 const useCommand = () => {
   const [focusId, setFocusId] = useRecoilState(focusState);
-  const [familyBlock, familyFunc] = useManager(focusId);
+  const [{ block }, managerFunc] = useManager(focusId);
   const blockRef = useRecoilValue(blockRefState);
 
-  const setFocus = (block: Block) => {
-    if (!block) {
+  const setFocus = (targetBlock: Block) => {
+    if (!targetBlock) {
       return null;
     }
     const beforeOffset = window.getSelection().focusOffset;
-    setFocusId(block.id);
-    blockRef[block.id]?.current.focus();
+    setFocusId(targetBlock.id);
+    blockRef[targetBlock.id]?.current.focus();
     return beforeOffset;
   };
 
@@ -22,13 +22,14 @@ const useCommand = () => {
     const sel = window.getSelection();
     const { focusNode: node } = sel;
     const { length } = node as any;
-    sel.collapse(node, offset > length ? length : offset);
+    !(node instanceof HTMLElement) &&
+      sel.collapse(node, offset > length ? length : offset);
   };
 
   const getSlicedValueToCaretOffset = () => {
-    const { focusNode, focusOffset } = window.getSelection();
+    const { focusNode, anchorOffset, focusOffset } = window.getSelection();
     return [
-      focusNode.textContent.slice(0, focusOffset),
+      focusNode.textContent.slice(0, anchorOffset),
       focusNode.textContent.slice(focusOffset, Infinity),
     ];
   };
@@ -36,36 +37,32 @@ const useCommand = () => {
   const dispatcher = (key: String) => {
     switch (key) {
       case 'ArrowUp': {
-        const beforeCaretOffset = setFocus(familyFunc.getPrevBlock());
+        const beforeCaretOffset = setFocus(managerFunc.getPrevBlock());
         beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset);
         break;
       }
       case 'ArrowLeft': {
-        const beforeCaretOffset = setFocus(familyFunc.getPrevBlock());
+        const beforeCaretOffset = setFocus(managerFunc.getPrevBlock());
         beforeCaretOffset !== null && setCaretOffset(Infinity);
         break;
       }
       case 'ArrowDown': {
-        const beforeCaretOffset = setFocus(familyFunc.getNextBlock());
+        const beforeCaretOffset = setFocus(managerFunc.getNextBlock());
         beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset);
         break;
       }
       case 'ArrowRight': {
-        const beforeCaretOffset = setFocus(familyFunc.getNextBlock());
+        const beforeCaretOffset = setFocus(managerFunc.getNextBlock());
         beforeCaretOffset !== null && setCaretOffset(0);
         break;
       }
       case 'Enter': {
         const [before, after] = getSlicedValueToCaretOffset();
-        familyFunc.setBlockValue(before);
-        setFocus(
-          familyFunc.makeNewBlock(
-            {
-              value: after,
-            },
-            familyBlock.block.type,
-          ),
-        );
+        if (block?.children.length) {
+          setFocus(managerFunc.addChild({ value: before }, { value: after }));
+        } else {
+          setFocus(managerFunc.addSibling({ value: before }, { value: after }));
+        }
         break;
       }
     }
