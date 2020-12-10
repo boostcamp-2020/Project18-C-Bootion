@@ -7,23 +7,30 @@ import { useRecoilState } from 'recoil';
 import { pagesState, selectedPageState, staticMenuToggleState } from '@/stores';
 import { createPage } from '@/utils';
 
-const wrapperCss = (staticToggle: boolean) => css`
+const wrapperCss = (staticMenuToggle: boolean) => css`
   width: 240px;
-  height: 80vh;
-  border-radius: 3px;
-  background: rgb(247, 246, 243);
-  ${!staticToggle ? 'box-shadow: 0 0 10px 1px #aaaaaa' : ''};
+  height: ${staticMenuToggle ? 100 : 80}vh;
+  border-radius: ${staticMenuToggle ? 0 : '3px'};
+  background: ${staticMenuToggle ? 'rgb(247, 246, 243)' : '#ffffff'};
+  ${staticMenuToggle ? '' : 'box-shadow: 0 0 10px 1px #aaaaaa'};
 `;
 
 const itemCss = (isSelected: boolean) => css`
+  display: inline-block;
+  width: 100%;
   color: ${isSelected ? 'red' : 'black'};
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 interface Props {}
 
 function Menu({}: Props): JSX.Element {
   const [pages, setPages] = useRecoilState(pagesState);
-  const [staticToggle, setStaticToggle] = useRecoilState(staticMenuToggleState);
+  const [staticMenuToggle, setStaticMenuToggle] = useRecoilState(
+    staticMenuToggleState,
+  );
   const [selectedPage, setSelectedPage] = useRecoilState(selectedPageState);
 
   const handleCreatingPage = () => {
@@ -36,7 +43,7 @@ function Menu({}: Props): JSX.Element {
   };
 
   return (
-    <div css={wrapperCss(staticToggle)}>
+    <div css={wrapperCss(staticMenuToggle)}>
       <div>WORKSPACE</div>
       <button type="button" onClick={handleCreatingPage}>
         +

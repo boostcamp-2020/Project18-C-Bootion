@@ -1,18 +1,17 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
-import { useState } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 
 import { HeaderButton } from '@components/atoms';
-import { Menu } from '@components/molecules';
 import { ReactComponent as HamburgerMenu } from '@assets/hamburgerMenu.svg';
 import { ReactComponent as DoubleChevronRight } from '@assets/doubleChevronRight.svg';
-import { staticMenuToggleState } from '@/stores';
+import { hoveredMenuToggleState, staticMenuToggleState } from '@/stores';
+import { Menu } from '@molecules/index';
 
-const wrapperCss = (staticMenuToggle: boolean) => css`
+const wrapperCss = () => css`
   position: relative;
-  display: ${staticMenuToggle ? 'none' : 'flex'};
+  display: flex;
   align-items: center;
   line-height: 1.2;
   font-size: 14px;
@@ -30,33 +29,37 @@ const hoverAreaCss = () => css`
   width: 100%;
   height: 100vh;
 `;
-const menuCss = () => css`
+const menuCss = (staticMenuToggle: boolean) => css`
   position: absolute;
   display: inline-block;
-  top: 50px;
+  top: ${staticMenuToggle ? 0 : 50}px;
   left: 0;
-  margin-top: 10px;
+  margin-top: ${staticMenuToggle ? 0 : 10}px;
 `;
 
 interface Props {}
 
 function HeaderMenu({}: Props): JSX.Element {
-  const staticMenuToggle = useRecoilValue(staticMenuToggleState);
-  const [menuHovered, setMenuHovered] = useState<boolean>(false);
+  const [staticMenuToggle, setStaticMenuToggle] = useRecoilState(
+    staticMenuToggleState,
+  );
+  const [hoveredMenuToggle, setHoveredMenuToggle] = useRecoilState(
+    hoveredMenuToggleState,
+  );
 
   return (
     <div
-      css={wrapperCss(staticMenuToggle)}
-      onMouseEnter={() => staticMenuToggle || setMenuHovered(true)}
-      onMouseLeave={() => staticMenuToggle || setMenuHovered(false)}
+      css={wrapperCss()}
+      onMouseEnter={() => staticMenuToggle || setHoveredMenuToggle(true)}
+      onMouseLeave={() => staticMenuToggle || setHoveredMenuToggle(false)}
     >
-      <HeaderButton>
+      <HeaderButton handleClick={() => setStaticMenuToggle(!staticMenuToggle)}>
         {staticMenuToggle ||
-          (!menuHovered ? <HamburgerMenu /> : <DoubleChevronRight />)}
+          (!hoveredMenuToggle ? <HamburgerMenu /> : <DoubleChevronRight />)}
       </HeaderButton>
       <div css={hoverAreaCss()} />
-      {(staticMenuToggle || menuHovered) && (
-        <div css={menuCss()}>
+      {(staticMenuToggle || hoveredMenuToggle) && (
+        <div css={menuCss(staticMenuToggle)}>
           <Menu />
         </div>
       )}

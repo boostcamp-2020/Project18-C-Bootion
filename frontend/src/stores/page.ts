@@ -13,6 +13,7 @@ enum StateType {
   PAGES_STATE = 'pagesState',
   BLOCK_MAP_STATE = 'blockMapState',
   STATIC_MENU_TOGGLE_STATE = 'staticMenuToggleState',
+  HOVERED_MENU_TOGGLE_STATE = 'hoveredMenuToggleState',
   SELECTED_PAGE_STATE = 'selectedPageState',
 }
 
@@ -68,6 +69,11 @@ export const pagesState = atom({
 
 export const staticMenuToggleState = atom({
   key: StateType.STATIC_MENU_TOGGLE_STATE,
+  default: false,
+});
+
+export const hoveredMenuToggleState = atom({
+  key: StateType.HOVERED_MENU_TOGGLE_STATE,
   default: false,
 });
 
