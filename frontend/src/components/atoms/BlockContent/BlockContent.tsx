@@ -8,7 +8,6 @@ import { blockState, blockRefState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
   regex,
-  decreaseLenth,
   fontSize,
   placeHolder,
   listComponent,
@@ -76,7 +75,7 @@ function BlockContent(blockDTO: Block) {
         content.slice(content.indexOf(' ') + 1, content.length),
         newType[0],
       );
-      setCaret(content.length - decreaseLenth[newType[0]]);
+      setCaret(0);
       return;
     }
     handleBlock(content);

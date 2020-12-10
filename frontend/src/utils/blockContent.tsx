@@ -13,17 +13,6 @@ export const regex: { [key: string]: RegExp } = {
   quote: /^\|\s[^\s.]*/gm,
 };
 
-export const decreaseLenth: { [key: string]: number } = {
-  text: 0,
-  heading1: 2,
-  heading2: 3,
-  heading3: 4,
-  bulletedlist: 2,
-  numberedlist: 3,
-  togglelist: 2,
-  quote: 2,
-};
-
 export const listComponent: { [key: string]: any } = {
   bulletedlist: <span>•</span>,
   numberedlist: <span> 1. </span>,
