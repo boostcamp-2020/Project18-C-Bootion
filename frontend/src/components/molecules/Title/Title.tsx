@@ -39,10 +39,12 @@ const titleCss = () => css`
 
   font-family: inter, Helvetica, 'Apple Color Emoji', Arial, sans-serif,
     'Segoe UI Emoji', 'Segoe UI Symbol';
-
-  &::placeholder {
+  
+  &:empty:before {
+    content: 'Untitled';
     color: rgba(55, 53, 47, 0.15);
   }
+}
 `;
 
 interface Props {}
@@ -50,33 +52,38 @@ interface Props {}
 function Title({}: Props): JSX.Element {
   const [selectedPage, setSelectedPage] = useRecoilState(selectedPageState);
   const setPages = useSetRecoilState(pagesState);
-  const [title, setTitle] = useState(selectedPage.title);
+  const titleRef = useRef(selectedPage.title);
   const updateSelectedPage = useRef(
     debounce(async (updatedPage: Page) => {
+      const { focusOffset } = window.getSelection();
       setSelectedPage(await updatePage(updatedPage));
       setPages(await readPages());
+
+      setImmediate(() => {
+        const selection = window.getSelection();
+        selection.collapse(selection.focusNode, focusOffset);
+      });
     }, 300),
   ).current;
 
-  useEffect(() => {
-    setTitle(selectedPage.title);
-  }, [selectedPage]);
-
-  const handleChange = async (event: ChangeEvent<HTMLTextAreaElement>) => {
-    const { value } = event.target;
-    setTitle(value);
-    updateSelectedPage({ ...selectedPage, title: value });
+  const handleChange = async (event: ChangeEvent<HTMLDivElement>) => {
+    const { textContent } = event.currentTarget;
+    titleRef.current = textContent;
+    updateSelectedPage({ ...selectedPage, title: textContent });
   };
 
   return (
     <div css={wrapperCss()}>
       <div css={titlePaddingTopCss()} />
-      <textarea
+      <div
         placeholder="Untitled"
+        contentEditable
+        suppressContentEditableWarning
         css={titleCss()}
-        onChange={handleChange}
-        value={title}
-      />
+        onInput={handleChange}
+      >
+        {titleRef.current}
+      </div>
     </div>
   );
 }
