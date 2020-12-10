@@ -4,7 +4,7 @@ import { jsx, css } from '@emotion/react';
 
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { pagesState, selectedPageState } from '@/stores';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef } from 'react';
 import { debounce, readPages, updatePage } from '@/utils';
 import { Page } from '@/schemes';
 
@@ -52,25 +52,30 @@ interface Props {}
 function Title({}: Props): JSX.Element {
   const [selectedPage, setSelectedPage] = useRecoilState(selectedPageState);
   const setPages = useSetRecoilState(pagesState);
-  const titleRef = useRef(selectedPage.title);
+  const caretRef = useRef(0);
   const updateSelectedPage = useRef(
     debounce(async (updatedPage: Page) => {
-      const { focusOffset } = window.getSelection();
+      caretRef.current = window.getSelection().focusOffset;
+
       setSelectedPage(await updatePage(updatedPage));
       setPages(await readPages());
-
-      setImmediate(() => {
-        const selection = window.getSelection();
-        selection.collapse(selection.focusNode, focusOffset);
-      });
     }, 300),
   ).current;
 
-  const handleChange = async (event: ChangeEvent<HTMLDivElement>) => {
-    const { textContent } = event.currentTarget;
-    titleRef.current = textContent;
-    updateSelectedPage({ ...selectedPage, title: textContent });
-  };
+  useEffect(() => {
+    const selection = window.getSelection();
+    const nodeLength = selection.focusNode?.nodeValue?.length ?? 0;
+    if (caretRef.current > nodeLength) {
+      caretRef.current = nodeLength;
+    }
+    selection.collapse(selection.focusNode, caretRef.current);
+  }, [selectedPage]);
+
+  const handleChange = async (event: ChangeEvent<HTMLDivElement>) =>
+    updateSelectedPage({
+      ...selectedPage,
+      title: event.currentTarget.textContent,
+    });
 
   return (
     <div css={wrapperCss()}>
@@ -81,7 +86,7 @@ function Title({}: Props): JSX.Element {
         css={titleCss()}
         onInput={handleChange}
       >
-        {titleRef.current}
+        {selectedPage.title}
       </div>
     </div>
   );
