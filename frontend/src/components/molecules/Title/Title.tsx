@@ -4,7 +4,9 @@ import { jsx, css } from '@emotion/react';
 
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { pagesState, selectedPageState } from '@/stores';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { debounce, readPages, updatePage } from '@/utils';
+import { Page } from '@/schemes';
 
 const wrapperCss = () => css`
   padding-left: calc(96px + env(safe-area-inset-left));
@@ -18,20 +20,25 @@ const titlePaddingTopCss = () => css`
   height: 100px;
 `;
 const titleCss = () => css`
-  font-weight: 700;
-  line-height: 1.2;
-  font-size: 40px;
-  color: rgb(55, 53, 47);
+  display: inline-block;
+  min-width: 100%;
+  min-height: fit-content;
+  padding: 3px 2px;
   border: none;
   outline: none;
-  max-width: 100%;
-  width: 100%;
+  color: rgb(55, 53, 47);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.2;
   white-space: pre-wrap;
   word-break: break-word;
   caret-color: rgb(55, 53, 47);
-  padding: 3px 2px;
-  min-height: 1em;
   cursor: text;
+  overflow-y: hidden;
+  resize: none;
+
+  font-family: inter, Helvetica, 'Apple Color Emoji', Arial, sans-serif,
+    'Segoe UI Emoji', 'Segoe UI Symbol';
 
   &::placeholder {
     color: rgba(55, 53, 47, 0.15);
@@ -43,19 +50,32 @@ interface Props {}
 function Title({}: Props): JSX.Element {
   const [selectedPage, setSelectedPage] = useRecoilState(selectedPageState);
   const setPages = useSetRecoilState(pagesState);
+  const [title, setTitle] = useState(selectedPage.title);
+  const updateSelectedPage = useRef(
+    debounce(async (updatedPage: Page) => {
+      setSelectedPage(await updatePage(updatedPage));
+      setPages(await readPages());
+    }, 300),
+  ).current;
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSelectedPage({ ...selectedPage, title: event.currentTarget.value });
+  useEffect(() => {
+    setTitle(selectedPage.title);
+  }, [selectedPage]);
+
+  const handleChange = async (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = event.target;
+    setTitle(value);
+    updateSelectedPage({ ...selectedPage, title: value });
   };
 
   return (
     <div css={wrapperCss()}>
       <div css={titlePaddingTopCss()} />
-      <input
+      <textarea
+        placeholder="Untitled"
         css={titleCss()}
         onChange={handleChange}
-        type="text"
-        placeholder="Untitled"
+        value={title}
       />
     </div>
   );
