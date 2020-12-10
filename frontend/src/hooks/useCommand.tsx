@@ -5,16 +5,16 @@ import { Block } from '@/schemes';
 
 const useCommand = () => {
   const [focusId, setFocusId] = useRecoilState(focusState);
-  const [, managerFunc] = useManager(focusId);
+  const [{ block }, managerFunc] = useManager(focusId);
   const blockRef = useRecoilValue(blockRefState);
 
-  const setFocus = (block: Block) => {
-    if (!block) {
+  const setFocus = (targetBlock: Block) => {
+    if (!targetBlock) {
       return null;
     }
     const beforeOffset = window.getSelection().focusOffset;
-    setFocusId(block.id);
-    blockRef[block.id]?.current.focus();
+    setFocusId(targetBlock.id);
+    blockRef[targetBlock.id]?.current.focus();
     return beforeOffset;
   };
 
@@ -27,9 +27,9 @@ const useCommand = () => {
   };
 
   const getSlicedValueToCaretOffset = () => {
-    const { focusNode, focusOffset } = window.getSelection();
+    const { focusNode, anchorOffset, focusOffset } = window.getSelection();
     return [
-      focusNode.textContent.slice(0, focusOffset),
+      focusNode.textContent.slice(0, anchorOffset),
       focusNode.textContent.slice(focusOffset, Infinity),
     ];
   };
