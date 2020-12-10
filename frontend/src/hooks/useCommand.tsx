@@ -1,7 +1,7 @@
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { focusState, blockRefState } from '@/stores';
 import { useManager } from '@/hooks';
-import { Block } from '@/schemes';
+import { Block, BlockType } from '@/schemes';
 
 const useCommand = () => {
   const [focusId, setFocusId] = useRecoilState(focusState);
@@ -62,7 +62,15 @@ const useCommand = () => {
         if (block?.children.length) {
           setFocus(managerFunc.addChild({ value: before }, { value: after }));
         } else {
-          setFocus(managerFunc.addSibling({ value: before }, { value: after }));
+          const type = [
+            BlockType.NUMBEREDLIST,
+            BlockType.BULLETEDLIST,
+          ].includes(block.type)
+            ? block.type
+            : BlockType.TEXT;
+          setFocus(
+            managerFunc.addSibling({ value: before }, { value: after }, type),
+          );
         }
         break;
       }
