@@ -8,6 +8,7 @@ import { blockState, blockRefState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
   regex,
+  decreaseLenth,
   fontSize,
   placeHolder,
   listComponent,
@@ -69,42 +70,31 @@ function BlockContent(blockDTO: Block) {
     const newType = Object.entries(regex).find((testRegex) =>
       testRegex[1].test(content),
     );
-    /* blockType이 안 바뀔 경우: 기존의 caret위치 유지 */
-    if (!newType) {
-      handleBlock(content);
-      const selection = window.getSelection();
-      setCaret(selection.focusOffset);
+
+    if (newType) {
+      handleBlock(
+        content.slice(content.indexOf(' ') + 1, content.length),
+        newType[0],
+      );
+      setCaret(content.length - decreaseLenth[newType[0]]);
       return;
     }
-    /* 바뀐 blockType의 내용이 있을 때: 타입을 바꾼 뒤 content의 끝에 caret 위치 */
-    handleBlock(
-      content.slice(content.indexOf(' ') + 1, content.length),
-      newType[0],
-    );
-    if (
-      newType[0] === BlockType.HEADING2 ||
-      newType[0] === BlockType.NUMBEREDLIST
-    ) {
-      setCaret(content.length - 3);
-      return;
-    }
-    if (newType[0] === BlockType.HEADING3) {
-      setCaret(content.length - 4);
-      return;
-    }
-    setCaret(content.length - 2);
+    handleBlock(content);
+    const selection = window.getSelection();
+    setCaret(selection.focusOffset);
   };
 
   const handleKeyUp = (event: KeyboardEvent<HTMLDivElement>) => {
+    const content = event.currentTarget.textContent;
     if (
       event.key === 'Backspace' &&
       (!renderBlock.value || !window.getSelection().focusOffset)
     ) {
-      handleBlock(event.currentTarget.textContent, BlockType.TEXT);
+      handleBlock(content, BlockType.TEXT);
     }
 
     if (event.key === 'Enter' && event.shiftKey) {
-      handleBlock(event.currentTarget.textContent);
+      handleBlock(content);
       setCaret(window.getSelection().focusOffset);
     }
   };
