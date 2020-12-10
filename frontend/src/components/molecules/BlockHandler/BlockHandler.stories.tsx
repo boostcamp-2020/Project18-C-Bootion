@@ -4,7 +4,7 @@ import { jsx } from '@emotion/react';
 import { useEffect, useState } from 'react';
 
 import { BlockComponent } from '@components/molecules';
-import { getPage } from '@/utils';
+import { fetchDummyData } from '@/utils';
 import BlockHandler from '.';
 
 const desc = {
@@ -16,7 +16,7 @@ export const Default = (): JSX.Element => {
   const [block, setBlock] = useState(null);
   useEffect(() => {
     (async () => {
-      setBlock((await getPage('1')).blockList[2]);
+      setBlock((await fetchDummyData('1')).blockList[2]);
     })();
   });
   return (

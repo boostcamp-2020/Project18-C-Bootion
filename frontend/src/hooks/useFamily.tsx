@@ -1,11 +1,7 @@
-import { useRecoilValue } from 'recoil';
-import { blockState, pageState } from '@/stores';
-import { Block, Page, BlockType, BlockFamily } from '@/schemes';
-
-interface FamilyFunc {
-  getNextBlock: () => Block | null;
-  getPrevBlock: () => Block | null;
-}
+/* eslint-disable @typescript-eslint/indent */
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { blockState, pageState, blockMapState } from '@/stores';
+import { Block, BlockType, BlockFamily, FamilyFunc } from '@/schemes';
 
 const findLastDescendant = (targetBlock: Block) => {
   let currentBlock = targetBlock;
@@ -16,19 +12,22 @@ const findLastDescendant = (targetBlock: Block) => {
 };
 
 const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
-  const block: Block = useRecoilValue(blockState(blockId));
-  const page: Page = useRecoilValue(pageState(block?.pageId));
-  const parent: Block = useRecoilValue(blockState(block?.parentBlockId));
-  const grandParent: Block = useRecoilValue(blockState(parent?.parentBlockId));
+  const [block, setBlock] = useRecoilState(blockState(blockId));
+  const [page, setPage] = useRecoilState(pageState(block?.pageId));
+  const setParent = useSetRecoilState(blockState(block?.parentBlockId));
+  const parent = blockMapState[block?.parentBlockId];
+  const setGrandParent = useSetRecoilState(blockState(parent?.parentBlockId));
+  const grandParent = blockMapState[parent?.parentBlockId];
   const children = block?.children;
   const siblings = parent?.children || page?.blockList;
   const parents = grandParent?.children || (parent && page?.blockList);
   const blockIndex = (parent?.children || page.blockList).findIndex(
-    (_block) => _block.id === block?.id,
+    (_block: Block) => _block.id === block?.id,
   );
   const parentIndex = (grandParent?.children || page.blockList).findIndex(
     (_block) => _block.id === parent?.id,
   );
+
   const getNextBlock = () => {
     if (children.length) {
       /* 자식이 있을 때 첫번째 자식이 다음 block 이다.  */
@@ -36,7 +35,7 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
     }
     if (blockIndex === siblings.length - 1) {
       /* block이 마지막 자식일 때. 다음 부모가 다음 Block 이다. */
-      const targetParentBlock = parents[parentIndex + 1];
+      const targetParentBlock = blockMapState[parents[parentIndex + 1]?.id];
       if (targetParentBlock) {
         switch (targetParentBlock.type) {
           case BlockType.COLUMN:
@@ -44,7 +43,7 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
             return targetParentBlock.children[0];
           case BlockType.GRID:
             /** 다음 부모의 Type이 Grid 일때 첫번째 자식(Column)의 자식이 다음 Block 이다. */
-            return targetParentBlock.children[0].children[0];
+            return blockMapState[targetParentBlock.children[0].id].children[0];
           default:
             /** 다음 부모의 타입이 COLUMN이나 GRID가 아니면 다음 Block 이다. */
             return targetParentBlock;
@@ -58,11 +57,12 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
       return siblings[blockIndex + 1];
     }
   };
+
   const getPrevBlock = () => {
     if (blockIndex) {
       /** blockIndex가 0이 아니면 이전 형제에서 prev block을 찾을 수 있다. */
-      const prevSibling = siblings[blockIndex - 1];
-      if (prevSibling.children.length) {
+      const prevSibling = blockMapState[siblings[blockIndex - 1]?.id];
+      if (prevSibling?.children.length) {
         /* 이전 형제에게 자식이 있다면 마지막 자식이 prev block 이다.  */
         return prevSibling.children[prevSibling.children.length - 1];
       }
@@ -76,7 +76,8 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
           /** 부모의 Type이 Column 이면 부모의 이전 형제의 마지막 자식이 이전 Block 이다. */
           if (parentIndex) {
             /** 부모의 index가 0이 아니면 이전 부모의 마지막 */
-            const prevParentChildren = parents[parentIndex - 1].children;
+            const prevParentChildren =
+              blockMapState[parents[parentIndex - 1].id].children;
             return prevParentChildren[prevParentChildren.length - 1];
           }
           /** 부모의 index가 0이면 조부모에 이전 Block이 있다. */
@@ -89,7 +90,8 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
               );
               if (grandParentIndex) {
                 /** grandParentIndex 가 0이 아니면 prevGrandParent의 마지막 후손이 prev 블록이다. */
-                const prevGrandParent = page.blockList[grandParentIndex - 1];
+                const prevGrandParent =
+                  blockMapState[page.blockList[grandParentIndex - 1].id];
                 return findLastDescendant(prevGrandParent);
               }
               /** grandParentIndex가 0이면 page의 blockList 중 맨 앞이라는 의미이므로 prev 블록이 없다. */
@@ -108,6 +110,7 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
       return null;
     }
   };
+
   return [
     {
       block,
@@ -123,6 +126,10 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
     {
       getNextBlock,
       getPrevBlock,
+      setBlock,
+      setParent,
+      setGrandParent,
+      setPage,
     },
   ];
 };
