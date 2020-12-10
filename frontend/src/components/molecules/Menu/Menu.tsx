@@ -2,7 +2,7 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 import { Suspense } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
 import {
   hoveredMenuToggleState,
@@ -14,6 +14,7 @@ import { createPage } from '@/utils';
 import { HeaderButton } from '@atoms/index';
 import { ReactComponent as DoubleChevronLeft } from '@assets/doubleChevronLeft.svg';
 import { ReactComponent as PlusPage } from '@assets/plusPage.svg';
+import { MenuItem } from '@molecules/index';
 
 const wrapperCss = (staticMenuToggle: boolean) => css`
   position: relative;
@@ -49,20 +50,12 @@ const plusCss = () => css`
   border: 1px solid rgba(55, 53, 47, 0.16);
   border-radius: 3px;
 `;
-const itemCss = (isSelected: boolean) => css`
-  display: inline-block;
-  width: 100%;
-  color: ${isSelected ? 'red' : 'black'};
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-`;
 
 interface Props {}
 
 function Menu({}: Props): JSX.Element {
   const [pages, setPages] = useRecoilState(pagesState);
-  const [selectedPage, setSelectedPage] = useRecoilState(selectedPageState);
+  const setSelectedPage = useSetRecoilState(selectedPageState);
   const [staticMenuToggle, setStaticMenuToggle] = useRecoilState(
     staticMenuToggleState,
   );
@@ -102,22 +95,9 @@ function Menu({}: Props): JSX.Element {
       )}
       <div css={workspaceCss()}>WORKSPACE</div>
       <Suspense fallback={<div>Loading...</div>}>
-        {pages.map((page) => {
-          const isSelected = page.id === selectedPage.id;
-
-          const handleSelectingPage = () => setSelectedPage(page);
-
-          return (
-            <div
-              key={page.id}
-              css={itemCss(isSelected)}
-              onClick={handleSelectingPage}
-              onKeyUp={handleSelectingPage}
-            >
-              {`${page.title || 'Untitled'} - ${page.id}`}
-            </div>
-          );
-        })}
+        {pages.map((page) => (
+          <MenuItem page={page} />
+        ))}
       </Suspense>
     </div>
   );
