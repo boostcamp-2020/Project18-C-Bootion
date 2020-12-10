@@ -14,7 +14,8 @@ const useCommand = () => {
     }
     const beforeOffset = window.getSelection().focusOffset;
     setFocusId(targetBlock.id);
-    blockRef[targetBlock.id]?.current.focus();
+    const targetRef = blockRef[targetBlock.id];
+    targetRef ? targetRef.current.focus() : blockRef[block.id].current.blur();
     return beforeOffset;
   };
 
