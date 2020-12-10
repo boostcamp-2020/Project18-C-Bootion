@@ -134,6 +134,10 @@ function BlockContent(blockDTO: Block) {
 
   useEffect(() => {
     const selection = window.getSelection();
+    if (caret > renderBlock.value.length) {
+      selection.collapse(selection.focusNode, renderBlock.value.length);
+      return;
+    }
     selection.collapse(selection.focusNode, caret);
   }, [renderBlock.value]);
 
