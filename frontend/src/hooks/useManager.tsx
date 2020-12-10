@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/indent */
 import { Block, BlockType, BlockFamily, FamilyFunc } from '@/schemes';
 import { useFamily } from '@/hooks';
 
