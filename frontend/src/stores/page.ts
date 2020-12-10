@@ -1,6 +1,6 @@
-import { atom, atomFamily, RecoilState } from 'recoil';
+import { atom, atomFamily } from 'recoil';
 
-import { IdType, Page, Block } from '@/schemes';
+import { IdType, Block } from '@/schemes';
 import { fetchDummyData, readPages } from '@/utils';
 
 enum StateType {
@@ -26,12 +26,16 @@ export const blockState = atomFamily({
   default: null,
   effects_UNSTABLE: (blockId: string) => [
     ({ onSet }) => {
-      onSet((newValue) => {
-        blockMapState[blockId] = newValue;
+      onSet((block) => {
+        blockMapState[blockId] = block;
       });
     },
   ],
 });
+
+export const throttleState = {
+  isThrottle: false,
+};
 
 export const blockRefState = atom<any>({
   key: StateType.BLOCK_REF_STATE,
