@@ -1,12 +1,14 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css, SerializedStyles } from '@emotion/react';
+import { jsx, css } from '@emotion/react';
 
-const buttonCss = (): SerializedStyles => css`
+const buttonCss = () => css`
   display: flow-root;
-  max-width: 150px;
+  width: 100%;
+  max-width: 400px;
   padding: 6px;
   margin: auto;
+  margin-left: 10px;
   border-radius: 3px;
   font-size: inherit;
   color: inherit;

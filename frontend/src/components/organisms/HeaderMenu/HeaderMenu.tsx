@@ -50,8 +50,8 @@ function HeaderMenu({}: Props): JSX.Element {
   return (
     <div
       css={wrapperCss()}
-      onMouseEnter={() => staticMenuToggle || setHoveredMenuToggle(true)}
-      onMouseLeave={() => staticMenuToggle || setHoveredMenuToggle(false)}
+      onMouseEnter={() => setHoveredMenuToggle(true)}
+      onMouseLeave={() => setHoveredMenuToggle(false)}
     >
       <HeaderButton handleClick={() => setStaticMenuToggle(!staticMenuToggle)}>
         {staticMenuToggle ||
