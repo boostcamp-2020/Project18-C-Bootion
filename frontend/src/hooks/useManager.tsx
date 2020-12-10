@@ -70,7 +70,6 @@ const useManger = (
     const copySibling = [...siblings];
     copySibling.splice(blockIndex + 1, 0, newBlock);
     copySibling.splice(blockIndex, 1, { ...block, ...parentOption });
-    setBlock({ ...block, ...parentOption });
     parent
       ? setParent({ ...parent, children: copySibling })
       : setPage({
