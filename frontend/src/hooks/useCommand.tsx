@@ -58,7 +58,11 @@ const useCommand = () => {
       }
       case 'Enter': {
         const [before, after] = getSlicedValueToCaretOffset();
-        setFocus(managerFunc.makeNewBlock({ value: { before, after } }));
+        if (block?.children.length) {
+          setFocus(managerFunc.addChild({ value: before }, { value: after }));
+        } else {
+          setFocus(managerFunc.addSibling({ value: before }, { value: after }));
+        }
         break;
       }
     }
