@@ -35,6 +35,15 @@ export interface BlockFamily {
   parents: Block[];
 }
 
+export interface FamilyFunc {
+  getNextBlock: () => Block | null;
+  getPrevBlock: () => Block | null;
+  setBlock: (block: Block) => void;
+  setParent: (block: Block) => void;
+  setGrandParent: (block: Block) => void;
+  setPage: (page: Page) => void;
+}
+
 export interface Page {
   id: IdType;
   title: string;
