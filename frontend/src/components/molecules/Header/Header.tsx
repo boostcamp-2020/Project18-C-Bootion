@@ -44,9 +44,7 @@ function Header({}: Props): JSX.Element {
     <div css={headerCss()}>
       <div css={wrapperCss()}>
         {!staticMenuToggle && <div css={menuMarginCss()} />}
-        <HeaderLink>
-          {`${selectedPage?.title || 'Untitled'} - ${selectedPage?.id}`}
-        </HeaderLink>
+        <HeaderLink>{selectedPage?.title || 'Untitled'}</HeaderLink>
       </div>
       <div css={wrapperCss()}>
         <HeaderButton>Share</HeaderButton>
