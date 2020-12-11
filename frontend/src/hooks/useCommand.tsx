@@ -5,7 +5,7 @@ import { Block, BlockType } from '@/schemes';
 
 const useCommand = () => {
   const [focusId, setFocusId] = useRecoilState(focusState);
-  const [{ block }, managerFunc] = useManager(focusId);
+  const [{ block, blockIndex }, managerFunc] = useManager(focusId);
   const blockRef = useRecoilValue(blockRefState);
 
   const setFocus = (targetBlock: Block) => {
@@ -59,8 +59,17 @@ const useCommand = () => {
       }
       case 'Enter': {
         const [before, after] = getSlicedValueToCaretOffset();
-        if (block?.children.length) {
-          setFocus(managerFunc.addChild({ value: before }, { value: after }));
+        const { focusOffset } = window.getSelection();
+        if (!focusOffset) {
+          managerFunc.addSibling({}, {}, BlockType.TEXT, blockIndex);
+        } else if (block?.children.length) {
+          setFocus(
+            managerFunc.addChild(
+              { value: before },
+              { value: after },
+              block.type,
+            ),
+          );
         } else {
           const type = [
             BlockType.NUMBEREDLIST,
