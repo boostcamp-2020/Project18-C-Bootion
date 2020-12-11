@@ -6,11 +6,13 @@ interface ManagerFunc {
     parentOption: any,
     childOption: any,
     blockType?: BlockType,
+    insertIndex?: number,
   ) => Block;
   addSibling: (
     parentOption: any,
     siblingOption: any,
     blockType?: BlockType,
+    insertIndex?: number,
   ) => Block;
 }
 
@@ -30,10 +32,12 @@ const useManger = (
     parents,
   } = family;
   const { setBlock, setParent, setPage } = familyFunc;
+
   const addChild = (
     parentOption: any = {},
     childOption: any = {},
     blockType: BlockType = BlockType.TEXT,
+    insertIndex: number = 0,
   ) => {
     const newBlock: Block = {
       id: `${block.id}${children.length + 1}_${Date.now()}`,
@@ -44,18 +48,21 @@ const useManger = (
       pageId: page.id,
       ...childOption,
     };
+    const copyChildren = [...children];
+    copyChildren.splice(insertIndex, 0, newBlock);
     setBlock({
       ...block,
-      children: [newBlock, ...children],
+      children: copyChildren,
       ...parentOption,
     });
     return newBlock;
   };
 
   const addSibling = (
-    parentOption: any = {},
+    blockOption: any = {},
     siblingOption: any = {},
     blockType: BlockType = BlockType.TEXT,
+    insertIndex = blockIndex + 1,
   ) => {
     const newBlock: Block = {
       id: `${parent?.id ?? ''}${siblings.length + 1}_${Date.now()}`,
@@ -67,8 +74,8 @@ const useManger = (
       ...siblingOption,
     };
     const copySibling = [...siblings];
-    copySibling.splice(blockIndex + 1, 0, newBlock);
-    copySibling.splice(blockIndex, 1, { ...block, ...parentOption });
+    copySibling.splice(blockIndex, 1, { ...block, ...blockOption });
+    copySibling.splice(insertIndex, 0, newBlock);
     parent
       ? setParent({ ...parent, children: copySibling })
       : setPage({

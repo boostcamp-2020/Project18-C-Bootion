@@ -1,54 +1,55 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useState } from 'react';
+import { jsx, css } from '@emotion/react';
 
-import { Page } from '@/schemes';
-import { Header, Editor } from '@components/molecules';
+import { Header, Title, Editor } from '@components/molecules';
 import { HeaderMenu } from '@components/organisms';
+import { useRecoilValue } from 'recoil';
+import { staticMenuToggleState } from '@/stores';
 
-const staticMenuAreaCss = (): SerializedStyles => css`
+const staticMenuAreaCss = () => css`
   position: fixed;
   z-index: 2;
 `;
-const staticHeaderAreaCss = (): SerializedStyles => css`
+const staticHeaderAreaCss = (staticMenuToggle: boolean) => css`
   position: fixed;
   right: 0;
-  width: 100%;
+  left: ${staticMenuToggle ? 240 : 0}px;
+  width: calc(100% - ${staticMenuToggle ? 240 : 0}px);
   background-color: #ffffff;
   z-index: 1;
 `;
-const staticScrollAreaCss = (): SerializedStyles => css`
+const staticScrollAreaCss = (staticMenuToggle: boolean) => css`
   position: fixed;
   top: 45px;
   right: 0;
-  width: 100%;
+  left: ${staticMenuToggle ? 240 : 0}px;
+  width: calc(100% - ${staticMenuToggle ? 240 : 0}px);
   height: calc(100% - 45px);
   overflow: auto;
 `;
-const bottomMarginCss = (): SerializedStyles => css`
+const bottomMarginCss = () => css`
   display: inline-block;
   width: 100%;
   height: 45%;
 `;
 
-interface Props {
-  page: Page;
-  menuClosed: boolean;
-}
+interface Props {}
 
-function PageComponent({ page, menuClosed }: Props): JSX.Element {
-  const [isMenuClosed, setIsMenuClosed] = useState<boolean>(menuClosed);
+function PageComponent({}: Props): JSX.Element {
+  const staticMenuToggle = useRecoilValue(staticMenuToggleState);
+
   return (
     <div>
       <div css={staticMenuAreaCss()}>
-        <HeaderMenu isMenuClosed />
+        <HeaderMenu />
       </div>
-      <div css={staticHeaderAreaCss()}>
-        <Header page={page} menuClosed={isMenuClosed} />
+      <div css={staticHeaderAreaCss(staticMenuToggle)}>
+        <Header />
       </div>
-      <div css={staticScrollAreaCss()}>
-        <Editor page={page} />
+      <div css={staticScrollAreaCss(staticMenuToggle)}>
+        <Title />
+        <Editor />
         <div css={bottomMarginCss()} />
       </div>
     </div>

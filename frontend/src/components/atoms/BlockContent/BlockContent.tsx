@@ -54,7 +54,7 @@ function BlockContent(blockDTO: Block) {
   const contentEditableRef = useRef(null);
   const focusId = useRecoilValue(focusState);
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
-  const [caret, setCaret] = useState<number>();
+  const caretRef = useRef(0);
   const setBlockRef = useSetRecoilState(blockRefState);
   const renderBlock: Block = block ?? blockDTO;
   const [Dispatcher] = useCommand();
@@ -75,12 +75,12 @@ function BlockContent(blockDTO: Block) {
         content.slice(content.indexOf(' ') + 1, content.length),
         newType[0],
       );
-      setCaret(0);
+      caretRef.current = 0;
       return;
     }
     handleBlock(content);
     const selection = window.getSelection();
-    setCaret(selection.focusOffset);
+    caretRef.current = selection.focusOffset;
   };
 
   const handleKeyUp = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -94,7 +94,7 @@ function BlockContent(blockDTO: Block) {
 
     if (event.key === 'Enter' && event.shiftKey) {
       handleBlock(content);
-      setCaret(window.getSelection().focusOffset);
+      caretRef.current = window.getSelection().focusOffset;
     }
   };
 
@@ -105,7 +105,7 @@ function BlockContent(blockDTO: Block) {
     } else if (
       event.key === 'ArrowUp' ||
       event.key === 'ArrowDown' ||
-      (event.key === 'ArrowLeft' && focusOffset === 0) ||
+      (event.key === 'ArrowLeft' && !focusOffset) ||
       (event.key === 'ArrowRight' &&
         focusOffset ===
           ((focusNode as any).length ?? (focusNode as any).innerText.length)) ||
@@ -139,11 +139,11 @@ function BlockContent(blockDTO: Block) {
 
   useEffect(() => {
     const selection = window.getSelection();
-    if (caret > renderBlock.value.length) {
-      selection.collapse(selection.focusNode, renderBlock.value.length);
-      return;
+    const nodeLength = selection.focusNode?.nodeValue?.length ?? 0;
+    if (caretRef.current > nodeLength) {
+      caretRef.current = nodeLength;
     }
-    selection.collapse(selection.focusNode, caret);
+    selection.collapse(selection.focusNode, caretRef.current);
   }, [renderBlock.value]);
 
   return (
