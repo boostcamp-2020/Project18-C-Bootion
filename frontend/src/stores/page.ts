@@ -1,7 +1,7 @@
-import { atom, atomFamily } from 'recoil';
+import { atom, atomFamily, useRecoilValue } from 'recoil';
 
-import { IdType, Block } from '@/schemes';
-import { fetchDummyData, readPages } from '@/utils';
+import { IdType, Block, Page } from '@/schemes';
+import { createPage, fetchDummyData, readPage, readPages } from '@/utils';
 
 enum StateType {
   PAGE_STATE = 'pageState',
@@ -12,6 +12,9 @@ enum StateType {
   BLOCK_REF_STATE = 'blockRefState',
   PAGES_STATE = 'pagesState',
   BLOCK_MAP_STATE = 'blockMapState',
+  STATIC_MENU_TOGGLE_STATE = 'staticMenuToggleState',
+  HOVERED_MENU_TOGGLE_STATE = 'hoveredMenuToggleState',
+  SELECTED_PAGE_STATE = 'selectedPageState',
 }
 
 export const pageState = atomFamily({
@@ -59,5 +62,26 @@ export const focusState = atom({
 
 export const pagesState = atom({
   key: StateType.PAGES_STATE,
-  default: readPages(),
+  default: (async () => {
+    const pages = await readPages();
+    if (pages.length) {
+      return pages;
+    }
+    return (await createPage())?.pages;
+  })(),
+});
+
+export const staticMenuToggleState = atom({
+  key: StateType.STATIC_MENU_TOGGLE_STATE,
+  default: false,
+});
+
+export const hoveredMenuToggleState = atom({
+  key: StateType.HOVERED_MENU_TOGGLE_STATE,
+  default: false,
+});
+
+export const selectedPageState = atom({
+  key: StateType.SELECTED_PAGE_STATE,
+  default: (async () => (await readPages())[0])(),
 });

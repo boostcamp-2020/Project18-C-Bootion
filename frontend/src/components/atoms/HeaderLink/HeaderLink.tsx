@@ -1,18 +1,24 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css, SerializedStyles } from '@emotion/react';
+import { jsx, css } from '@emotion/react';
 
-const buttonCss = (): SerializedStyles => css`
-  display: flex;
+const buttonCss = () => css`
+  display: flow-root;
+  width: 100%;
+  max-width: 400px;
+  padding: 6px;
+  margin: auto;
+  margin-left: 10px;
+  border-radius: 3px;
+  font-size: inherit;
+  color: inherit;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   text-decoration: none;
   user-select: none;
   cursor: pointer;
-  color: inherit;
-  minwidth: 0px;
-  padding: 6px;
-  white-space: nowrap;
-  border-radius: 3px;
-  font-size: inherit;
+
   &:hover {
     background-color: #cccccc;
   }
