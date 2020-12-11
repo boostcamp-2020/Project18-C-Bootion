@@ -5,8 +5,9 @@ import { StatusCode, transactionHandler } from '@/aops';
 
 export const create = transactionHandler(
   async (req: Request, res: Response): Promise<void> => {
-    const page = await pageService.create({ title: req.body.title });
-    res.status(StatusCode.CREATED).json(page);
+    const page = await pageService.create();
+    const pages = await pageService.getAll();
+    res.status(StatusCode.CREATED).json({ page, pages });
   },
 );
 
@@ -29,5 +30,6 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 
 export const remove = async (req: Request, res: Response): Promise<void> => {
   await pageService.remove({ id: req.params.id });
-  res.status(StatusCode.NO_CONTENT).json();
+  const pages = await pageService.getAll();
+  res.status(StatusCode.OK).json(pages);
 };

@@ -5,12 +5,14 @@ import { Block, BlockDoc } from '@/models';
 export interface Page {
   id?: string;
   title?: string;
+  createdAt: Date;
   blockIdList?: string[];
   blockList?: Block[];
 }
 
 export interface PageDoc extends Document {
   title?: string;
+  createdAt: Date;
   blockIdList?: Types.ObjectId[];
   blockList?: BlockDoc[];
   addBlock?: (
@@ -21,18 +23,27 @@ export interface PageDoc extends Document {
   removeBlock?: (this: PageDoc, block: BlockDoc) => Promise<void>;
   populateBlock?: (this: PageDoc) => Promise<void>;
 }
-const PageSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  blockIdList: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Block',
+const PageSchema = new Schema(
+  {
+    title: {
+      type: String,
+      default: '',
     },
-  ],
+    blockIdList: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Block',
+      },
+    ],
+  },
+  { timestamps: true },
+);
+
+PageSchema.virtual('id').get(function (this: PageDoc) {
+  return this._id.toHexString();
 });
+
+PageSchema.set('toJSON', { virtuals: true });
 
 PageSchema.methods.addBlock = async function (
   this: PageDoc,
