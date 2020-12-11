@@ -105,7 +105,7 @@ function BlockContent(blockDTO: Block) {
     } else if (
       event.key === 'ArrowUp' ||
       event.key === 'ArrowDown' ||
-      (event.key === 'ArrowLeft' && focusOffset === 0) ||
+      (event.key === 'ArrowLeft' && !focusOffset) ||
       (event.key === 'ArrowRight' &&
         focusOffset ===
           ((focusNode as any).length ?? (focusNode as any).innerText.length)) ||
