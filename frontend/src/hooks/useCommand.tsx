@@ -74,6 +74,7 @@ const useCommand = () => {
           const type = [
             BlockType.NUMBEREDLIST,
             BlockType.BULLETEDLIST,
+            BlockType.TOGGLELIST,
           ].includes(block.type)
             ? block.type
             : BlockType.TEXT;
