@@ -9,23 +9,25 @@ const desc = {
 };
 
 export const Default = (): JSX.Element => {
-  const [page, setPage] = useState(null);
+  const [loadedPage, setPage] = useState(null);
   useEffect(() => {
     (async () => {
-      setPage(await fetchDummyData('1'));
+      const { page } = await fetchDummyData();
+      setPage(page);
     })();
   });
-  return <Header page={page} menuClosed />;
+  return <Header page={loadedPage} menuClosed />;
 };
 
 export const MenuOpened = (): JSX.Element => {
-  const [page, setPage] = useState(null);
+  const [loadedPage, setPage] = useState(null);
   useEffect(() => {
     (async () => {
-      setPage(await fetchDummyData('1'));
+      const { page } = await fetchDummyData();
+      setPage(page);
     })();
   });
-  return <Header page={page} menuClosed={false} />;
+  return <Header page={loadedPage} menuClosed={false} />;
 };
 
 export default desc;
