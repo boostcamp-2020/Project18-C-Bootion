@@ -2,7 +2,7 @@
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
 
-import { Page, Block } from '@/schemes';
+import { Page } from '@/schemes';
 import { BlockComponent } from '@components/molecules';
 import { blockMapState } from '@/stores';
 import { useRecoilValue } from 'recoil';
@@ -32,6 +32,7 @@ interface Props {
 
 function Editor({ page }: Props): JSX.Element {
   const blockMap = useRecoilValue(blockMapState);
+
   return (
     <div>
       <div css={wrapperCss()}>
@@ -44,7 +45,7 @@ function Editor({ page }: Props): JSX.Element {
         <div css={emptyCss()} />
       </div>
       <div css={wrapperCss()}>
-        {page?.blockIdList.map((blockId: string) => (
+        {blockMap[page.rootId].childIdList.map((blockId: string) => (
           <BlockComponent key={blockId} blockDTO={blockMap[blockId]} />
         ))}
       </div>
