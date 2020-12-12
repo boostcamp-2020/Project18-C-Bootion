@@ -6,12 +6,10 @@ import { useBlock } from '@/hooks';
 
 const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
   const [blockMap, setBlockMap] = useRecoilState(blockMapState);
-  const [block, setBlock] = useBlock(blockId);
-  const [parent, setParent] = useBlock(block?.parentId);
-  const [grandParent, setGrandParent] = useBlock(parent?.parentId);
-  const [greatGrandParent, setGreatGrandParent] = useBlock(
-    grandParent?.parentId,
-  );
+  const [block] = useBlock(blockId);
+  const [parent] = useBlock(block?.parentId);
+  const [grandParent] = useBlock(parent?.parentId);
+  const [greatGrandParent] = useBlock(grandParent?.parentId);
   const page = useRecoilValue(pageState);
   const getChildren = (childrenIdList: IdType[] | null) =>
     childrenIdList?.map((childId: string) => blockMap[childId]);

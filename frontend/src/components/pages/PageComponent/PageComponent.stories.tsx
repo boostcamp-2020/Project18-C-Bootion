@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-import { fetchDummyData } from '@/utils';
 import PageComponent from '.';
 
 const desc = {
@@ -9,14 +8,7 @@ const desc = {
 };
 
 export const Default = (): JSX.Element => {
-  const [loadedPage, setPage] = useState(null);
-  useEffect(() => {
-    (async () => {
-      const { page } = await fetchDummyData();
-      setPage(page);
-    })();
-  });
-  return <PageComponent page={loadedPage} menuClosed />;
+  return <PageComponent />;
 };
 
 export default desc;

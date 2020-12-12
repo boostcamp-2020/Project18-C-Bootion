@@ -8,11 +8,11 @@ const desc = {
 };
 
 export const Default = (): JSX.Element => {
-  return <HeaderMenu isMenuClosed />;
+  return <HeaderMenu />;
 };
 
 export const MenuOpened = (): JSX.Element => {
-  return <HeaderMenu isMenuClosed={false} />;
+  return <HeaderMenu />;
 };
 
 export default desc;
