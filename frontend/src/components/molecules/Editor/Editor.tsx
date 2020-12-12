@@ -4,6 +4,8 @@ import { jsx, css, SerializedStyles } from '@emotion/react';
 
 import { Page, Block } from '@/schemes';
 import { BlockComponent } from '@components/molecules';
+import { blockMapState } from '@/stores';
+import { useRecoilValue } from 'recoil';
 
 const wrapperCss = (): SerializedStyles => css`
   padding-left: calc(96px + env(safe-area-inset-left));
@@ -29,6 +31,7 @@ interface Props {
 }
 
 function Editor({ page }: Props): JSX.Element {
+  const blockMap = useRecoilValue(blockMapState);
   return (
     <div>
       <div css={wrapperCss()}>
@@ -41,8 +44,8 @@ function Editor({ page }: Props): JSX.Element {
         <div css={emptyCss()} />
       </div>
       <div css={wrapperCss()}>
-        {page?.blockList.map((block: Block) => (
-          <BlockComponent key={block.id} blockDTO={block} />
+        {page?.blockIdList.map((blockId: string) => (
+          <BlockComponent key={blockId} blockDTO={blockMap[blockId]} />
         ))}
       </div>
     </div>
