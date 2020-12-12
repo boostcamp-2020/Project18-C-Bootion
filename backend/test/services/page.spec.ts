@@ -63,8 +63,12 @@ describe('@services/page', () => {
   it('readAll: Success', async () => {
     const page01 = await pageService.create({ title: 'test page 01' });
     const page02 = await pageService.create({ title: 'test page 02' });
-    const expected = [page01, page02].reverse();
-    const received = await pageService.readAll();
+    const expected = [page01, page02]
+      .map((pageDoc) => pageDoc.toJSON())
+      .reverse();
+    const received = (await pageService.readAll()).map((pageDoc) =>
+      pageDoc.toJSON(),
+    );
     expect(received).toEqual(expected);
   });
 

@@ -33,6 +33,7 @@ PageSchema.set('toJSON', { virtuals: true });
 export interface PageModel extends Model<PageDoc> {
   createOne?: (this: PageModel, pageDTO?: PageDTO) => Promise<PageDoc>;
   readOne?: (this: PageModel, pageId: string) => Promise<PageDoc>;
+  readAll?: (this: PageModel) => Promise<PageDoc[]>;
 }
 
 export interface PageDoc extends Document {
@@ -63,6 +64,14 @@ PageSchema.statics.readOne = async function (
   pageId: string,
 ): Promise<PageDoc> {
   return this.findById(pageId).exec();
+};
+
+PageSchema.statics.readAll = async function (
+  this: PageModel,
+): Promise<PageDoc[]> {
+  return this.find()
+    .sort([['createdAt', -1]])
+    .exec();
 };
 
 PageSchema.methods.test = async function (this: PageDoc): Promise<any> {

@@ -14,7 +14,7 @@ export const readOne = async (pageId: string): Promise<PageDoc> => {
 };
 
 export const readAll = async (): Promise<PageDoc[]> => {
-  return null;
+  return Page.readAll();
 };
 
 export const update = async (pageDTO: PageDTO): Promise<PageDoc> => {
