@@ -9,13 +9,14 @@ const desc = {
 };
 
 export const Default = (): JSX.Element => {
-  const [page, setPage] = useState(null);
+  const [loadedPage, setPage] = useState(null);
   useEffect(() => {
     (async () => {
-      setPage(await fetchDummyData('1'));
+      const { page } = await fetchDummyData('1');
+      setPage(page);
     })();
   });
-  return <Editor {...{ page }} />;
+  return <Editor {...{ page: loadedPage }} />;
 };
 
 export default desc;
