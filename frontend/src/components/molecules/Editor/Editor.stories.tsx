@@ -12,7 +12,7 @@ export const Default = (): JSX.Element => {
   const [loadedPage, setPage] = useState(null);
   useEffect(() => {
     (async () => {
-      const { page } = await fetchDummyData('1');
+      const { page } = await fetchDummyData();
       setPage(page);
     })();
   });
