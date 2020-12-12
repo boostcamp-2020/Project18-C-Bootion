@@ -1,6 +1,8 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css, SerializedStyles } from '@emotion/react';
+import { jsx } from '@emotion/react';
+
+import { Block, BlockType } from '@/schemes';
 import { ReactComponent as Toggle } from '@assets/toggle-default.svg';
 
 export const regex: { [key: string]: RegExp } = {
@@ -13,9 +15,15 @@ export const regex: { [key: string]: RegExp } = {
   quote: /^\|\s[^\s.]*/gm,
 };
 
+export const listBlockType = (block: Block, idx: number) => {
+  if (block.type === BlockType.NUMBEREDLIST) {
+    return <span>{`${idx}. `}</span>;
+  }
+  return listComponent[block.type];
+};
+
 export const listComponent: { [key: string]: any } = {
   bulletedlist: <span>•</span>,
-  numberedlist: <span> 1. </span>,
   togglelist: (
     <span>
       <Toggle />
