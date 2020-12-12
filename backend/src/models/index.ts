@@ -1,4 +1,5 @@
 import mongoose, { ConnectionOptions } from 'mongoose';
+import { Block } from '@models/block';
 
 export const connect = async (dbName?: string): Promise<void> => {
   const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_DATABASE } = process.env;
@@ -29,7 +30,7 @@ export const connect = async (dbName?: string): Promise<void> => {
   }
 };
 
-export { PageModel } from './page';
-export type { Page, PageDoc } from './page';
-export { BlockModel } from './block';
-export type { BlockType, Block, BlockDoc } from './block';
+export type { PageDTO, PageDoc } from './page';
+export { Page } from './page';
+export type { BlockType, BlockDTO, BlockDoc } from './block';
+export { Block } from './block';

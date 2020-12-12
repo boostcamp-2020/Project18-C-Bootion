@@ -1,40 +1,36 @@
-import { Document, Schema, Types, model } from 'mongoose';
+import { Document, Schema, Types, model, Model } from 'mongoose';
 
-import { Block, BlockDoc } from '@/models';
-
-export interface Page {
+export interface PageDTO {
+  _id?: string;
   id?: string;
   title?: string;
-  createdAt: Date;
-  blockIdList?: string[];
-  blockList?: Block[];
+  rootId?: string;
 }
 
 export interface PageDoc extends Document {
-  title?: string;
+  title: string;
+  rootId: Types.ObjectId;
   createdAt: Date;
-  blockIdList?: Types.ObjectId[];
-  blockList?: BlockDoc[];
-  addBlock?: (
-    this: PageDoc,
-    block: BlockDoc,
-    targetIndex?: number,
-  ) => Promise<void>;
-  removeBlock?: (this: PageDoc, block: BlockDoc) => Promise<void>;
-  populateBlock?: (this: PageDoc) => Promise<void>;
+
+  test: (this: PageDoc) => Promise<any>;
 }
+
+export interface PageModel extends Model<PageDoc> {
+  test: (this: PageModel) => Promise<any>;
+}
+
 const PageSchema = new Schema(
   {
     title: {
       type: String,
+      required: true,
       default: '',
     },
-    blockIdList: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Block',
-      },
-    ],
+    rootId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Block',
+      default: null,
+    },
   },
   { timestamps: true },
 );
@@ -45,46 +41,12 @@ PageSchema.virtual('id').get(function (this: PageDoc) {
 
 PageSchema.set('toJSON', { virtuals: true });
 
-PageSchema.methods.addBlock = async function (
-  this: PageDoc,
-  block: BlockDoc,
-  targetIndex?: number,
-): Promise<void> {
-  if (
-    (targetIndex !== 0 && !targetIndex) ||
-    targetIndex < 0 ||
-    targetIndex > this.blockIdList.length
-  ) {
-    targetIndex = this.blockIdList.length;
-  }
-  this.blockIdList.splice(targetIndex, 0, block.id);
-  await this.save();
-
-  block.pageId = this.id;
-  block.parentIdList = [];
-  block.children.forEach((child: BlockDoc, index: number) =>
-    block.addChild(child, index),
-  );
-  await block.save();
+PageSchema.statics.test = async function (this: PageModel): Promise<any> {
+  //
 };
 
-PageSchema.methods.removeBlock = async function (
-  this: PageDoc,
-  block: BlockDoc,
-): Promise<void> {
-  this.blockIdList = this.blockIdList.filter(
-    (blockId: Types.ObjectId) => block.id !== blockId.toHexString(),
-  );
-  await this.save();
+PageSchema.methods.test = async function (this: PageDoc): Promise<any> {
+  //
 };
 
-PageSchema.methods.populateBlock = async function (
-  this: PageDoc,
-): Promise<void> {
-  const populatedPage = await PageModel.findById(this.id)
-    .populate('blockIdList')
-    .exec();
-  (this as any)._doc.blockList = populatedPage.blockIdList;
-};
-
-export const PageModel = model<PageDoc>('Page', PageSchema);
+export const Page = model<PageDoc>('Page', PageSchema) as PageModel;
