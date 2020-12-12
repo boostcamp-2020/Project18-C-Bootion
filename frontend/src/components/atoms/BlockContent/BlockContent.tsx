@@ -77,6 +77,31 @@ function BlockContent(blockDTO: Block) {
     );
 
     if (newType) {
+      if (newType[0] === BlockType.NUMBEREDLIST) {
+        const blockIndex = blockMapState[
+          renderBlock.parentBlockId
+        ].children.findIndex((_block: Block) => _block.id === renderBlock?.id);
+        if (!blockIndex && content[0] !== '1') return;
+        if (blockIndex) {
+          const upperBlocks = blockMapState[renderBlock.parentBlockId].children
+            .slice(0, blockIndex)
+            .reverse();
+          if (
+            upperBlocks[0].type !== BlockType.NUMBEREDLIST &&
+            content[0] !== '1'
+          )
+            return;
+          if (upperBlocks[0].type === BlockType.NUMBEREDLIST) {
+            let cnt = 0;
+            for (const upperblock of upperBlocks) {
+              if (upperblock.type !== BlockType.NUMBEREDLIST) break;
+              cnt += 1;
+            }
+            if (cnt + 1 !== +content[0]) return;
+          }
+        }
+      }
+
       handleBlock(
         content.slice(content.indexOf(' ') + 1, content.length),
         newType[0],
@@ -150,11 +175,6 @@ function BlockContent(blockDTO: Block) {
       caretRef.current = nodeLength;
     }
     selection.collapse(selection.focusNode, caretRef.current);
-
-    const blockIndex = blockMapState[
-      renderBlock.parentBlockId
-    ]?.children.findIndex((_block: Block) => _block.id === renderBlock?.id);
-    listCnt.current = blockIndex + 1;
   }, [renderBlock.value]);
 
   return (
