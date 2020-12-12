@@ -8,7 +8,7 @@ import { pageState } from './stores';
 const PageComponent = lazy(() => import('@components/pages/PageComponent'));
 
 function App(): JSX.Element {
-  const page = useRecoilValue(pageState('1'));
+  const page = useRecoilValue(pageState);
   return (
     <div>
       <Global
