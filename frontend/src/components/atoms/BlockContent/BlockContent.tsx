@@ -60,7 +60,7 @@ function BlockContent(blockDTO: Block) {
   const focusId = useRecoilValue(focusState);
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
   const caretRef = useRef(0);
-  const listCnt = useRef(0);
+  const listCnt = useRef(1);
   const setBlockRef = useSetRecoilState(blockRefState);
   const renderBlock: Block = block ?? blockDTO;
   const [Dispatcher] = useCommand();
@@ -175,6 +175,31 @@ function BlockContent(blockDTO: Block) {
       caretRef.current = nodeLength;
     }
     selection.collapse(selection.focusNode, caretRef.current);
+
+    if (renderBlock.type === BlockType.NUMBEREDLIST) {
+      const blockIndex = blockMapState[
+        renderBlock.parentBlockId
+      ].children.findIndex((_block: Block) => _block.id === renderBlock?.id);
+      if (!blockIndex) {
+        listCnt.current = 1;
+        return;
+      }
+      const upperBlocks = blockMapState[renderBlock.parentBlockId].children
+        .slice(0, blockIndex)
+        .reverse();
+      if (upperBlocks[0].type !== BlockType.NUMBEREDLIST) {
+        listCnt.current = 1;
+        return;
+      }
+      if (upperBlocks[0].type === BlockType.NUMBEREDLIST) {
+        let cnt = 0;
+        for (const upperblock of upperBlocks) {
+          if (upperblock.type !== BlockType.NUMBEREDLIST) break;
+          cnt += 1;
+        }
+        listCnt.current = cnt + 1;
+      }
+    }
   }, [renderBlock.value]);
 
   return (
