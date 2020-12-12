@@ -5,7 +5,7 @@ import { StatusCode, transactionHandler } from '@/aops';
 
 export const create = transactionHandler(
   async (req: Request, res: Response): Promise<void> => {
-    const page = await pageService.create();
+    const page = await pageService.create(req.body.page);
     const pages = await pageService.readAll();
     res.status(StatusCode.CREATED).json({ page, pages });
   },
@@ -22,7 +22,7 @@ export const readAll = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const update = async (req: Request, res: Response): Promise<void> => {
-  const page = await pageService.update(req.params.id, req.body);
+  const page = await pageService.update(req.params.id, req.body.page);
   res.status(StatusCode.OK).json(page);
 };
 
