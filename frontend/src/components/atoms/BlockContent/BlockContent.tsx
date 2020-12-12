@@ -65,6 +65,32 @@ function BlockContent(blockDTO: Block) {
   const renderBlock: Block = block ?? blockDTO;
   const [Dispatcher] = useCommand();
 
+  const indexInSibling: number = blockMapState[
+    renderBlock.parentBlockId
+  ]?.children.findIndex((_block: Block) => _block.id === renderBlock?.id);
+
+  const upperBlocks: Array<Block> = blockMapState[
+    renderBlock.parentBlockId
+  ]?.children
+    .slice(0, indexInSibling)
+    .reverse();
+
+  const isUpperBlockEqualToNumberList = (): boolean => {
+    if (upperBlocks.length) {
+      return upperBlocks[0].type === BlockType.NUMBEREDLIST;
+    }
+    return false;
+  };
+
+  const cntOfUpperNumberListBlock = (): number => {
+    let cnt = 0;
+    for (const upperblock of upperBlocks) {
+      if (upperblock.type !== BlockType.NUMBEREDLIST) break;
+      cnt += 1;
+    }
+    return cnt;
+  };
+
   const handleBlock = (value: string, type?: string) =>
     type
       ? setBlock({ ...renderBlock, value, type })
@@ -78,27 +104,14 @@ function BlockContent(blockDTO: Block) {
 
     if (newType) {
       if (newType[0] === BlockType.NUMBEREDLIST) {
-        const blockIndex = blockMapState[
-          renderBlock.parentBlockId
-        ].children.findIndex((_block: Block) => _block.id === renderBlock?.id);
-        if (!blockIndex && content[0] !== '1') return;
-        if (blockIndex) {
-          const upperBlocks = blockMapState[renderBlock.parentBlockId].children
-            .slice(0, blockIndex)
-            .reverse();
+        if (!indexInSibling && content[0] !== '1') return;
+        if (indexInSibling) {
+          if (!isUpperBlockEqualToNumberList() && content[0] !== '1') return;
           if (
-            upperBlocks[0].type !== BlockType.NUMBEREDLIST &&
-            content[0] !== '1'
+            isUpperBlockEqualToNumberList() &&
+            cntOfUpperNumberListBlock() + 1 !== +content[0]
           )
             return;
-          if (upperBlocks[0].type === BlockType.NUMBEREDLIST) {
-            let cnt = 0;
-            for (const upperblock of upperBlocks) {
-              if (upperblock.type !== BlockType.NUMBEREDLIST) break;
-              cnt += 1;
-            }
-            if (cnt + 1 !== +content[0]) return;
-          }
         }
       }
 
@@ -177,27 +190,12 @@ function BlockContent(blockDTO: Block) {
     selection.collapse(selection.focusNode, caretRef.current);
 
     if (renderBlock.type === BlockType.NUMBEREDLIST) {
-      const blockIndex = blockMapState[
-        renderBlock.parentBlockId
-      ].children.findIndex((_block: Block) => _block.id === renderBlock?.id);
-      if (!blockIndex) {
+      if (!indexInSibling || !isUpperBlockEqualToNumberList()) {
         listCnt.current = 1;
         return;
       }
-      const upperBlocks = blockMapState[renderBlock.parentBlockId].children
-        .slice(0, blockIndex)
-        .reverse();
-      if (upperBlocks[0].type !== BlockType.NUMBEREDLIST) {
-        listCnt.current = 1;
-        return;
-      }
-      if (upperBlocks[0].type === BlockType.NUMBEREDLIST) {
-        let cnt = 0;
-        for (const upperblock of upperBlocks) {
-          if (upperblock.type !== BlockType.NUMBEREDLIST) break;
-          cnt += 1;
-        }
-        listCnt.current = cnt + 1;
+      if (isUpperBlockEqualToNumberList()) {
+        listCnt.current = cntOfUpperNumberListBlock() + 1;
       }
     }
   }, [renderBlock.value]);
