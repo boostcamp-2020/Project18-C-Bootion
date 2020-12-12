@@ -17,12 +17,12 @@ enum StateType {
 
 export const pageState = atom<Page>({
   key: StateType.PAGE_STATE,
-  default: (async () => (await fetchDummyData('1')).page)(),
+  default: (async () => (await fetchDummyData()).page)(),
 });
 
 export const blockMapState = atom<BlockMap>({
   key: StateType.BLOCK_MAP_STATE,
-  default: (async () => (await fetchDummyData('1')).blockMap)(),
+  default: (async () => (await fetchDummyData()).blockMap)(),
 });
 
 export const throttleState = {
