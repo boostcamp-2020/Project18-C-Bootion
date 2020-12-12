@@ -6,30 +6,30 @@ import { StatusCode, transactionHandler } from '@/aops';
 export const create = transactionHandler(
   async (req: Request, res: Response): Promise<void> => {
     const page = await pageService.create();
-    const pages = await pageService.getAll();
+    const pages = await pageService.readAll();
     res.status(StatusCode.CREATED).json({ page, pages });
   },
 );
 
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  const pages = await pageService.getAll();
-  res.status(StatusCode.OK).json(pages);
+export const readOne = async (req: Request, res: Response): Promise<void> => {
+  const page = await pageService.readOne(req.params.id);
+  res.status(StatusCode.OK).json(page);
 };
 
-export const getOne = async (req: Request, res: Response): Promise<void> => {
-  const page = await pageService.getOne({ id: req.params.id });
-  res.status(StatusCode.OK).json(page);
+export const readAll = async (req: Request, res: Response): Promise<void> => {
+  const pages = await pageService.readAll();
+  res.status(StatusCode.OK).json(pages);
 };
 
 export const update = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
-  const { title } = req.body;
-  const page = await pageService.update({ id, title });
+  const page = await pageService.update(req.params.id, req.body);
   res.status(StatusCode.OK).json(page);
 };
 
-export const remove = async (req: Request, res: Response): Promise<void> => {
-  await pageService.remove({ id: req.params.id });
-  const pages = await pageService.getAll();
-  res.status(StatusCode.OK).json(pages);
-};
+export const deleteOne = transactionHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    await pageService.deleteOne(req.params.id);
+    const pages = await pageService.readAll();
+    res.status(StatusCode.OK).json(pages);
+  },
+);
