@@ -24,32 +24,16 @@ export interface BlockDTO {
   childIdList?: string[];
 }
 
-export interface BlockDoc extends Document {
-  type: BlockType;
-  value: string;
-  pageId: Types.ObjectId;
-  parentId: Types.ObjectId;
-  childIdList: Types.ObjectId[];
-
-  test: (this: BlockDoc) => Promise<any>;
-}
-
-export interface BlockModel extends Model<BlockDoc> {
-  test: (this: BlockModel) => Promise<any>;
-}
-
 const MODEL_NAME = 'Block';
 const BlockSchema = new Schema(
   {
     type: {
       type: String,
       enum: Object.values(BlockType),
-      required: true,
       default: BlockType.TEXT,
     },
     value: {
       type: String,
-      required: true,
       default: '',
     },
     pageId: {
@@ -78,8 +62,27 @@ BlockSchema.virtual('id').get(function (this: BlockDoc) {
 
 BlockSchema.set('toJSON', { virtuals: true });
 
-BlockSchema.statics.test = async function (this: BlockModel): Promise<any> {
-  //
+export interface BlockModel extends Model<BlockDoc> {
+  createOne?: (this: BlockModel, blockDTO: BlockDTO) => Promise<BlockDoc>;
+}
+
+export interface BlockDoc extends Document {
+  type?: BlockType;
+  value?: string;
+  pageId?: Types.ObjectId;
+  parentId?: Types.ObjectId;
+  childIdList?: Types.ObjectId[];
+
+  test?: (this: BlockDoc) => Promise<any>;
+}
+
+BlockSchema.statics.createOne = async function (
+  this: BlockModel,
+  blockDTO: BlockDTO,
+): Promise<BlockDoc> {
+  const block = new this(blockDTO);
+  await block.save();
+  return block;
 };
 
 BlockSchema.methods.test = async function (this: BlockDoc): Promise<any> {

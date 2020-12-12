@@ -1,8 +1,8 @@
-import { PageDoc, PageDTO } from '@/models';
+import { Page, PageDoc, PageDTO } from '@/models';
 import { ErrorMessage } from '@/aops';
 
 export const create = async (pageDTO?: PageDTO): Promise<PageDoc> => {
-  return null;
+  return Page.createOne(pageDTO);
 };
 
 export const readOne = async (pageDTO: PageDTO): Promise<PageDoc> => {

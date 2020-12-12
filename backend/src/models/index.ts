@@ -32,5 +32,5 @@ export const connect = async (dbName?: string): Promise<void> => {
 
 export type { PageDTO, PageDoc } from './page';
 export { Page } from './page';
-export type { BlockType, BlockDTO, BlockDoc } from './block';
-export { Block } from './block';
+export type { BlockDTO, BlockDoc } from './block';
+export { Block, BlockType } from './block';
