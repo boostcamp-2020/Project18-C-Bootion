@@ -1,16 +1,21 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useEffect, useRef, FormEvent, KeyboardEvent, useState } from 'react';
+import { useEffect, useRef, FormEvent, KeyboardEvent } from 'react';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
-import { blockState, blockRefState, throttleState } from '@/stores';
+import {
+  blockState,
+  blockRefState,
+  throttleState,
+  blockMapState,
+} from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
   regex,
   fontSize,
   placeHolder,
-  listComponent,
+  listBlockType,
 } from '@utils/blockContent';
 import { useCommand } from '@/hooks';
 import { focusState } from '@/stores/page';
@@ -55,6 +60,7 @@ function BlockContent(blockDTO: Block) {
   const focusId = useRecoilValue(focusState);
   const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
   const caretRef = useRef(0);
+  const listCnt = useRef(0);
   const setBlockRef = useSetRecoilState(blockRefState);
   const renderBlock: Block = block ?? blockDTO;
   const [Dispatcher] = useCommand();
@@ -144,11 +150,16 @@ function BlockContent(blockDTO: Block) {
       caretRef.current = nodeLength;
     }
     selection.collapse(selection.focusNode, caretRef.current);
+
+    const blockIndex = blockMapState[
+      renderBlock.parentBlockId
+    ]?.children.findIndex((_block: Block) => _block.id === renderBlock?.id);
+    listCnt.current = blockIndex + 1;
   }, [renderBlock.value]);
 
   return (
     <div css={blockContentCSS}>
-      {listComponent[renderBlock.type]}
+      {listBlockType(renderBlock, listCnt.current)}
       <div
         ref={contentEditableRef}
         css={editableDivCSS(renderBlock)}
