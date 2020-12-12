@@ -95,17 +95,17 @@ describe('@services/page', () => {
   });
 
   it('delete: Success', async () => {
-    const pageDTO = (await pageService.create())?.toJSON();
-    const received = await pageService.deleteOne(pageDTO);
+    const pageDTO: PageDTO = (await pageService.create()).toJSON();
+    const received = await pageService.deleteOne(pageDTO.id);
     await expect(async () => {
       await pageService.readOne(received.id);
-    }).rejects.toThrow(ErrorMessage.NOT_FOUND);
+    }).rejects.toThrow();
   });
 
   it('delete: Not found', async () => {
     await expect(async () => {
       const pageDTO: PageDTO = { id: 'invalid id' };
-      await pageService.deleteOne(pageDTO);
-    }).rejects.toThrow(ErrorMessage.NOT_FOUND);
+      await pageService.deleteOne(pageDTO.id);
+    }).rejects.toThrow();
   });
 });

@@ -6,7 +6,7 @@ export const create = async (pageDTO?: PageDTO): Promise<PageDoc> => {
 };
 
 export const readOne = async (pageId: string): Promise<PageDoc> => {
-  const page = Page.readOne(pageId);
+  const page = await Page.readOne(pageId);
   if (!page) {
     throw new Error(ErrorMessage.NOT_FOUND);
   }
@@ -32,6 +32,13 @@ export const update = async (
   return page;
 };
 
-export const deleteOne = async (pageDTO: PageDTO): Promise<PageDTO> => {
-  return null;
+export const deleteOne = async (pageId: string): Promise<PageDTO> => {
+  const page = await Page.readOne(pageId);
+  if (!page) {
+    throw new Error(ErrorMessage.NOT_FOUND);
+  }
+
+  const pageDTO: PageDTO = page.toJSON();
+  await page.delete();
+  return pageDTO;
 };

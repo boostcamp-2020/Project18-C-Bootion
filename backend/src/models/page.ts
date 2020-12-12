@@ -46,7 +46,7 @@ export interface PageDoc extends Document {
   rootId?: Types.ObjectId;
   createdAt?: Date;
 
-  test?: (this: PageDoc) => Promise<any>;
+  delete?: (this: PageDoc) => Promise<void>;
 }
 
 PageSchema.statics.createOne = async function (
@@ -88,8 +88,9 @@ PageSchema.statics.updateOnePage = async function (
   return this.findByIdAndUpdate(pageId, { title }, { new: true }).exec();
 };
 
-PageSchema.methods.test = async function (this: PageDoc): Promise<any> {
-  //
+PageSchema.methods.delete = async function (this: PageDoc): Promise<void> {
+  await Block.deleteMany({ pageId: { $eq: this.id } });
+  await Page.findByIdAndDelete(this.id);
 };
 
 export const Page = model<PageDoc>('Page', PageSchema) as PageModel;
