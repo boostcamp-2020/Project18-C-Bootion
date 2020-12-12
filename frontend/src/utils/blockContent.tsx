@@ -10,7 +10,7 @@ export const regex: { [key: string]: RegExp } = {
   heading2: /^##\s[^\s.]*/gm,
   heading3: /^###\s[^\s.]*/gm,
   bulletedlist: /^-\s[^\s.]*/gm,
-  numberedlist: /^1.\s[^\s.]*/gm,
+  numberedlist: /^\d.\s[^\s.]*/gm,
   togglelist: /^>\s[^\s.]*/gm,
   quote: /^\|\s[^\s.]*/gm,
 };
