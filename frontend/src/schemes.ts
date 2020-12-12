@@ -18,12 +18,14 @@ export interface Block {
   id: IdType;
   type: BlockType;
   value: string;
-  children: Block[];
+  childrenIdList: IdType[];
   parentBlockId: IdType | null;
   pageId: IdType;
 }
 
+export type BlockMap = { [key: string]: Block };
 export interface BlockFamily {
+  blockMap: BlockMap;
   block: Block;
   blockIndex: number;
   parent: Block | null;
@@ -38,6 +40,7 @@ export interface BlockFamily {
 export interface FamilyFunc {
   getNextBlock: () => Block | null;
   getPrevBlock: () => Block | null;
+  setBlockMap: (blockMap: BlockMap) => void;
   setBlock: (block: Block) => void;
   setParent: (block: Block) => void;
   setGrandParent: (block: Block) => void;
@@ -48,7 +51,6 @@ export interface Page {
   id: IdType;
   title: string;
   blockIdList: IdType[];
-  blockList?: Block[];
 }
 
 export interface User {
