@@ -54,10 +54,9 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
         <HoverArea handleClick={() => blockRef.current.focus()} />
         {hoverId === blockDTO.id && <BlockHandler />}
       </div>
-
-      {blockDTO.childrenIdList.length ? (
+      {blockDTO.childIdList.length ? (
         <div css={descendantsCss(blockDTO)}>
-          {blockDTO.childrenIdList.map((blockId: IdType) => (
+          {blockDTO.childIdList.map((blockId: IdType) => (
             <BlockComponent key={blockId} blockDTO={blockMap[blockId]} />
           ))}
         </div>
