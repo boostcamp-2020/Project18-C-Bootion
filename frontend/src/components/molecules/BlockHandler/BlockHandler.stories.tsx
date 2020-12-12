@@ -16,7 +16,8 @@ export const Default = (): JSX.Element => {
   const [block, setBlock] = useState(null);
   useEffect(() => {
     (async () => {
-      setBlock((await fetchDummyData('1')).blockList[2]);
+      const { page, blockMap } = await fetchDummyData('1');
+      setBlock(blockMap[page.blockIdList[2]]);
     })();
   });
   return (
