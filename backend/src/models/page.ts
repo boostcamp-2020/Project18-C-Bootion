@@ -32,6 +32,7 @@ PageSchema.set('toJSON', { virtuals: true });
 
 export interface PageModel extends Model<PageDoc> {
   createOne?: (this: PageModel, pageDTO?: PageDTO) => Promise<PageDoc>;
+  readOne?: (this: PageModel, pageId: string) => Promise<PageDoc>;
 }
 
 export interface PageDoc extends Document {
@@ -55,6 +56,13 @@ PageSchema.statics.createOne = async function (
   page.rootId = block.id;
   await page.save();
   return page;
+};
+
+PageSchema.statics.readOne = async function (
+  this: PageModel,
+  pageId: string,
+): Promise<PageDoc> {
+  return this.findById(pageId).exec();
 };
 
 PageSchema.methods.test = async function (this: PageDoc): Promise<any> {

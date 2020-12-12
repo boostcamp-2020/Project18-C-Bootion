@@ -49,15 +49,15 @@ describe('@services/page', () => {
 
   it('readOne: Success', async () => {
     const expected = await pageService.create();
-    const received = await pageService.readOne(expected.toJSON());
-    expect(received).toEqual(expected);
+    const received = await pageService.readOne(expected.id);
+    expect(received?.toJSON()).toEqual(expected?.toJSON());
   });
 
   it('readOne: Not found', async () => {
     await expect(async () => {
       const pageDTO: PageDTO = { id: 'invalid id' };
-      await pageService.readOne(pageDTO);
-    }).rejects.toThrow(ErrorMessage.NOT_FOUND);
+      await pageService.readOne(pageDTO.id);
+    }).rejects.toThrow();
   });
 
   it('readAll: Success', async () => {
@@ -86,7 +86,7 @@ describe('@services/page', () => {
     const pageDTO = (await pageService.create())?.toJSON();
     const received = await pageService.deleteOne(pageDTO);
     await expect(async () => {
-      await pageService.readOne(received);
+      await pageService.readOne(received.id);
     }).rejects.toThrow(ErrorMessage.NOT_FOUND);
   });
 

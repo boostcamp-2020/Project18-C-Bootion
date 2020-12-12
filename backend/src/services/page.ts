@@ -5,8 +5,12 @@ export const create = async (pageDTO?: PageDTO): Promise<PageDoc> => {
   return Page.createOne(pageDTO);
 };
 
-export const readOne = async (pageDTO: PageDTO): Promise<PageDoc> => {
-  return null;
+export const readOne = async (pageId: string): Promise<PageDoc> => {
+  const page = Page.readOne(pageId);
+  if (!page) {
+    throw new Error(ErrorMessage.NOT_FOUND);
+  }
+  return page;
 };
 
 export const readAll = async (): Promise<PageDoc[]> => {
