@@ -1,16 +1,15 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useEffect } from 'react';
 
 import { BlockContent } from '@atoms/index';
 import { BlockHandler, HoverArea } from '@components/molecules';
-import { Block, BlockType } from '@/schemes';
+import { Block, BlockType, IdType } from '@/schemes';
 import {
   hoverState,
   focusState,
-  blockState,
   blockRefState,
+  blockMapState,
 } from '@stores/page';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
@@ -36,38 +35,30 @@ const descendantsCss = (block: Block): SerializedStyles => css`
 `;
 
 function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
+  const blockMap = useRecoilValue(blockMapState);
   const [focusId, setFocusId] = useRecoilState<string>(focusState);
-  const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
   const [hoverId, setHoverId] = useRecoilState(hoverState);
-  const renderBlock = block ?? blockDTO;
-  const blockRef: any = useRecoilValue(blockRefState)[renderBlock.id];
-
-  useEffect(() => {
-    setBlock(blockDTO);
-    return () => {
-      setBlock(null);
-    };
-  }, [blockDTO]);
+  const blockRef: any = blockRefState[blockDTO.id];
 
   return (
     <div css={blockCss()}>
       <div
         css={{ position: 'relative' }}
-        onMouseEnter={() => setHoverId(renderBlock.id)}
+        onMouseEnter={() => setHoverId(blockDTO.id)}
         onMouseLeave={() => setHoverId(null)}
         onFocus={() => {
-          if (focusId !== renderBlock.id) setFocusId(renderBlock.id);
+          if (focusId !== blockDTO.id) setFocusId(blockDTO.id);
         }}
       >
-        <BlockContent {...renderBlock} />
+        <BlockContent {...blockDTO} />
         <HoverArea handleClick={() => blockRef.current.focus()} />
-        {hoverId === renderBlock.id && <BlockHandler />}
+        {hoverId === blockDTO.id && <BlockHandler />}
       </div>
 
-      {renderBlock.children.length ? (
-        <div css={descendantsCss(renderBlock)}>
-          {renderBlock.children.map((_block: Block) => (
-            <BlockComponent key={_block.id} blockDTO={_block} />
+      {blockDTO.childrenIdList.length ? (
+        <div css={descendantsCss(blockDTO)}>
+          {blockDTO.childrenIdList.map((blockId: IdType) => (
+            <BlockComponent key={blockId} blockDTO={blockMap[blockId]} />
           ))}
         </div>
       ) : (
