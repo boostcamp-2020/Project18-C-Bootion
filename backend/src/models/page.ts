@@ -34,6 +34,11 @@ export interface PageModel extends Model<PageDoc> {
   createOne?: (this: PageModel, pageDTO?: PageDTO) => Promise<PageDoc>;
   readOne?: (this: PageModel, pageId: string) => Promise<PageDoc>;
   readAll?: (this: PageModel) => Promise<PageDoc[]>;
+  updateOnePage?: (
+    this: PageModel,
+    pageId: string,
+    pageDTO: PageDTO,
+  ) => Promise<PageDoc>;
 }
 
 export interface PageDoc extends Document {
@@ -72,6 +77,15 @@ PageSchema.statics.readAll = async function (
   return this.find()
     .sort([['createdAt', -1]])
     .exec();
+};
+
+PageSchema.statics.updateOnePage = async function (
+  this: PageModel,
+  pageId: string,
+  pageDTO: PageDTO,
+): Promise<PageDoc> {
+  const { title } = pageDTO;
+  return this.findByIdAndUpdate(pageId, { title }, { new: true }).exec();
 };
 
 PageSchema.methods.test = async function (this: PageDoc): Promise<any> {

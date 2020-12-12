@@ -75,15 +75,23 @@ describe('@services/page', () => {
   it('update: Success', async () => {
     const page = await pageService.create();
     const expected: PageDTO = { ...page.toJSON(), title: 'updated title' };
-    const received = await pageService.update(expected);
-    expect(received?.toJSON()).toEqual(expected);
+    const received = await pageService.update(expected.id, expected);
+    expect(received?.toJSON().title).toEqual(expected.title);
   });
 
   it('update: Not found', async () => {
     await expect(async () => {
       const pageDTO: PageDTO = { id: 'invalid id' };
-      await pageService.update(pageDTO);
-    }).rejects.toThrow(ErrorMessage.NOT_FOUND);
+      await pageService.update(pageDTO.id, pageDTO);
+    }).rejects.toThrow();
+  });
+
+  it('update: Bad request', async () => {
+    await expect(async () => {
+      const pageDTO: PageDTO = (await pageService.create()).toJSON();
+      delete pageDTO.title;
+      await pageService.update(pageDTO.id, pageDTO);
+    }).rejects.toThrow(ErrorMessage.BAD_REQUEST);
   });
 
   it('delete: Success', async () => {

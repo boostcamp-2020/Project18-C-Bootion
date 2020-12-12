@@ -17,8 +17,19 @@ export const readAll = async (): Promise<PageDoc[]> => {
   return Page.readAll();
 };
 
-export const update = async (pageDTO: PageDTO): Promise<PageDoc> => {
-  return null;
+export const update = async (
+  pageId: string,
+  pageDTO: PageDTO,
+): Promise<PageDoc> => {
+  if (!pageDTO?.title) {
+    throw new Error(ErrorMessage.BAD_REQUEST);
+  }
+
+  const page = await Page.updateOnePage(pageId, pageDTO);
+  if (!page) {
+    throw new Error(ErrorMessage.NOT_FOUND);
+  }
+  return page;
 };
 
 export const deleteOne = async (pageDTO: PageDTO): Promise<PageDTO> => {
