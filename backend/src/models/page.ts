@@ -89,8 +89,8 @@ PageSchema.statics.updateOnePage = async function (
 };
 
 PageSchema.methods.delete = async function (this: PageDoc): Promise<void> {
-  await Block.deleteMany({ pageId: { $eq: this.id } });
-  await Page.findByIdAndDelete(this.id);
+  await Block.deleteMany({ pageId: { $eq: this.id } }).exec();
+  await Page.findByIdAndDelete(this.id).exec();
 };
 
 export const Page = model<PageDoc>('Page', PageSchema) as PageModel;

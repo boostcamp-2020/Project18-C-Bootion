@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import * as mongoose from 'mongoose';
 
-import { BlockDTO, BlockType, connect, PageDoc, PageDTO } from '@/models';
+import { Block, BlockDTO, BlockType, connect, PageDoc } from '@/models';
 import { blockService, pageService } from '@/services';
 
 config();
@@ -166,23 +166,31 @@ describe('@services/block', () => {
     ).rejects.toThrow();
   });
 
-  it('delete: Success', async () => {
+  it('deleteCascade: Success', async () => {
     const { block } = await blockService.create({
       parentId: page.rootId.toHexString(),
     });
-    const parent = await blockService.deleteOne(block.id);
+    const { block: child } = await blockService.create({
+      parentId: block.id,
+    });
+    const blockId = block.id;
+    const childId = child.id;
+
+    const parent = await blockService.deleteCascade(block.id);
 
     expect(parent.id).toEqual(block.parentId.toHexString());
     expect(
       parent.childIdList.every((childId) => childId.toHexString() !== block.id),
     ).toBeTruthy();
+    expect(await Block.readOne(blockId)).toBeNull();
+    expect(await Block.readOne(childId)).toBeNull();
   });
 
-  it('delete: Not found', async () => {
+  it('deleteCascade: Not found', async () => {
     const received: BlockDTO = { id: 'invalid id' };
 
-    await expect(
-      async () => await blockService.deleteOne(received.id),
+    await expect(async () =>
+      blockService.deleteCascade(received.id),
     ).rejects.toThrow();
   });
 });

@@ -32,6 +32,13 @@ export const update = async (param: {
   return null;
 };
 
-export const deleteOne = async (blockId: string): Promise<BlockDoc> => {
-  return null;
+export const deleteCascade = async (blockId: string): Promise<BlockDoc> => {
+  const block = await Block.readOne(blockId);
+  if (!block) {
+    throw new Error(ErrorMessage.NOT_FOUND);
+  }
+
+  const parent = await Block.readOne(block.parentId.toHexString());
+  await parent.deleteChild(block);
+  return parent;
 };

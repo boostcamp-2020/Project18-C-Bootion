@@ -76,6 +76,8 @@ export interface BlockDoc extends Document {
   childIdList?: Types.ObjectId[];
 
   setChild?: (this: BlockDoc, child: BlockDoc, index?: number) => Promise<void>;
+  deleteChild?: (this: BlockDoc, child: BlockDoc) => Promise<void>;
+  deleteCascade?: (this: BlockDoc) => Promise<void>;
 }
 
 BlockSchema.statics.createOne = async function (
@@ -112,6 +114,31 @@ BlockSchema.methods.setChild = async function (
 
   this.childIdList.splice(index ?? this.childIdList.length, 0, child.id);
   await this.save();
+};
+
+BlockSchema.methods.deleteChild = async function (
+  this: BlockDoc,
+  child: BlockDoc,
+): Promise<void> {
+  const childId = child.id;
+  await child.deleteCascade();
+
+  const index = this.childIdList.findIndex(
+    (_childId) => _childId.toHexString() === childId,
+  );
+  this.childIdList.splice(index, 1);
+  await this.save();
+};
+
+BlockSchema.methods.deleteCascade = async function (
+  this: BlockDoc,
+): Promise<void> {
+  for (const childId of this.childIdList) {
+    const child = await Block.readOne(childId.toHexString());
+    await child.deleteCascade();
+  }
+
+  await Block.findByIdAndDelete(this.id).exec();
 };
 
 export const Block = model<BlockDoc>(MODEL_NAME, BlockSchema) as BlockModel;
