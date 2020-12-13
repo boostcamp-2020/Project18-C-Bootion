@@ -7,16 +7,16 @@
 # Bootion : The Notion Clone
 
 ![NodeJS](https://img.shields.io/badge/Node.js-v14.4.0-339933?logo=node.js&style=plastic)
-![TypeScript](https://img.shields.io/badge/TypeScript-v4.1.2-007acc?logo=typescript&style=plastic)
-![Javascript](https://img.shields.io/badge/javascript-ES2020-yellow?logo=javascript&style=plastic)
+![typescript](https://img.shields.io/badge/typescript-v4.1.2-007acc?logo=typescript&style=plastic)
+![javascript](https://img.shields.io/badge/javascript-ES2020-yellow?logo=javascript&style=plastic)
 
-![React](https://img.shields.io/badge/React-v17.0.1-61dafb?logo=React&style=plastic)
-![Express](https://img.shields.io/badge/Express-v4.17.1-eee?logo=Express&style=plastic)
-![Webpack](https://img.shields.io/badge/Webpack-v5.6.0-8dd6f9?logo=Webpack&style=plastic)
-![Babel](https://img.shields.io/badge/Babel-v8.1.0-f9dc3e?logo=Babel&style=plastic)
+![react](https://img.shields.io/badge/react-v17.0.1-61dafb?logo=React&style=plastic)
+![express](https://img.shields.io/badge/express-v4.17.1-eee?logo=Express&style=plastic)
+![webpack](https://img.shields.io/badge/webpack-v5.6.0-8dd6f9?logo=Webpack&style=plastic)
+![@babel/core](https://img.shields.io/badge/@babel/core-v7.12.7-f9dc3e?logo=Babel&style=plastic)
 
-![Jest](https://img.shields.io/badge/Jest-v26.6.3-c21325?logo=Jest&style=plastic)
-![Storybook](https://img.shields.io/badge/Storybook-v26.6.3-ff4785?logo=Storybook&style=plastic)
+![jest](https://img.shields.io/badge/jest-v26.6.3-c21325?logo=Jest&style=plastic)
+![storybook](https://img.shields.io/badge/storybook-v26.6.3-ff4785?logo=Storybook&style=plastic)
 ![Docker](https://img.shields.io/badge/Docker-v20.10.0-2496ed?logo=Docker&style=plastic)
 ![MongoDB](https://img.shields.io/badge/MongoDB-latest-47a248?logo=MongoDB&style=plastic)
 
