@@ -20,7 +20,7 @@ export const create = async (param: {
 };
 
 export const readAll = async (pageId: string): Promise<BlockDoc[]> => {
-  return null;
+  return Block.readAll(pageId);
 };
 
 export const update = async (param: {

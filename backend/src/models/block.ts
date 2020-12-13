@@ -65,6 +65,7 @@ BlockSchema.set('toJSON', { virtuals: true });
 export interface BlockModel extends Model<BlockDoc> {
   createOne?: (this: BlockModel, blockDTO: BlockDTO) => Promise<BlockDoc>;
   readOne?: (this: BlockModel, blockId: string) => Promise<BlockDoc>;
+  readAll?: (this: BlockModel, pageId: string) => Promise<BlockDoc[]>;
 }
 
 export interface BlockDoc extends Document {
@@ -91,6 +92,13 @@ BlockSchema.statics.readOne = async function (
   blockId: string,
 ): Promise<BlockDoc> {
   return this.findById(blockId).exec();
+};
+
+BlockSchema.statics.readAll = async function (
+  this: BlockModel,
+  pageId: string,
+): Promise<BlockDoc[]> {
+  return this.find({ pageId: { $eq: pageId } }).exec();
 };
 
 BlockSchema.methods.setChild = async function (
