@@ -17,7 +17,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
 
-const blockCss = (): SerializedStyles => css`
+const blockCss = css`
   width: 100%;
   max-width: 1000px;
   margin-top: 3px;
@@ -50,7 +50,7 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
   }, [blockDTO]);
 
   return (
-    <div css={blockCss()}>
+    <div css={blockCss}>
       <div
         css={{ position: 'relative' }}
         onMouseEnter={() => setHoverId(renderBlock.id)}
