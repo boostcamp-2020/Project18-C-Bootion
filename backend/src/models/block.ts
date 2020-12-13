@@ -66,6 +66,11 @@ export interface BlockModel extends Model<BlockDoc> {
   createOne?: (this: BlockModel, blockDTO: BlockDTO) => Promise<BlockDoc>;
   readOne?: (this: BlockModel, blockId: string) => Promise<BlockDoc>;
   readAll?: (this: BlockModel, pageId: string) => Promise<BlockDoc[]>;
+  updateOneBlock?: (
+    this: BlockModel,
+    blockId: string,
+    blockDTO: BlockDTO,
+  ) => Promise<BlockDoc>;
 }
 
 export interface BlockDoc extends Document {
@@ -101,6 +106,15 @@ BlockSchema.statics.readAll = async function (
   pageId: string,
 ): Promise<BlockDoc[]> {
   return this.find({ pageId: { $eq: pageId } }).exec();
+};
+
+BlockSchema.statics.updateOneBlock = async function (
+  this: BlockModel,
+  blockId: string,
+  blockDTO: BlockDTO,
+): Promise<BlockDoc> {
+  const { type, value } = blockDTO;
+  return this.findByIdAndUpdate(blockId, { type, value }, { new: true }).exec();
 };
 
 BlockSchema.methods.setChild = async function (

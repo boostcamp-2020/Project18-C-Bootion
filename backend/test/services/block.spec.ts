@@ -108,7 +108,7 @@ describe('@services/block', () => {
       value: 'updated',
       type: BlockType.HEADING1,
     };
-    const { block: received } = await blockService.update(block.id, expected);
+    const received = await blockService.update(block.id, expected);
 
     expect(received.value).toEqual(expected.value);
     expect(received.type).toEqual(expected.type);
@@ -145,7 +145,7 @@ describe('@services/block', () => {
     ).toBeTruthy();
   });
 
-  it('update: Success changing order', async () => {
+  it('move: Success changing order', async () => {
     const param = { parentId: page.rootId.toHexString() };
     const { block: block01 } = await blockService.create(param);
     const { block: block02, parent } = await blockService.create(param);

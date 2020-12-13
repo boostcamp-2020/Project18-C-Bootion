@@ -26,8 +26,12 @@ export const readAll = async (pageId: string): Promise<BlockDoc[]> => {
 export const update = async (
   blockId: string,
   blockDTO: BlockDTO,
-): Promise<{ block: BlockDoc; from?: BlockDoc; to?: BlockDoc }> => {
-  return null;
+): Promise<BlockDoc> => {
+  const block = await Block.updateOneBlock(blockId, blockDTO);
+  if (!block) {
+    throw new Error(ErrorMessage.NOT_FOUND);
+  }
+  return block;
 };
 
 export const move = async (
