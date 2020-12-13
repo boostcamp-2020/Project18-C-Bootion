@@ -53,6 +53,8 @@ describe('@services/block', () => {
     const expected: BlockDTO = { value: 'expected', type: BlockType.HEADING1 };
     const { block: received, parent } = await blockService.create({
       parentId: page.rootId.toHexString(),
+      blockDTO: expected,
+      index,
     });
 
     expect(received.value).toEqual(expected.value);
@@ -70,8 +72,17 @@ describe('@services/block', () => {
     });
 
     await expect(async () =>
-      blockService.create(block.toJSON()),
+      blockService.create({
+        parentId: page.rootId.toHexString(),
+        blockDTO: block.toJSON(),
+      }),
     ).rejects.toThrow();
+  });
+
+  it('create: Not found', async () => {
+    const params = { parentId: 'invalid id' };
+
+    await expect(async () => blockService.create(params)).rejects.toThrow();
   });
 
   it('readAll: Success', async () => {

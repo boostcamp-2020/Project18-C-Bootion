@@ -64,6 +64,7 @@ BlockSchema.set('toJSON', { virtuals: true });
 
 export interface BlockModel extends Model<BlockDoc> {
   createOne?: (this: BlockModel, blockDTO: BlockDTO) => Promise<BlockDoc>;
+  readOne?: (this: BlockModel, blockId: string) => Promise<BlockDoc>;
 }
 
 export interface BlockDoc extends Document {
@@ -73,7 +74,7 @@ export interface BlockDoc extends Document {
   parentId?: Types.ObjectId;
   childIdList?: Types.ObjectId[];
 
-  test?: (this: BlockDoc) => Promise<any>;
+  setChild?: (this: BlockDoc, child: BlockDoc, index?: number) => Promise<void>;
 }
 
 BlockSchema.statics.createOne = async function (
@@ -85,8 +86,24 @@ BlockSchema.statics.createOne = async function (
   return block;
 };
 
-BlockSchema.methods.test = async function (this: BlockDoc): Promise<any> {
-  //
+BlockSchema.statics.readOne = async function (
+  this: BlockModel,
+  blockId: string,
+): Promise<BlockDoc> {
+  return this.findById(blockId).exec();
+};
+
+BlockSchema.methods.setChild = async function (
+  this: BlockDoc,
+  child: BlockDoc,
+  index?: number,
+): Promise<void> {
+  child.parentId = this.id;
+  child.pageId = this.pageId;
+  await child.save();
+
+  this.childIdList.splice(index ?? this.childIdList.length, 0, child.id);
+  await this.save();
 };
 
 export const Block = model<BlockDoc>(MODEL_NAME, BlockSchema) as BlockModel;
