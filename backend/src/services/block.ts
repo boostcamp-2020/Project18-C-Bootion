@@ -39,7 +39,24 @@ export const move = async (
   toId: string,
   toIndex?: number,
 ): Promise<{ block: BlockDoc; from?: BlockDoc; to?: BlockDoc }> => {
-  return null;
+  const block = await Block.readOne(blockId);
+  const from = await Block.readOne(block.parentId.toHexString());
+  const to = await Block.readOne(toId);
+
+  if (from.id !== to.id) {
+    await from.deleteChild(blockId);
+    await to.setChild(block, toIndex);
+    return { block, from, to };
+  }
+
+  toIndex ??= to.childIdList.length;
+  const fromIndex = from.childIdList.findIndex(
+    (_childId) => _childId.toHexString() === blockId,
+  );
+  toIndex = fromIndex < toIndex ? toIndex - 1 : toIndex;
+  await to.deleteChild(blockId);
+  await to.setChild(block, toIndex);
+  return { block, from: null, to };
 };
 
 export const deleteCascade = async (blockId: string): Promise<BlockDoc> => {
@@ -49,6 +66,7 @@ export const deleteCascade = async (blockId: string): Promise<BlockDoc> => {
   }
 
   const parent = await Block.readOne(block.parentId.toHexString());
-  await parent.deleteChild(block);
+  await block.deleteCascade();
+  await parent.deleteChild(blockId);
   return parent;
 };
