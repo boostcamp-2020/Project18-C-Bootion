@@ -23,12 +23,18 @@ export const readAll = async (pageId: string): Promise<BlockDoc[]> => {
   return Block.readAll(pageId);
 };
 
-export const update = async (param: {
-  blockId: string;
-  blockDTO: BlockDTO;
-  toId?: string;
-  toIndex?: number;
-}): Promise<{ block: BlockDoc; from?: BlockDoc; to?: BlockDoc }> => {
+export const update = async (
+  blockId: string,
+  blockDTO: BlockDTO,
+): Promise<{ block: BlockDoc; from?: BlockDoc; to?: BlockDoc }> => {
+  return null;
+};
+
+export const move = async (
+  blockId: string,
+  toId: string,
+  toIndex?: number,
+): Promise<{ block: BlockDoc; from?: BlockDoc; to?: BlockDoc }> => {
   return null;
 };
 

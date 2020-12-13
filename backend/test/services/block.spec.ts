@@ -99,7 +99,7 @@ describe('@services/block', () => {
     expect(received).toEqual(expected);
   });
 
-  it('update: Success contents', async () => {
+  it('update: Success', async () => {
     const { block } = await blockService.create({
       parentId: page.rootId.toHexString(),
     });
@@ -108,25 +108,29 @@ describe('@services/block', () => {
       value: 'updated',
       type: BlockType.HEADING1,
     };
-    const { block: received } = await blockService.update({
-      blockId: block.id,
-      blockDTO: expected,
-    });
+    const { block: received } = await blockService.update(block.id, expected);
 
     expect(received.value).toEqual(expected.value);
     expect(received.type).toEqual(expected.type);
   });
 
-  it('update: Success moving one to another', async () => {
+  it('update: Not found', async () => {
+    const received = { blockId: 'invalid id', blockDTO: {} };
+
+    await expect(async () =>
+      blockService.update(received.blockId, received.blockDTO),
+    ).rejects.toThrow();
+  });
+
+  it('move: Success moving one to another', async () => {
     const param = { parentId: page.rootId.toHexString() };
     const { block: block01 } = await blockService.create(param);
     const { block: block02, parent } = await blockService.create(param);
 
-    const { block: received, from, to } = await blockService.update({
-      blockId: block01.id,
-      blockDTO: block01.toJSON(),
-      toId: block02.id,
-    });
+    const { block: received, from, to } = await blockService.move(
+      block01.id,
+      block02.id,
+    );
 
     expect(received.parentId.toHexString()).toEqual(block02.id);
     expect(from.id).toEqual(parent.id);
@@ -146,24 +150,11 @@ describe('@services/block', () => {
     const { block: block01 } = await blockService.create(param);
     const { block: block02, parent } = await blockService.create(param);
 
-    const { to } = await blockService.update({
-      blockId: block02.id,
-      blockDTO: block02.toJSON(),
-      toId: parent.id,
-      toIndex: 0,
-    });
+    const { to } = await blockService.move(block02.id, parent.id, 0);
     const received = to.childIdList.map((childId) => childId.toHexString());
 
     expect(to.id).toEqual(parent.id);
     expect(received).toEqual([block02.id, block01.id]);
-  });
-
-  it('update: Not found', async () => {
-    const received = { blockId: 'invalid id', blockDTO: {} };
-
-    await expect(
-      async () => await blockService.update(received),
-    ).rejects.toThrow();
   });
 
   it('deleteCascade: Success', async () => {
