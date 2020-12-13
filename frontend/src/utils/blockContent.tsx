@@ -13,15 +13,22 @@ export const regex: { [key: string]: RegExp } = {
   quote: /^\|\s[^\s.]*/gm,
 };
 
+const divCSS = css`
+  margin: 0px 4px;
+  font-size: 18px;
+  color: inherit;
+  height: 100%;
+`;
+
 export const listComponent: { [key: string]: any } = {
-  bulletedlist: <span>•</span>,
-  numberedlist: <span> 1. </span>,
+  bulletedlist: <div css={divCSS}>•</div>,
+  numberedlist: <div css={divCSS}> 1. </div>,
   togglelist: (
-    <span>
+    <div css={divCSS}>
       <Toggle />
-    </span>
+    </div>
   ),
-  quote: <span>▕</span>,
+  quote: <div css={divCSS}>▕</div>,
 };
 
 export const fontSize: { [key: string]: string } = {
@@ -35,4 +42,5 @@ export const placeHolder: { [key: string]: string } = {
   heading1: 'Heading 1',
   heading2: 'Heading 2',
   heading3: 'Heading 3',
+  quote: 'Empty quote',
 };
