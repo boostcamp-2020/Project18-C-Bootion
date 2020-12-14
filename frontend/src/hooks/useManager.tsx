@@ -8,6 +8,7 @@ interface ManagerFunc {
   startTransaction: () => void;
   commitTransaction: () => void;
   pullIn: () => Block;
+  pullOut: () => Block;
 }
 
 const useManger = (
@@ -107,6 +108,26 @@ const useManger = (
     return block;
   };
 
+  const pullOut = () => {
+    if (grandParent && grandParent.type !== BlockType.GRID) {
+      transaction[parent.id] = {
+        ...parent,
+        childIdList: parent.childIdList.filter((id) => id !== block.id),
+      };
+      const copyParentsIdList = [...parentsIdList];
+      copyParentsIdList.splice(parentIndex + 1, 0, block.id);
+      transaction[block.id] = {
+        ...block,
+        parentId: grandParent.id,
+      };
+      transaction[grandParent.id] = {
+        ...grandParent,
+        childIdList: copyParentsIdList,
+      };
+    }
+    return block;
+  };
+
   return [
     family,
     {
@@ -117,6 +138,7 @@ const useManger = (
       startTransaction,
       commitTransaction,
       pullIn,
+      pullOut,
     },
   ];
 };
