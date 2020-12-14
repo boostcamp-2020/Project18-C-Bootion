@@ -1,4 +1,4 @@
-import { Block, Page } from '@/schemes';
+import { Block } from '@/schemes';
 
 import { fetchApi } from '@/utils';
 

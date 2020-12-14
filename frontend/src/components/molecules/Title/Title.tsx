@@ -55,7 +55,7 @@ function Title(): JSX.Element {
     debounce(async (page: Page) => {
       caretRef.current = window.getSelection().focusOffset;
 
-      const { page: updatedPage } = await updatePage(page.id)({ page });
+      const { page: updatedPage } = await updatePage(page);
       const updatedPages = await refreshPages();
 
       setSelectedPage(updatedPage);

@@ -4,7 +4,10 @@ import { fetchApi } from '@/utils';
 
 const BASE_URL = '/api/pages';
 
-export const createPage = fetchApi<{ page: Page; pages: Page[] }>({
+export const createPage = fetchApi<
+  { page: Page; pages: Page[] },
+  { page: Page }
+>({
   url: `${BASE_URL}`,
   method: 'POST',
   defaultReturn: { page: null, pages: [] },
@@ -23,12 +26,12 @@ export const readPages = fetchApi<{ pages: Page[] }>({
   defaultReturn: { pages: [] },
 });
 
-export const updatePage = (pageId: string) => (paramData: { page: Page }) =>
+export const updatePage = (page: Page) =>
   fetchApi<{ page: Page }, { page: Page }>({
-    url: `${BASE_URL}/id/${pageId}`,
+    url: `${BASE_URL}/id/${page.id}`,
     method: 'PATCH',
-    defaultReturn: paramData,
-  })(paramData);
+    defaultReturn: { page },
+  })({ page });
 
 export const deletePage = (pageId: string) =>
   fetchApi<{ pages: Page[] }>({
