@@ -8,18 +8,18 @@ export const pageRouter = Router();
 
 pageRouter.post('', errorHandler(pageController.create));
 pageRouter.get(
-  '/id/:id',
-  validateObjectId,
+  '/id/:pageId',
+  validateObjectId('pageId'),
   errorHandler(pageController.readOne),
 );
 pageRouter.get('', errorHandler(pageController.readAll));
 pageRouter.patch(
-  '/id/:id',
-  validateObjectId,
+  '/id/:pageId',
+  validateObjectId('pageId'),
   errorHandler(pageController.update),
 );
 pageRouter.delete(
-  '/id/:id',
-  validateObjectId,
+  '/id/:pageId',
+  validateObjectId('pageId'),
   errorHandler(pageController.deleteOne),
 );
