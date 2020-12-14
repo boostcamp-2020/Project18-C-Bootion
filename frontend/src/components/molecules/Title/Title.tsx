@@ -5,7 +5,7 @@ import { jsx, css } from '@emotion/react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { pagesState, selectedPageState } from '@/stores';
 import { ChangeEvent, useEffect, useRef } from 'react';
-import { debounce, readPages, updatePage } from '@/utils';
+import { debounce, refreshPages, updatePage } from '@/utils';
 import { Page } from '@/schemes';
 
 const wrapperCss = () => css`
@@ -52,11 +52,14 @@ function Title(): JSX.Element {
   const setPages = useSetRecoilState(pagesState);
   const caretRef = useRef(0);
   const updateSelectedPage = useRef(
-    debounce(async (updatedPage: Page) => {
+    debounce(async (page: Page) => {
       caretRef.current = window.getSelection().focusOffset;
 
-      setSelectedPage(await updatePage(updatedPage));
-      setPages(await readPages());
+      const { page: updatedPage } = await updatePage(page.id)({ page });
+      const updatedPages = await refreshPages();
+
+      setSelectedPage(updatedPage);
+      setPages(updatedPages);
     }, 300),
   ).current;
 

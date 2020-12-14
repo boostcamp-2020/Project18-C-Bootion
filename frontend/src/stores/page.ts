@@ -1,7 +1,7 @@
-import { atom } from 'recoil';
+import { atom, selector } from 'recoil';
 
 import { BlockMap, Page } from '@/schemes';
-import { createPage, fetchDummyData, readPages } from '@/utils';
+import { fetchDummyData, refreshPages } from '@/utils';
 import { MutableRefObject } from 'react';
 
 enum StateType {
@@ -51,13 +51,7 @@ export const focusState = atom({
 
 export const pagesState = atom({
   key: StateType.PAGES_STATE,
-  default: (async () => {
-    const pages = await readPages();
-    if (pages.length) {
-      return pages;
-    }
-    return (await createPage())?.pages;
-  })(),
+  default: refreshPages(),
 });
 
 export const staticMenuToggleState = atom({
@@ -72,5 +66,5 @@ export const hoveredMenuToggleState = atom({
 
 export const selectedPageState = atom({
   key: StateType.SELECTED_PAGE_STATE,
-  default: (async () => (await readPages())[0])(),
+  default: (async () => (await refreshPages())[0])(),
 });
