@@ -46,23 +46,23 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
     }
     /* block이 마지막 자식일 때. 다음 부모가 다음 Block 이다. */
     const targetParentBlock = parents[parentIndex + 1];
-    if (targetParentBlock) {
-      switch (targetParentBlock.type) {
-        case BlockType.COLUMN:
-          /** 다음 부모의 Type이 Column 일때 첫번째 자식이 다음 Block 이다. */
-          return blockMap[targetParentBlock.childIdList[0]];
-        case BlockType.GRID:
-          /** 다음 부모의 Type이 Grid 일때 첫번째 자식(Column)의 자식이 다음 Block 이다. */
-          return blockMap[
-            blockMap[targetParentBlock.childIdList[0]].childIdList[0]
-          ];
-        default:
-          /** 다음 부모의 타입이 COLUMN이나 GRID가 아니면 다음 Block 이다. */
-          return targetParentBlock;
-      }
+    if (!targetParentBlock) {
+      /** 현재 블록이 마지막 블록이다. */
+      return null;
     }
-    /** 현재 블록이 마지막 블록이다. */
-    return null;
+    switch (targetParentBlock.type) {
+      case BlockType.COLUMN:
+        /** 다음 부모의 Type이 Column 일때 첫번째 자식이 다음 Block 이다. */
+        return blockMap[targetParentBlock.childIdList[0]];
+      case BlockType.GRID:
+        /** 다음 부모의 Type이 Grid 일때 첫번째 자식(Column)의 자식이 다음 Block 이다. */
+        return blockMap[
+          blockMap[targetParentBlock.childIdList[0]].childIdList[0]
+        ];
+      default:
+        /** 다음 부모의 타입이 COLUMN이나 GRID가 아니면 다음 Block 이다. */
+        return targetParentBlock;
+    }
   };
 
   const getPrevBlock = () => {
