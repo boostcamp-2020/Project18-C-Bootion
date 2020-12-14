@@ -114,7 +114,8 @@ function BlockContent(blockDTO: Block) {
         focusOffset ===
           ((focusNode as any).length ?? (focusNode as any).innerText.length)) ||
       (event.key === 'Enter' && !event.shiftKey) ||
-      event.key === 'Tab'
+      event.key === 'Tab' ||
+      (event.key === 'Backspace' && !focusOffset)
     ) {
       throttleState.isThrottle = true;
       event.preventDefault();
