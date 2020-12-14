@@ -13,6 +13,7 @@ const useCommand = () => {
       addChild,
       addSibling,
       setBlock,
+      pullIn,
       startTransaction,
       commitTransaction,
     },
@@ -91,6 +92,12 @@ const useCommand = () => {
           const newBlock = addSibling({ value: after, type });
           setFocus(newBlock);
         }
+        commitTransaction();
+        break;
+      }
+      case 'Tab': {
+        startTransaction();
+        pullIn();
         commitTransaction();
         break;
       }
