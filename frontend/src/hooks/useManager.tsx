@@ -7,6 +7,7 @@ interface ManagerFunc {
   setBlock: (option?: any) => void;
   startTransaction: () => void;
   commitTransaction: () => void;
+  pullIn: () => Block;
 }
 
 const useManger = (
@@ -87,6 +88,25 @@ const useManger = (
     return newBlock;
   };
 
+  const pullIn = () => {
+    if (blockIndex) {
+      const targetSibling = transaction[siblingsIdList[blockIndex - 1]];
+      transaction[siblingsIdList[blockIndex - 1]] = {
+        ...targetSibling,
+        childIdList: [...targetSibling.childIdList, block.id],
+      };
+      transaction[parent.id] = {
+        ...transaction[parent.id],
+        childIdList: siblingsIdList.filter((id) => id !== block.id),
+      };
+      transaction[block.id] = {
+        ...block,
+        parentId: siblingsIdList[blockIndex - 1],
+      };
+    }
+    return block;
+  };
+
   return [
     family,
     {
@@ -96,6 +116,7 @@ const useManger = (
       setBlock,
       startTransaction,
       commitTransaction,
+      pullIn,
     },
   ];
 };
