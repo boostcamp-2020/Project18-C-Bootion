@@ -10,23 +10,24 @@ import { HeaderButton } from '@atoms/index';
 import { ReactComponent as Trash } from '@assets/trash.svg';
 import { deletePage, refreshPages } from '@/utils';
 
-const itemCss = (isHovered: boolean) => css`
+const itemWrapperCss = (isHovered: boolean) => css`
+  position: relative;
   align-items: center;
+  cursor: pointer;
+`;
+const itemCss = (isHovered: boolean) => css`
   min-height: 27px;
   padding: 2px 14px;
   padding-right: ${isHovered ? 8 : 14}px;
-  cursor: pointer;
   background: ${isHovered ? 'rgba(55, 53, 47, 0.08)' : 'inherit'};
 `;
 const selectedItemCss = (isHovered: boolean) => css`
-  align-items: center;
   min-height: 27px;
   padding: 2px 14px;
   padding-right: ${isHovered ? 8 : 14}px;
   background: ${isHovered
     ? 'rgba(55, 53, 47, 0.16)'
     : 'rgba(55, 53, 47, 0.08)'};
-  cursor: pointer;
 `;
 const titleCss = () => css`
   color: rgb(55, 53, 47);
@@ -38,7 +39,9 @@ const titleCss = () => css`
   text-overflow: ellipsis;
 `;
 const trashCss = () => css`
-  float: right;
+  position: absolute;
+  top: 2px;
+  right: 13px;
 `;
 
 interface Props {
@@ -62,17 +65,22 @@ function MenuItem({ page }: Props): JSX.Element {
 
   return (
     <div
-      key={page.id}
-      css={
-        selectedPage.id === page.id
-          ? selectedItemCss(hoverToggle)
-          : itemCss(hoverToggle)
-      }
-      onClick={() => setSelectedPage(page)}
-      onKeyUp={() => setSelectedPage(page)}
+      css={itemWrapperCss(hoverToggle)}
       onMouseEnter={() => setHoverToggle(true)}
       onMouseLeave={() => setHoverToggle(false)}
     >
+      <div
+        key={page.id}
+        css={
+          selectedPage.id === page.id
+            ? selectedItemCss(hoverToggle)
+            : itemCss(hoverToggle)
+        }
+        onClick={() => setSelectedPage(page)}
+        onKeyUp={() => setSelectedPage(page)}
+      >
+        <div css={titleCss()}>{page.title || 'Untitled'}</div>
+      </div>
       {hoverToggle && (
         <div css={trashCss()}>
           <HeaderButton clickHandler={deletePageHandler}>
@@ -80,7 +88,6 @@ function MenuItem({ page }: Props): JSX.Element {
           </HeaderButton>
         </div>
       )}
-      <div css={titleCss()}>{page.title || 'Untitled'}</div>
     </div>
   );
 }
