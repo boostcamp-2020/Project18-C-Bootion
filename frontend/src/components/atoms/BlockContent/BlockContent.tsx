@@ -1,10 +1,10 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useEffect, useRef, FormEvent, KeyboardEvent, useState } from 'react';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useEffect, useRef, FormEvent, KeyboardEvent } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
-import { blockState, blockRefState, throttleState } from '@/stores';
+import { blockMapState, blockRefState, throttleState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
   regex,
@@ -52,17 +52,21 @@ const editableDivCSS = (block: Block): SerializedStyles => css`
 
 function BlockContent(blockDTO: Block) {
   const contentEditableRef = useRef(null);
+  const [blockMap, setBlockMap] = useRecoilState(blockMapState);
   const focusId = useRecoilValue(focusState);
-  const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
   const caretRef = useRef(0);
-  const setBlockRef = useSetRecoilState(blockRefState);
-  const renderBlock: Block = block ?? blockDTO;
   const [Dispatcher] = useCommand();
 
-  const handleBlock = (value: string, type?: string) =>
+  const handleBlock = (value: string, type?: BlockType) =>
     type
-      ? setBlock({ ...renderBlock, value, type })
-      : setBlock({ ...renderBlock, value });
+      ? setBlockMap({
+          ...blockMap,
+          [blockDTO.id]: { ...blockDTO, value, type },
+        })
+      : setBlockMap({
+          ...blockMap,
+          [blockDTO.id]: { ...blockDTO, value },
+        });
 
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     const content = event.currentTarget.textContent;
@@ -73,7 +77,7 @@ function BlockContent(blockDTO: Block) {
     if (newType) {
       handleBlock(
         content.slice(content.indexOf(' ') + 1, content.length),
-        newType[0],
+        newType[0] as BlockType,
       );
       caretRef.current = 0;
       return;
@@ -87,7 +91,7 @@ function BlockContent(blockDTO: Block) {
     const content = event.currentTarget.textContent;
     if (
       event.key === 'Backspace' &&
-      (!renderBlock.value || !window.getSelection().focusOffset)
+      (!blockDTO.value || !window.getSelection().focusOffset)
     ) {
       handleBlock(content, BlockType.TEXT);
     }
@@ -121,20 +125,14 @@ function BlockContent(blockDTO: Block) {
   };
 
   useEffect(() => {
-    setBlockRef((data: any) => ({
-      ...data,
-      [renderBlock.id]: contentEditableRef,
-    }));
+    blockRefState[blockDTO.id] = contentEditableRef;
     return () => {
-      setBlockRef((data: any) => ({
-        ...data,
-        [renderBlock.id]: null,
-      }));
+      blockRefState[blockDTO.id] = null;
     };
   }, []);
 
   useEffect(() => {
-    if (focusId === renderBlock.id) contentEditableRef.current.focus();
+    if (focusId === blockDTO.id) contentEditableRef.current.focus();
   }, [focusId]);
 
   useEffect(() => {
@@ -144,22 +142,22 @@ function BlockContent(blockDTO: Block) {
       caretRef.current = nodeLength;
     }
     selection.collapse(selection.focusNode, caretRef.current);
-  }, [renderBlock.value]);
+  }, [blockDTO.value]);
 
   return (
     <div css={blockContentCSS}>
-      {listComponent[renderBlock.type]}
+      {listComponent[blockDTO.type]}
       <div
         ref={contentEditableRef}
-        css={editableDivCSS(renderBlock)}
+        css={editableDivCSS(blockDTO)}
         contentEditable
         onKeyDown={handleKeyDown}
         suppressContentEditableWarning
-        placeholder={placeHolder[renderBlock.type]}
+        placeholder={placeHolder[blockDTO.type]}
         onInput={handleValue}
         onKeyUp={handleKeyUp}
       >
-        {renderBlock.value}
+        {blockDTO.value}
       </div>
     </div>
   );

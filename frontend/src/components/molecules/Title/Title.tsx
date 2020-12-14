@@ -47,9 +47,7 @@ const titleCss = () => css`
 }
 `;
 
-interface Props {}
-
-function Title({}: Props): JSX.Element {
+function Title(): JSX.Element {
   const [selectedPage, setSelectedPage] = useRecoilState(selectedPageState);
   const setPages = useSetRecoilState(pagesState);
   const caretRef = useRef(0);

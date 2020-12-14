@@ -1,7 +1,8 @@
-import { atom, atomFamily, useRecoilValue } from 'recoil';
+import { atom } from 'recoil';
 
-import { IdType, Block, Page } from '@/schemes';
-import { createPage, fetchDummyData, readPage, readPages } from '@/utils';
+import { BlockMap, Page } from '@/schemes';
+import { createPage, fetchDummyData, readPages } from '@/utils';
+import { MutableRefObject } from 'react';
 
 enum StateType {
   PAGE_STATE = 'pageState',
@@ -17,33 +18,21 @@ enum StateType {
   SELECTED_PAGE_STATE = 'selectedPageState',
 }
 
-export const pageState = atomFamily({
+export const pageState = atom<Page>({
   key: StateType.PAGE_STATE,
-  default: async (id: IdType) => fetchDummyData(id),
+  default: (async () => (await fetchDummyData()).page)(),
 });
 
-export const blockMapState: { [id: string]: Block } = {};
-
-export const blockState = atomFamily({
-  key: StateType.BLOCK_STATE,
-  default: null,
-  effects_UNSTABLE: (blockId: string) => [
-    ({ onSet }) => {
-      onSet((block) => {
-        blockMapState[blockId] = block;
-      });
-    },
-  ],
+export const blockMapState = atom<BlockMap>({
+  key: StateType.BLOCK_MAP_STATE,
+  default: (async () => (await fetchDummyData()).blockMap)(),
 });
 
 export const throttleState = {
   isThrottle: false,
 };
 
-export const blockRefState = atom<any>({
-  key: StateType.BLOCK_REF_STATE,
-  default: {},
-});
+export const blockRefState: { [id: string]: MutableRefObject<any> } = {};
 
 export const hoverState = atom({
   key: StateType.HOVER_STATE,

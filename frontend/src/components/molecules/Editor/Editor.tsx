@@ -2,10 +2,9 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 
-import { Block } from '@/schemes';
 import { BlockComponent } from '@components/molecules';
 import { useRecoilValue } from 'recoil';
-import { pageState } from '@/stores';
+import { pageState, blockMapState } from '@/stores';
 
 const wrapperCss = () => css`
   padding-left: calc(96px + env(safe-area-inset-left));
@@ -15,15 +14,14 @@ const wrapperCss = () => css`
   margin: auto;
 `;
 
-interface Props {}
-
-function Editor({}: Props): JSX.Element {
-  const page = useRecoilValue(pageState('1'));
+function Editor(): JSX.Element {
+  const page = useRecoilValue(pageState);
+  const blockMap = useRecoilValue(blockMapState);
 
   return (
     <div css={wrapperCss()}>
-      {page?.blockList.map((block: Block) => (
-        <BlockComponent key={block.id} blockDTO={block} />
+      {blockMap[page.rootId].childIdList.map((blockId: string) => (
+        <BlockComponent key={blockId} blockDTO={blockMap[blockId]} />
       ))}
     </div>
   );
