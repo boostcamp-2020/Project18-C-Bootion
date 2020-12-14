@@ -63,16 +63,13 @@ function Menu({}: Props): JSX.Element {
     hoveredMenuToggleState,
   );
 
-  const handleCreatingPage = () => {
-    const doFetch = async () => {
-      const { pages: updated, page: created } = await createPage();
-      setPages(updated);
-      setSelectedPage(created);
-    };
-    doFetch();
+  const CreatingPageHandler = async () => {
+    const { pages: updated, page: created } = await createPage();
+    setPages(updated);
+    setSelectedPage(created);
   };
 
-  const handleClickClose = () => {
+  const clickCloseHandler = () => {
     setStaticMenuToggle(false);
     setHoveredMenuToggle(false);
   };
@@ -82,12 +79,12 @@ function Menu({}: Props): JSX.Element {
       {hoveredMenuToggle && (
         <div css={buttonsCss()}>
           <div css={plusCss()}>
-            <HeaderButton handleClick={handleCreatingPage}>
+            <HeaderButton clickHandler={CreatingPageHandler}>
               <PlusPage />
             </HeaderButton>
           </div>
           {staticMenuToggle && (
-            <HeaderButton handleClick={handleClickClose}>
+            <HeaderButton clickHandler={clickCloseHandler}>
               <DoubleChevronLeft />
             </HeaderButton>
           )}
@@ -96,7 +93,7 @@ function Menu({}: Props): JSX.Element {
       <div css={workspaceCss()}>WORKSPACE</div>
       <Suspense fallback={<div>Loading...</div>}>
         {pages.map((page) => (
-          <MenuItem page={page} />
+          <MenuItem key={page.id} page={page} />
         ))}
       </Suspense>
     </div>

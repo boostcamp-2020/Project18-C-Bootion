@@ -19,13 +19,13 @@ const buttonCss = (): SerializedStyles => css`
   }
 `;
 
-function HeaderButton({ children, handleClick }: any): JSX.Element {
+function HeaderButton({ children, clickHandler }: any): JSX.Element {
   return (
     <div
       role="button"
       css={buttonCss()}
-      onClick={handleClick}
-      onKeyUp={handleClick}
+      onClick={clickHandler}
+      onKeyUp={clickHandler}
       tabIndex={0}
     >
       {children}
