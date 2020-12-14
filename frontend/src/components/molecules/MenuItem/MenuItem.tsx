@@ -1,13 +1,14 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { css, jsx } from '@emotion/react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useState } from 'react';
 
 import { Page } from '@/schemes';
-import { selectedPageState } from '@/stores';
+import { pagesState, selectedPageState } from '@/stores';
 import { HeaderButton } from '@atoms/index';
 import { ReactComponent as Trash } from '@assets/trash.svg';
+import { deletePage, refreshPages } from '@/utils';
 
 const itemCss = (isHovered: boolean) => css`
   align-items: center;
@@ -47,8 +48,17 @@ interface Props {
 function MenuItem({ page }: Props): JSX.Element {
   const [selectedPage, setSelectedPage] = useRecoilState(selectedPageState);
   const [hoverToggle, setHoverToggle] = useState(false);
+  const setPages = useSetRecoilState(pagesState);
 
-  const handleDeletePage = () => {};
+  const deletePageHandler = async () => {
+    await deletePage(page.id);
+    const pages = await refreshPages();
+
+    if (page.id === selectedPage.id) {
+      setSelectedPage(pages[0]);
+    }
+    setPages(pages);
+  };
 
   return (
     <div
@@ -65,7 +75,7 @@ function MenuItem({ page }: Props): JSX.Element {
     >
       {hoverToggle && (
         <div css={trashCss()}>
-          <HeaderButton handleClick={handleDeletePage}>
+          <HeaderButton clickHandler={deletePageHandler}>
             <Trash />
           </HeaderButton>
         </div>
