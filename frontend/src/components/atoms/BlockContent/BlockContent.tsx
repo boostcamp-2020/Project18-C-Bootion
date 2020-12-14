@@ -2,14 +2,9 @@
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useEffect, useRef, FormEvent, KeyboardEvent } from 'react';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
-import {
-  blockState,
-  blockRefState,
-  throttleState,
-  blockMapState,
-} from '@/stores';
+import { blockRefState, throttleState, blockMapState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
   regex,
@@ -57,27 +52,24 @@ const editableDivCSS = (block: Block): SerializedStyles => css`
 
 function BlockContent(blockDTO: Block) {
   const contentEditableRef = useRef(null);
+  const [blockMap, setBlockMap] = useRecoilState(blockMapState);
   const focusId = useRecoilValue(focusState);
-  const [block, setBlock] = useRecoilState(blockState(blockDTO.id));
   const caretRef = useRef(0);
   const listCnt = useRef(1);
-  const setBlockRef = useSetRecoilState(blockRefState);
-  const renderBlock: Block = block ?? blockDTO;
   const [Dispatcher] = useCommand();
 
-  const indexInSibling: number = blockMapState[
-    renderBlock.parentBlockId
-  ]?.children.findIndex((_block: Block) => _block.id === renderBlock?.id);
+  const indexInSibling: number = blockMap[
+    blockDTO.parentId
+  ].childIdList.findIndex((childId: string) => childId === blockDTO.id);
 
-  const upperBlocks: Array<Block> = blockMapState[
-    renderBlock.parentBlockId
-  ]?.children
+  const upperBlocks: Array<Block> = blockMap[blockDTO.parentId].childIdList
+    .map((childId: any) => blockMap[childId])
     .slice(0, indexInSibling)
     .reverse();
 
   const isUpperBlockEqualToNumberList = (): boolean => {
     if (upperBlocks.length) {
-      return upperBlocks[0].type === BlockType.NUMBEREDLIST;
+      return upperBlocks[0].type === BlockType.NUMBERED_LIST;
     }
     return false;
   };
@@ -85,16 +77,22 @@ function BlockContent(blockDTO: Block) {
   const cntOfUpperNumberListBlock = (): number => {
     let cnt = 0;
     for (const upperblock of upperBlocks) {
-      if (upperblock.type !== BlockType.NUMBEREDLIST) break;
+      if (upperblock.type !== BlockType.NUMBERED_LIST) break;
       cnt += 1;
     }
     return cnt;
   };
 
-  const handleBlock = (value: string, type?: string) =>
+  const handleBlock = (value: string, type?: BlockType) =>
     type
-      ? setBlock({ ...renderBlock, value, type })
-      : setBlock({ ...renderBlock, value });
+      ? setBlockMap({
+          ...blockMap,
+          [blockDTO.id]: { ...blockDTO, value, type },
+        })
+      : setBlockMap({
+          ...blockMap,
+          [blockDTO.id]: { ...blockDTO, value },
+        });
 
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     const content = event.currentTarget.textContent;
@@ -103,7 +101,7 @@ function BlockContent(blockDTO: Block) {
     );
 
     if (newType) {
-      if (newType[0] === BlockType.NUMBEREDLIST) {
+      if (newType[0] === BlockType.NUMBERED_LIST) {
         if (!indexInSibling && content[0] !== '1') return;
         if (indexInSibling) {
           if (!isUpperBlockEqualToNumberList() && content[0] !== '1') return;
@@ -117,7 +115,7 @@ function BlockContent(blockDTO: Block) {
 
       handleBlock(
         content.slice(content.indexOf(' ') + 1, content.length),
-        newType[0],
+        newType[0] as BlockType,
       );
       caretRef.current = 0;
       return;
@@ -131,7 +129,7 @@ function BlockContent(blockDTO: Block) {
     const content = event.currentTarget.textContent;
     if (
       event.key === 'Backspace' &&
-      (!renderBlock.value || !window.getSelection().focusOffset)
+      (!blockDTO.value || !window.getSelection().focusOffset)
     ) {
       handleBlock(content, BlockType.TEXT);
     }
@@ -165,20 +163,14 @@ function BlockContent(blockDTO: Block) {
   };
 
   useEffect(() => {
-    setBlockRef((data: any) => ({
-      ...data,
-      [renderBlock.id]: contentEditableRef,
-    }));
+    blockRefState[blockDTO.id] = contentEditableRef;
     return () => {
-      setBlockRef((data: any) => ({
-        ...data,
-        [renderBlock.id]: null,
-      }));
+      blockRefState[blockDTO.id] = null;
     };
   }, []);
 
   useEffect(() => {
-    if (focusId === renderBlock.id) contentEditableRef.current.focus();
+    if (focusId === blockDTO.id) contentEditableRef.current.focus();
   }, [focusId]);
 
   useEffect(() => {
@@ -189,7 +181,7 @@ function BlockContent(blockDTO: Block) {
     }
     selection.collapse(selection.focusNode, caretRef.current);
 
-    if (renderBlock.type === BlockType.NUMBEREDLIST) {
+    if (blockDTO.type === BlockType.NUMBERED_LIST) {
       if (!indexInSibling || !isUpperBlockEqualToNumberList()) {
         listCnt.current = 1;
         return;
@@ -198,22 +190,22 @@ function BlockContent(blockDTO: Block) {
         listCnt.current = cntOfUpperNumberListBlock() + 1;
       }
     }
-  }, [renderBlock.value]);
+  }, [blockDTO.value]);
 
   return (
     <div css={blockContentCSS}>
-      {listBlockType(renderBlock, listCnt.current)}
+      {listBlockType(blockDTO, listCnt.current)}
       <div
         ref={contentEditableRef}
-        css={editableDivCSS(renderBlock)}
+        css={editableDivCSS(blockDTO)}
         contentEditable
         onKeyDown={handleKeyDown}
         suppressContentEditableWarning
-        placeholder={placeHolder[renderBlock.type]}
+        placeholder={placeHolder[blockDTO.type]}
         onInput={handleValue}
         onKeyUp={handleKeyUp}
       >
-        {renderBlock.value}
+        {blockDTO.value}
       </div>
     </div>
   );

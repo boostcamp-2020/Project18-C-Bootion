@@ -1,19 +1,12 @@
-import { Block, BlockType, BlockFamily, FamilyFunc } from '@/schemes';
+import { Block, BlockType, BlockFamily, FamilyFunc, BlockMap } from '@/schemes';
 import { useFamily } from '@/hooks';
 
 interface ManagerFunc {
-  addChild: (
-    parentOption: any,
-    childOption: any,
-    blockType?: BlockType,
-    insertIndex?: number,
-  ) => Block;
-  addSibling: (
-    parentOption: any,
-    siblingOption: any,
-    blockType?: BlockType,
-    insertIndex?: number,
-  ) => Block;
+  addChild: (option?: any, insertIndex?: number) => Block;
+  addSibling: (option?: any, insertIndex?: number) => Block;
+  setBlock: (option?: any) => void;
+  startTransaction: () => void;
+  commitTransaction: () => void;
 }
 
 const useManger = (
@@ -21,68 +14,76 @@ const useManger = (
 ): [BlockFamily, ManagerFunc & FamilyFunc] => {
   const [family, familyFunc] = useFamily(blockId);
   const {
+    blockMap,
     block,
     blockIndex,
     parent,
     parentIndex,
     grandParent,
     page,
+    childrenIdList,
     children,
+    siblingsIdList,
     siblings,
+    parentsIdList,
     parents,
   } = family;
-  const { setBlock, setParent, setPage } = familyFunc;
+  let transaction: BlockMap = { ...blockMap };
+  const startTransaction = () => {
+    transaction = { ...blockMap };
+  };
+  const commitTransaction = () => {
+    familyFunc.setBlockMap(transaction);
+  };
 
-  const addChild = (
-    parentOption: any = {},
-    childOption: any = {},
-    blockType: BlockType = BlockType.TEXT,
-    insertIndex: number = 0,
-  ) => {
-    const newBlock: Block = {
-      id: `${block.id}${children.length + 1}_${Date.now()}`,
-      type: blockType,
-      value: '',
-      children: [],
-      parentBlockId: block?.id ?? null,
-      pageId: page.id,
-      ...childOption,
-    };
-    const copyChildren = [...children];
-    copyChildren.splice(insertIndex, 0, newBlock);
-    setBlock({
+  const setBlock = (option: any = {}) => {
+    transaction[block.id] = {
       ...block,
-      children: copyChildren,
-      ...parentOption,
-    });
+      ...option,
+    };
+  };
+  const addChild = (option: any = {}, insertIndex = 0): Block => {
+    const id = `${block.id}${children.length + 1}_${Date.now()}`;
+    const newBlock: Block = {
+      id,
+      type: BlockType.TEXT,
+      value: '',
+      childIdList: [],
+      parentId: block?.id ?? null,
+      pageId: page.id,
+      ...option,
+    };
+    transaction[id] = newBlock;
+    const copyChildIdList = [...childrenIdList];
+    copyChildIdList.splice(insertIndex, 0, id);
+    transaction[block.id] = {
+      ...transaction[block.id],
+      childIdList: copyChildIdList,
+    };
     return newBlock;
   };
 
   const addSibling = (
-    blockOption: any = {},
-    siblingOption: any = {},
-    blockType: BlockType = BlockType.TEXT,
+    option: any = {},
     insertIndex = blockIndex + 1,
-  ) => {
+  ): Block => {
+    const id = `${parent?.id ?? ''}${siblings.length + 1}_${Date.now()}`;
     const newBlock: Block = {
-      id: `${parent?.id ?? ''}${siblings.length + 1}_${Date.now()}`,
-      type: blockType,
+      id,
+      type: BlockType.TEXT,
       value: '',
-      children: [],
-      parentBlockId: parent?.id ?? null,
+      childIdList: [],
+      parentId: parent?.id ?? null,
       pageId: page.id,
-      ...siblingOption,
+      ...option,
     };
-    const copySibling = [...siblings];
-    copySibling.splice(blockIndex, 1, { ...block, ...blockOption });
-    copySibling.splice(insertIndex, 0, newBlock);
-    parent
-      ? setParent({ ...parent, children: copySibling })
-      : setPage({
-          ...page,
-          blockList: copySibling,
-          blockIdList: copySibling.map((sibling) => sibling.id),
-        });
+    transaction[id] = newBlock;
+    const copySiblingsIdList = [...siblingsIdList];
+    copySiblingsIdList.splice(insertIndex, 0, id);
+    transaction[parent.id] = {
+      ...parent,
+      childIdList: copySiblingsIdList,
+    };
     return newBlock;
   };
 
@@ -92,6 +93,9 @@ const useManger = (
       ...familyFunc,
       addChild,
       addSibling,
+      setBlock,
+      startTransaction,
+      commitTransaction,
     },
   ];
 };

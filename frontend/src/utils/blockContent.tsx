@@ -16,7 +16,7 @@ export const regex: { [key: string]: RegExp } = {
 };
 
 export const listBlockType = (block: Block, idx: number) => {
-  if (block.type === BlockType.NUMBEREDLIST) {
+  if (block.type === BlockType.NUMBERED_LIST) {
     return <span>{`${idx}. `}</span>;
   }
   return listComponent[block.type];

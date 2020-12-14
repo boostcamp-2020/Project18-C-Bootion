@@ -34,9 +34,7 @@ const bottomMarginCss = () => css`
   height: 45%;
 `;
 
-interface Props {}
-
-function PageComponent({}: Props): JSX.Element {
+function PageComponent(): JSX.Element {
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
 
   return (

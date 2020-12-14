@@ -37,9 +37,7 @@ const menuCss = (staticMenuToggle: boolean) => css`
   margin-top: ${staticMenuToggle ? 0 : 10}px;
 `;
 
-interface Props {}
-
-function HeaderMenu({}: Props): JSX.Element {
+function HeaderMenu(): JSX.Element {
   const [staticMenuToggle, setStaticMenuToggle] = useRecoilState(
     staticMenuToggleState,
   );
