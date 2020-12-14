@@ -2,32 +2,32 @@ import { Router } from 'express';
 
 import { blockController } from '@/controllers';
 import { errorHandler } from '@/aops';
-import { validateObjectId } from '@/middlewares';
+import { objectIdValidator } from '@/middlewares';
 
 export const blockRouter = Router();
 
 blockRouter.post(
   '/parent-id/:parentId',
-  validateObjectId('parentId'),
+  objectIdValidator('parentId'),
   errorHandler(blockController.create),
 );
 blockRouter.get(
   '/page-id/:pageId',
-  validateObjectId('pageId'),
+  objectIdValidator('pageId'),
   errorHandler(blockController.readAll),
 );
 blockRouter.patch(
   '/id/:blockId',
-  validateObjectId('blockId'),
+  objectIdValidator('blockId'),
   errorHandler(blockController.update),
 );
 blockRouter.patch(
   '/id/:blockId/to/:toId',
-  validateObjectId('blockId', 'toId'),
+  objectIdValidator('blockId', 'toId'),
   errorHandler(blockController.move),
 );
 blockRouter.delete(
   '/id/:blockId',
-  validateObjectId('blockId'),
+  objectIdValidator('blockId'),
   errorHandler(blockController.deleteCascade),
 );

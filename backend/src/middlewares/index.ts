@@ -1,1 +1,1 @@
-export { validateObjectId } from './validateObjectId';
+export { objectIdValidator } from './objectIdValidator';
