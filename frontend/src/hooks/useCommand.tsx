@@ -6,10 +6,11 @@ import { Block, BlockType } from '@/schemes';
 const useCommand = () => {
   const [focusId, setFocusId] = useRecoilState(focusState);
   const [
-    { block, blockIndex },
+    { block, blockIndex, siblingsIdList, parent, grandParent, blockMap },
     {
       getPrevBlock,
       getNextBlock,
+      insertSibling,
       insertNewChild,
       insertNewSibling,
       setBlock,
@@ -17,6 +18,7 @@ const useCommand = () => {
       pullOut,
       startTransaction,
       commitTransaction,
+      deleteBlock,
     },
   ] = useManager(focusId);
 
@@ -105,6 +107,32 @@ const useCommand = () => {
       case 'shiftTab': {
         startTransaction();
         pullOut();
+        commitTransaction();
+        break;
+      }
+      case 'Backspace': {
+        startTransaction();
+        if (block.type !== BlockType.TEXT) {
+          setBlock(block.id, { type: BlockType.TEXT });
+        } else if (
+          siblingsIdList.length - 1 === blockIndex &&
+          grandParent?.type !== BlockType.GRID
+        ) {
+          pullOut();
+        } else {
+          const [, after] = getSlicedValueToCaretOffset();
+          const prevBlock = getPrevBlock();
+          if (prevBlock) {
+            const deletedBlockChildrenIdList = deleteBlock();
+            deletedBlockChildrenIdList.forEach((id, index) =>
+              insertSibling(id, index),
+            );
+            setFocus(
+              setBlock(prevBlock.id, { value: prevBlock.value + after }),
+            );
+            setCaretOffset(prevBlock.value.length);
+          }
+        }
         commitTransaction();
         break;
       }
