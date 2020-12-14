@@ -14,6 +14,7 @@ const useCommand = () => {
       addSibling,
       setBlock,
       pullIn,
+      pullOut,
       startTransaction,
       commitTransaction,
     },
@@ -98,6 +99,12 @@ const useCommand = () => {
       case 'Tab': {
         startTransaction();
         pullIn();
+        commitTransaction();
+        break;
+      }
+      case 'shiftTab': {
+        startTransaction();
+        pullOut();
         commitTransaction();
         break;
       }
