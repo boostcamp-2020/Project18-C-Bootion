@@ -1,13 +1,15 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
-import { jsx } from '@emotion/react';
-import styled from '@emotion/styled';
+import { jsx, css } from '@emotion/react';
 import React from 'react';
 
 import { ReactComponent as DraggableIcon } from '@assets/draggable.svg';
 import { ReactComponent as PlusIcon } from '@assets/plus.svg';
+import { Block } from '@/schemes';
+import { useSetRecoilState } from 'recoil';
+import { draggingBlockState } from '@/stores';
 
-const ButtonWrapper = styled.div`
+const buttonWrapperCss = () => css`
   display: flex;
   height: 100%;
   position: absolute;
@@ -23,13 +25,29 @@ const ButtonWrapper = styled.div`
     border-radius: 3px;
   }
 `;
+const buttonCss = () => css`
+  display: inline-block;
+  height: 16px;
+`;
 
-function BlockHandler(): React.ReactElement {
+interface Props {
+  block: Block;
+}
+
+function BlockHandler({ block }: Props): JSX.Element {
+  const setDraggingBlock = useSetRecoilState(draggingBlockState);
+
+  const setDraggingBlockHandler = () => {
+    setDraggingBlock(block);
+  };
+
   return (
-    <ButtonWrapper>
-      <PlusIcon css={{ height: '16px' }} />
-      <DraggableIcon css={{ height: '16px' }} />
-    </ButtonWrapper>
+    <div css={buttonWrapperCss()}>
+      <PlusIcon css={buttonCss()} />
+      <div css={buttonCss()} onMouseDown={setDraggingBlockHandler}>
+        <DraggableIcon css={buttonCss()} />
+      </div>
+    </div>
   );
 }
 

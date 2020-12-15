@@ -4,7 +4,12 @@ import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useEffect, useRef, FormEvent, KeyboardEvent } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
-import { blockMapState, blockRefState, throttleState } from '@/stores';
+import {
+  blockMapState,
+  blockRefState,
+  draggingBlockState,
+  throttleState,
+} from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
   regex,
@@ -12,8 +17,9 @@ import {
   placeHolder,
   listComponent,
 } from '@utils/blockContent';
-import { useCommand } from '@/hooks';
+import { useCommand, useManager } from '@/hooks';
 import { focusState } from '@/stores/page';
+import { moveBlock } from '@/utils';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
@@ -56,6 +62,28 @@ function BlockContent(blockDTO: Block) {
   const focusId = useRecoilValue(focusState);
   const caretRef = useRef(0);
   const [Dispatcher] = useCommand();
+  const draggingBlock = useRecoilValue(draggingBlockState);
+  const [{ blockIndex }] = useManager(blockDTO.id);
+
+  useEffect(() => {
+    blockRefState[blockDTO.id] = contentEditableRef;
+    return () => {
+      blockRefState[blockDTO.id] = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (focusId === blockDTO.id) contentEditableRef.current.focus();
+  }, [focusId]);
+
+  useEffect(() => {
+    const selection = window.getSelection();
+    const nodeLength = selection.focusNode?.nodeValue?.length ?? 0;
+    if (caretRef.current > nodeLength) {
+      caretRef.current = nodeLength;
+    }
+    selection.collapse(selection.focusNode, caretRef.current);
+  }, [blockDTO.value]);
 
   const handleBlock = (value: string, type?: BlockType) =>
     type
@@ -124,28 +152,28 @@ function BlockContent(blockDTO: Block) {
     }
   };
 
-  useEffect(() => {
-    blockRefState[blockDTO.id] = contentEditableRef;
-    return () => {
-      blockRefState[blockDTO.id] = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (focusId === blockDTO.id) contentEditableRef.current.focus();
-  }, [focusId]);
-
-  useEffect(() => {
-    const selection = window.getSelection();
-    const nodeLength = selection.focusNode?.nodeValue?.length ?? 0;
-    if (caretRef.current > nodeLength) {
-      caretRef.current = nodeLength;
+  const dropDraggingBlockHandler = async () => {
+    const blockId = draggingBlock?.id;
+    if (!blockId || blockId === blockDTO.id) {
+      return;
     }
-    selection.collapse(selection.focusNode, caretRef.current);
-  }, [blockDTO.value]);
+
+    const { block, from: fromBlock, to } = await moveBlock({
+      blockId,
+      toId: blockDTO.parentId,
+      index: blockIndex,
+    });
+    setBlockMap((prev) => {
+      const next = { ...prev };
+      next[block.id] = block;
+      fromBlock && (next[fromBlock.id] = fromBlock);
+      next[to.id] = to;
+      return next;
+    });
+  };
 
   return (
-    <div css={blockContentCSS}>
+    <div css={blockContentCSS} onMouseUp={dropDraggingBlockHandler}>
       {listComponent[blockDTO.type]}
       <div
         ref={contentEditableRef}
