@@ -15,19 +15,19 @@ export const regex: { [key: string]: RegExp } = {
   quote: /^\|\s[^\s.]*/gm,
 };
 
-export const listBlockType = (block: Block, idx: number) => {
-  if (block.type === BlockType.NUMBERED_LIST) {
-    return <span>{`${idx}. `}</span>;
-  }
-  return listComponent[block.type];
-};
-
 const divCSS = css`
   margin: 0px 4px;
   font-size: 18px;
   color: inherit;
   height: 100%;
 `;
+
+export const listBlockType = (block: Block, idx: number) => {
+  if (block.type === BlockType.NUMBERED_LIST) {
+    return <span css={divCSS}>{`${idx}. `}</span>;
+  }
+  return listComponent[block.type];
+};
 
 export const listComponent: { [key: string]: any } = {
   bulletedlist: <div css={divCSS}>•</div>,
