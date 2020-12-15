@@ -10,6 +10,7 @@ import {
   focusState,
   blockRefState,
   blockMapState,
+  draggingBlockState,
 } from '@stores/page';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
@@ -43,6 +44,7 @@ function BlockComponent({ blockDTO }: Props): JSX.Element {
   const [focusId, setFocusId] = useRecoilState<string>(focusState);
   const [hoverId, setHoverId] = useRecoilState(hoverState);
   const blockRef: any = blockRefState[blockDTO.id];
+  const draggingBlock = useRecoilValue(draggingBlockState);
 
   return (
     <div css={blockCss}>
@@ -59,7 +61,9 @@ function BlockComponent({ blockDTO }: Props): JSX.Element {
           block={blockDTO}
           clickHandler={() => blockRef.current.focus()}
         />
-        {hoverId === blockDTO.id && <BlockHandler block={blockDTO} />}
+        {!draggingBlock && hoverId === blockDTO.id && (
+          <BlockHandler block={blockDTO} />
+        )}
       </div>
       {blockDTO.childIdList.length ? (
         <div css={descendantsCss(blockDTO)}>
