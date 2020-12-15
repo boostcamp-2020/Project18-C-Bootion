@@ -1,40 +1,25 @@
-import { Document, Schema, Types, model } from 'mongoose';
+import { Document, Schema, Types, model, Model } from 'mongoose';
 
-import { Block, BlockDoc } from '@/models';
+import { Block, BlockType } from '.';
 
-export interface Page {
+export interface PageDTO {
+  _id?: string;
   id?: string;
   title?: string;
-  createdAt: Date;
-  blockIdList?: string[];
-  blockList?: Block[];
+  rootId?: string;
 }
 
-export interface PageDoc extends Document {
-  title?: string;
-  createdAt: Date;
-  blockIdList?: Types.ObjectId[];
-  blockList?: BlockDoc[];
-  addBlock?: (
-    this: PageDoc,
-    block: BlockDoc,
-    targetIndex?: number,
-  ) => Promise<void>;
-  removeBlock?: (this: PageDoc, block: BlockDoc) => Promise<void>;
-  populateBlock?: (this: PageDoc) => Promise<void>;
-}
 const PageSchema = new Schema(
   {
     title: {
       type: String,
       default: '',
     },
-    blockIdList: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Block',
-      },
-    ],
+    rootId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Block',
+      default: null,
+    },
   },
   { timestamps: true },
 );
@@ -45,46 +30,67 @@ PageSchema.virtual('id').get(function (this: PageDoc) {
 
 PageSchema.set('toJSON', { virtuals: true });
 
-PageSchema.methods.addBlock = async function (
-  this: PageDoc,
-  block: BlockDoc,
-  targetIndex?: number,
-): Promise<void> {
-  if (
-    (targetIndex !== 0 && !targetIndex) ||
-    targetIndex < 0 ||
-    targetIndex > this.blockIdList.length
-  ) {
-    targetIndex = this.blockIdList.length;
-  }
-  this.blockIdList.splice(targetIndex, 0, block.id);
-  await this.save();
+export interface PageModel extends Model<PageDoc> {
+  createOne?: (this: PageModel, pageDTO?: PageDTO) => Promise<PageDoc>;
+  readOne?: (this: PageModel, pageId: string) => Promise<PageDoc>;
+  readAll?: (this: PageModel) => Promise<PageDoc[]>;
+  updateOnePage?: (
+    this: PageModel,
+    pageId: string,
+    pageDTO: PageDTO,
+  ) => Promise<PageDoc>;
+}
 
-  block.pageId = this.id;
-  block.parentIdList = [];
-  block.children.forEach((child: BlockDoc, index: number) =>
-    block.addChild(child, index),
-  );
-  await block.save();
+export interface PageDoc extends Document {
+  title?: string;
+  rootId?: Types.ObjectId;
+  createdAt?: Date;
+
+  delete?: (this: PageDoc) => Promise<void>;
+}
+
+PageSchema.statics.createOne = async function (
+  this: PageModel,
+  pageDTO?: PageDTO,
+): Promise<PageDoc> {
+  const page = new this(pageDTO ?? {});
+  await page.save();
+  const block = await Block.createOne({
+    type: BlockType.PAGE,
+    pageId: page.id,
+  });
+  page.rootId = block.id;
+  await page.save();
+  return page;
 };
 
-PageSchema.methods.removeBlock = async function (
-  this: PageDoc,
-  block: BlockDoc,
-): Promise<void> {
-  this.blockIdList = this.blockIdList.filter(
-    (blockId: Types.ObjectId) => block.id !== blockId.toHexString(),
-  );
-  await this.save();
+PageSchema.statics.readOne = async function (
+  this: PageModel,
+  pageId: string,
+): Promise<PageDoc> {
+  return this.findById(pageId).exec();
 };
 
-PageSchema.methods.populateBlock = async function (
-  this: PageDoc,
-): Promise<void> {
-  const populatedPage = await PageModel.findById(this.id)
-    .populate('blockIdList')
+PageSchema.statics.readAll = async function (
+  this: PageModel,
+): Promise<PageDoc[]> {
+  return this.find()
+    .sort([['createdAt', -1]])
     .exec();
-  (this as any)._doc.blockList = populatedPage.blockIdList;
 };
 
-export const PageModel = model<PageDoc>('Page', PageSchema);
+PageSchema.statics.updateOnePage = async function (
+  this: PageModel,
+  pageId: string,
+  pageDTO: PageDTO,
+): Promise<PageDoc> {
+  const { title } = pageDTO;
+  return this.findByIdAndUpdate(pageId, { title }, { new: true }).exec();
+};
+
+PageSchema.methods.delete = async function (this: PageDoc): Promise<void> {
+  await Block.deleteMany({ pageId: { $eq: this.id } }).exec();
+  await Page.findByIdAndDelete(this.id).exec();
+};
+
+export const Page = model<PageDoc>('Page', PageSchema) as PageModel;
