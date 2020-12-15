@@ -1,11 +1,12 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useEffect, useRef, FormEvent, KeyboardEvent } from 'react';
+import { useEffect, useRef, FormEvent, KeyboardEvent, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { blockRefState, throttleState, blockMapState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
+import { updateBlock } from '@/utils';
 import {
   regex,
   fontSize,
@@ -57,6 +58,7 @@ function BlockContent(blockDTO: Block) {
   const caretRef = useRef(0);
   const listCnt = useRef(1);
   const [Dispatcher] = useCommand();
+  const [isBlur, setIsBlur] = useState(false);
 
   const indexInSibling: number = blockMap[
     blockDTO.parentId
@@ -166,6 +168,13 @@ function BlockContent(blockDTO: Block) {
   };
 
   useEffect(() => {
+    (async () => {
+      const { block: updatedBlock } = await updateBlock(blockDTO);
+      setBlockMap({ ...blockMap, [blockDTO.id]: updatedBlock });
+    })();
+  }, [isBlur]);
+
+  useEffect(() => {
     blockRefState[blockDTO.id] = contentEditableRef;
     return () => {
       blockRefState[blockDTO.id] = null;
@@ -208,6 +217,7 @@ function BlockContent(blockDTO: Block) {
         placeholder={placeHolder[blockDTO.type]}
         onInput={handleValue}
         onKeyUp={handleKeyUp}
+        onBlur={() => setIsBlur(!isBlur)}
       >
         {blockDTO.value}
       </div>
