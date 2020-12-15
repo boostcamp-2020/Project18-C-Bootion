@@ -5,12 +5,13 @@ import { Suspense } from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 
 import {
+  blockMapState,
   hoveredMenuToggleState,
   pagesState,
   pageState,
   staticMenuToggleState,
 } from '@/stores';
-import { createPage } from '@/utils';
+import { createPage, readBlockMap } from '@/utils';
 import { HeaderButton } from '@atoms/index';
 import { ReactComponent as DoubleChevronLeft } from '@assets/doubleChevronLeft.svg';
 import { ReactComponent as PlusPage } from '@assets/plusPage.svg';
@@ -62,9 +63,13 @@ function Menu({}: Props): JSX.Element {
   const [hoveredMenuToggle, setHoveredMenuToggle] = useRecoilState(
     hoveredMenuToggleState,
   );
+  const setBlockMap = useSetRecoilState(blockMapState);
 
   const CreatingPageHandler = async () => {
     const { pages: updated, page: created } = await createPage();
+    const { blockMap } = await readBlockMap(created.id);
+    console.log({ blockMap });
+    setBlockMap(blockMap);
     setPages(updated);
     setSelectedPage(created);
   };

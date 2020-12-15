@@ -8,7 +8,7 @@ import { Page } from '@/schemes';
 import { blockMapState, pagesState, pageState } from '@/stores';
 import { HeaderButton } from '@atoms/index';
 import { ReactComponent as Trash } from '@assets/trash.svg';
-import { deletePage, refreshPages } from '@/utils';
+import { deletePage, readBlockMap, refreshPages } from '@/utils';
 
 const itemWrapperCss = (isHovered: boolean) => css`
   position: relative;
@@ -52,20 +52,28 @@ function MenuItem({ page }: Props): JSX.Element {
   const [selectedPage, setSelectedPage] = useRecoilState(pageState);
   const [hoverToggle, setHoverToggle] = useState(false);
   const setPages = useSetRecoilState(pagesState);
+  const setBlockMap = useSetRecoilState(blockMapState);
+
+  const selectPageHandler = async () => {
+    setBlockMap((await readBlockMap(page.id)).blockMap);
+    setSelectedPage(page);
+  };
 
   const deletePageHandler = async () => {
     await deletePage(page.id);
     const pages = await refreshPages();
 
     if (page.id === selectedPage.id) {
-      setSelectedPage(pages[0]);
+      const nextSelectedPage = pages[0];
+      setBlockMap((await readBlockMap(nextSelectedPage.id)).blockMap);
+      setSelectedPage(nextSelectedPage);
     }
     setPages(pages);
   };
 
   return (
     <div
-      css={itemWrapperCss(hoverToggle)}
+      css={itemWrapperCss()}
       onMouseEnter={() => setHoverToggle(true)}
       onMouseLeave={() => setHoverToggle(false)}
     >
@@ -76,8 +84,8 @@ function MenuItem({ page }: Props): JSX.Element {
             ? selectedItemCss(hoverToggle)
             : itemCss(hoverToggle)
         }
-        onClick={() => setSelectedPage(page)}
-        onKeyUp={() => setSelectedPage(page)}
+        onClick={selectPageHandler}
+        onKeyUp={selectPageHandler}
       >
         <div css={titleCss()}>{page.title || 'Untitled'}</div>
       </div>
