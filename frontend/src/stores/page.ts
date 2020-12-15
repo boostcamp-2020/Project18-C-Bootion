@@ -1,6 +1,6 @@
 import { atom, selector } from 'recoil';
 
-import { BlockMap, Page } from '@/schemes';
+import { Block, BlockMap, Page } from '@/schemes';
 import { fetchDummyData, readBlockMap, refreshPages } from '@/utils';
 import { MutableRefObject } from 'react';
 
@@ -16,6 +16,7 @@ enum StateType {
   STATIC_MENU_TOGGLE_STATE = 'staticMenuToggleState',
   HOVERED_MENU_TOGGLE_STATE = 'hoveredMenuToggleState',
   SELECTED_PAGE_STATE = 'selectedPageState',
+  DRAGGING_BLOCK_STATE = 'draggingBlockState',
 }
 
 export const pagesState = atom({
@@ -73,4 +74,9 @@ export const staticMenuToggleState = atom({
 export const hoveredMenuToggleState = atom({
   key: StateType.HOVERED_MENU_TOGGLE_STATE,
   default: false,
+});
+
+export const draggingBlockState = atom<Block>({
+  key: StateType.DRAGGING_BLOCK_STATE,
+  default: null,
 });
