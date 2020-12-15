@@ -43,11 +43,11 @@ const buttonsCss = () => css`
   line-height: 1.2;
   font-size: 14px;
   flex-grow: 0;
-  margin-right: 8px;
+  margin-right: 14px;
   min-width: 0;
 `;
-const plusCss = () => css`
-  margin-right: 5px;
+const plusCss = (staticMenuToggle: boolean) => css`
+  margin-right: ${staticMenuToggle ? 5 : 0}px;
   border: 1px solid rgba(55, 53, 47, 0.16);
   border-radius: 3px;
 `;
@@ -83,7 +83,7 @@ function Menu({}: Props): JSX.Element {
     <div css={wrapperCss(staticMenuToggle)}>
       {hoveredMenuToggle && (
         <div css={buttonsCss()}>
-          <div css={plusCss()}>
+          <div css={plusCss(staticMenuToggle)}>
             <HeaderButton clickHandler={CreatingPageHandler}>
               <PlusPage />
             </HeaderButton>

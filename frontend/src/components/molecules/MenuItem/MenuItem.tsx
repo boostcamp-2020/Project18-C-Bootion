@@ -10,7 +10,7 @@ import { HeaderButton } from '@atoms/index';
 import { ReactComponent as Trash } from '@assets/trash.svg';
 import { deletePage, readBlockMap, refreshPages } from '@/utils';
 
-const itemWrapperCss = (isHovered: boolean) => css`
+const itemWrapperCss = () => css`
   position: relative;
   align-items: center;
   cursor: pointer;
