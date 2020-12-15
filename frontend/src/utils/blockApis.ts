@@ -1,4 +1,4 @@
-import { Block } from '@/schemes';
+import { Block, BlockMap } from '@/schemes';
 
 import { fetchApi } from '@/utils';
 
@@ -22,7 +22,7 @@ export const createBlock = (param: {
   })({ index: param.index, block: param.block });
 
 export const readBlockMap = (pageId: string) =>
-  fetchApi<{ blockMap: { [blockId: string]: Block } }>({
+  fetchApi<{ blockMap: BlockMap }>({
     url: `${BASE_URL}/page-id/${pageId}`,
     method: 'GET',
     defaultReturn: { blockMap: {} },
