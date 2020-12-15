@@ -4,8 +4,9 @@ import { jsx, css } from '@emotion/react';
 
 import { Header, Title, Editor } from '@components/molecules';
 import { HeaderMenu } from '@components/organisms';
-import { useRecoilValue } from 'recoil';
-import { staticMenuToggleState } from '@/stores';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { blockMapState, pageState, staticMenuToggleState } from '@/stores';
+import { createBlock } from '@/utils';
 
 const staticMenuAreaCss = () => css`
   position: fixed;
@@ -31,11 +32,24 @@ const staticScrollAreaCss = (staticMenuToggle: boolean) => css`
 const bottomMarginCss = () => css`
   display: inline-block;
   width: 100%;
-  height: 45%;
+  height: calc(100% - 200px);
+  min-height: 200px;
 `;
 
 function PageComponent(): JSX.Element {
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
+  const page = useRecoilValue(pageState);
+  const setBlockMap = useSetRecoilState(blockMapState);
+
+  const createBlockHandler = async () => {
+    const { parent, block } = await createBlock({ parentBlockId: page.rootId });
+    setBlockMap((prev) => {
+      const next = { ...prev };
+      next[parent.id] = parent;
+      next[block.id] = block;
+      return next;
+    });
+  };
 
   return (
     <div>
@@ -48,7 +62,11 @@ function PageComponent(): JSX.Element {
       <div css={staticScrollAreaCss(staticMenuToggle)}>
         <Title />
         <Editor />
-        <div css={bottomMarginCss()} />
+        <div
+          css={bottomMarginCss()}
+          onClick={createBlockHandler}
+          onKeyUp={createBlockHandler}
+        />
       </div>
     </div>
   );

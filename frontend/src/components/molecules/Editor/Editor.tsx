@@ -3,8 +3,10 @@
 import { jsx, css } from '@emotion/react';
 
 import { BlockComponent } from '@components/molecules';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { pageState, blockMapState } from '@/stores';
+import { Suspense, useEffect } from 'react';
+import { readBlockMap } from '@/utils';
 
 const wrapperCss = () => css`
   padding-left: calc(96px + env(safe-area-inset-left));
@@ -16,13 +18,22 @@ const wrapperCss = () => css`
 
 function Editor(): JSX.Element {
   const page = useRecoilValue(pageState);
-  const blockMap = useRecoilValue(blockMapState);
+  // const blockMap = useRecoilValue(blockMapState);
+  const [blockMap, setBlockMap] = useRecoilState(blockMapState);
+
+  useEffect(() => {
+    (async () => {
+      setBlockMap((await readBlockMap(page.id)).blockMap);
+    })();
+  }, [page, setBlockMap]);
 
   return (
     <div css={wrapperCss()}>
-      {blockMap[page.rootId].childIdList.map((blockId: string) => (
-        <BlockComponent key={blockId} blockDTO={blockMap[blockId]} />
-      ))}
+      <Suspense fallback={<div>로딩 중...</div>}>
+        {blockMap[page.rootId].childIdList.map((blockId: string) => (
+          <BlockComponent key={blockId} blockDTO={blockMap[blockId]} />
+        ))}
+      </Suspense>
     </div>
   );
 }

@@ -20,7 +20,7 @@ const isGridOrColumn = (block: Block): boolean =>
 
 const blockContentCSS = css`
   display: flex;
-  align-items: center;
+  align-items: stretch;
 `;
 const editableDivCSS = (block: Block): SerializedStyles => css`
   margin: 5;
