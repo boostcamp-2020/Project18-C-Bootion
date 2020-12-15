@@ -161,7 +161,7 @@ function BlockContent(blockDTO: Block) {
     const { block, from: fromBlock, to } = await moveBlock({
       blockId,
       toId: blockDTO.parentId,
-      index: blockIndex,
+      index: blockIndex + 1,
     });
     setBlockMap((prev) => {
       const next = { ...prev };
