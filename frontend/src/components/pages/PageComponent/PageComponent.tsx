@@ -2,7 +2,7 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 
-import { Header, Title, Editor } from '@components/molecules';
+import { Header, Title, Editor, BlockModal } from '@components/molecules';
 import { HeaderMenu } from '@components/organisms';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { blockMapState, pageState, staticMenuToggleState } from '@/stores';
@@ -61,6 +61,7 @@ function PageComponent(): JSX.Element {
       </div>
       <div css={staticScrollAreaCss(staticMenuToggle)}>
         <Title />
+        <BlockModal />
         <Editor />
         <div
           css={bottomMarginCss()}
