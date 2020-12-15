@@ -34,7 +34,11 @@ const descendantsCss = (block: Block): SerializedStyles => css`
   fill: inherit;
 `;
 
-function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
+interface Props {
+  blockDTO: Block;
+}
+
+function BlockComponent({ blockDTO }: Props): JSX.Element {
   const blockMap = useRecoilValue(blockMapState);
   const [focusId, setFocusId] = useRecoilState<string>(focusState);
   const [hoverId, setHoverId] = useRecoilState(hoverState);
@@ -51,8 +55,11 @@ function BlockComponent({ blockDTO }: { blockDTO: Block }): JSX.Element {
         }}
       >
         <BlockContent {...blockDTO} />
-        <HoverArea handleClick={() => blockRef.current.focus()} />
-        {hoverId === blockDTO.id && <BlockHandler />}
+        <HoverArea
+          block={blockDTO}
+          clickHandler={() => blockRef.current.focus()}
+        />
+        {hoverId === blockDTO.id && <BlockHandler block={blockDTO} />}
       </div>
       {blockDTO.childIdList.length ? (
         <div css={descendantsCss(blockDTO)}>
