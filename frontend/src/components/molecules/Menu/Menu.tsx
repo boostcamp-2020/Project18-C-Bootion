@@ -52,9 +52,7 @@ const plusCss = (staticMenuToggle: boolean) => css`
   border-radius: 3px;
 `;
 
-interface Props {}
-
-function Menu({}: Props): JSX.Element {
+function Menu(): JSX.Element {
   const [pages, setPages] = useRecoilState(pagesState);
   const setSelectedPage = useSetRecoilState(pageState);
   const [staticMenuToggle, setStaticMenuToggle] = useRecoilState(
