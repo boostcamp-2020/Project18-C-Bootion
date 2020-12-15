@@ -1,164 +1,54 @@
-import axios, { AxiosResponse } from 'axios';
-import { Page, Block } from '@/schemes';
+import { Block, BlockMap } from '@/schemes';
+
+import { fetchApi } from '@/utils';
 
 const BASE_URL = '/api/blocks';
 
-type ErrorReturns = {
-  error?: 1 | true;
-  message?: string;
-};
+export const createBlock = (param: {
+  parentBlockId: string;
+  index?: number;
+  block?: Block;
+}) =>
+  fetchApi<
+    { parent: Block; block: Block },
+    {
+      block?: Block;
+      index?: number;
+    }
+  >({
+    url: `${BASE_URL}/parent-id/${param.parentBlockId}`,
+    method: 'POST',
+    defaultReturn: { parent: null, block: null },
+  })({ index: param.index, block: param.block });
 
-type CreateBlockToPageParams = {
-  block: Block;
-  pageId: string;
-  targetIndex?: number;
-};
+export const readBlockMap = (pageId: string) =>
+  fetchApi<{ blockMap: BlockMap }>({
+    url: `${BASE_URL}/page-id/${pageId}`,
+    method: 'GET',
+    defaultReturn: { blockMap: {} },
+  })();
 
-type CreateBlockToPageReturns = {
-  block: Block;
-  page: Page;
-  parent: null;
-} & ErrorReturns;
+export const updateBlock = (block: Block) =>
+  fetchApi<{ block: Block }, { block: Block }>({
+    url: `${BASE_URL}/id/${block.id}`,
+    method: 'PATCH',
+    defaultReturn: { block },
+  })({ block });
 
-export const createBlockToPage = async (
-  params: CreateBlockToPageParams,
-): Promise<CreateBlockToPageReturns> =>
-  (await axios.post(BASE_URL, params))?.data;
+export const moveBlock = (param: {
+  blockId: string;
+  toId: string;
+  index?: number;
+}) =>
+  fetchApi<{ block: Block; from: Block; to: Block }, { index?: number }>({
+    url: `${BASE_URL}/id/${param.blockId}/to/${param.toId}`,
+    method: 'PATCH',
+    defaultReturn: { block: null, from: null, to: null },
+  })({ index: param.index });
 
-export const createBlockToPageSync = (
-  params: CreateBlockToPageParams,
-  callback: (res: AxiosResponse<CreateBlockToPageReturns>) => void,
-  errorHandler?: (err: Error) => void,
-) =>
-  axios
-    .post(BASE_URL)
-    .then(callback)
-    .catch(errorHandler ?? console.error);
-
-type CreateBlockToBlockParams = {
-  block: Block;
-  parent: Block;
-  targetIndex?: number;
-};
-
-type CreateBlockToBlockReturns = {
-  block: Block;
-  parent: Block;
-  page: null;
-} & ErrorReturns;
-
-export const createBlockToBlock = async (
-  params: CreateBlockToBlockParams,
-): Promise<CreateBlockToBlockReturns> =>
-  (await axios.post(BASE_URL, params))?.data;
-
-export const createBlockToBlockSync = (
-  params: CreateBlockToBlockParams,
-  callback: (res: AxiosResponse<CreateBlockToBlockReturns>) => void,
-  errorHandler?: (err: Error) => void,
-) =>
-  axios
-    .post(BASE_URL)
-    .then(callback)
-    .catch(errorHandler ?? console.error);
-
-type UpdateBlockParams = {
-  block: Block;
-};
-
-type UpdateBlockReturns = {
-  block: Block;
-  parent: null;
-  page: null;
-} & ErrorReturns;
-
-export const updateBlock = async (
-  params: UpdateBlockParams,
-): Promise<UpdateBlockReturns> => (await axios.patch(BASE_URL, params))?.data;
-
-export const updateBlockSync = (
-  params: UpdateBlockParams,
-  callback: (res: AxiosResponse<UpdateBlockReturns>) => void,
-  errorHandler?: (err: Error) => void,
-) =>
-  axios
-    .patch(BASE_URL)
-    .then(callback)
-    .catch(errorHandler ?? console.error);
-
-type MoveToPageParams = {
-  block: Block;
-  pageId: string;
-  targetIndex?: number;
-};
-
-type MoveToPageReturns = {
-  block: Block;
-  page: Page;
-  parent: null;
-} & ErrorReturns;
-
-export const moveToPage = async (
-  params: MoveToPageParams,
-): Promise<MoveToPageReturns> => (await axios.patch(BASE_URL, params))?.data;
-
-export const moveToPageSync = (
-  params: MoveToPageParams,
-  callback: (res: AxiosResponse<MoveToPageReturns>) => void,
-  errorHandler?: (err: Error) => void,
-) =>
-  axios
-    .patch(BASE_URL)
-    .then(callback)
-    .catch(errorHandler ?? console.error);
-
-type MoveToBlockParams = {
-  block: Block;
-  parent: Block;
-  targetIndex?: number;
-};
-
-type MoveToBlockReturns = {
-  block: Block;
-  parent: Block;
-  page: null;
-} & ErrorReturns;
-
-export const moveToBlock = async (
-  params: MoveToBlockParams,
-): Promise<MoveToBlockReturns> => (await axios.patch(BASE_URL, params))?.data;
-
-export const moveToBlockSync = (
-  params: MoveToBlockParams,
-  callback: (res: AxiosResponse<MoveToBlockReturns>) => void,
-  errorHandler?: (err: Error) => void,
-) =>
-  axios
-    .patch(BASE_URL)
-    .then(callback)
-    .catch(errorHandler ?? console.error);
-
-type DeleteBlockParams = {
-  block: Block;
-  remove?: 0 | 1 | false | true;
-};
-
-type DeleteBlockReturns = {
-  block: null;
-  page: Page | null;
-  parent: Block | null;
-} & ErrorReturns;
-
-export const deleteBlock = async (
-  params: DeleteBlockParams,
-): Promise<DeleteBlockReturns> => (await axios.patch(BASE_URL, params))?.data;
-
-export const deleteBlockSync = (
-  params: DeleteBlockParams,
-  callback: (res: AxiosResponse<DeleteBlockReturns>) => void,
-  errorHandler?: (err: Error) => void,
-) =>
-  axios
-    .patch(BASE_URL)
-    .then(callback)
-    .catch(errorHandler ?? console.error);
+export const deletePageCascade = (blockId: string) =>
+  fetchApi<{ parent: Block }>({
+    url: `${BASE_URL}/id/${blockId}`,
+    method: 'DELETE',
+    defaultReturn: { parent: null },
+  })();

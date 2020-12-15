@@ -51,7 +51,7 @@ function HeaderMenu(): JSX.Element {
       onMouseEnter={() => setHoveredMenuToggle(true)}
       onMouseLeave={() => setHoveredMenuToggle(false)}
     >
-      <HeaderButton handleClick={() => setStaticMenuToggle(!staticMenuToggle)}>
+      <HeaderButton clickHandler={() => setStaticMenuToggle(!staticMenuToggle)}>
         {staticMenuToggle ||
           (!hoveredMenuToggle ? <HamburgerMenu /> : <DoubleChevronRight />)}
       </HeaderButton>
