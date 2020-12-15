@@ -83,6 +83,8 @@ function BlockContent(blockDTO: Block) {
     return cnt;
   };
 
+  const FIRST_LIST_NUMBER = '1';
+
   const handleBlock = (value: string, type?: BlockType) =>
     type
       ? setBlockMap({
@@ -102,11 +104,12 @@ function BlockContent(blockDTO: Block) {
 
     if (newType) {
       if (newType[0] === BlockType.NUMBERED_LIST) {
-        if (!indexInSibling && content[0] !== '1') return;
+        if (!indexInSibling && content[0] !== FIRST_LIST_NUMBER) return;
         if (indexInSibling) {
-          if (!isUpperBlockEqualToNumberList() && content[0] !== '1') return;
+          const numberListUpperBlock = isUpperBlockEqualToNumberList();
+          if (!numberListUpperBlock && content[0] !== FIRST_LIST_NUMBER) return;
           if (
-            isUpperBlockEqualToNumberList() &&
+            numberListUpperBlock &&
             cntOfUpperNumberListBlock() + 1 !== +content[0]
           )
             return;
@@ -182,11 +185,12 @@ function BlockContent(blockDTO: Block) {
     selection.collapse(selection.focusNode, caretRef.current);
 
     if (blockDTO.type === BlockType.NUMBERED_LIST) {
-      if (!indexInSibling || !isUpperBlockEqualToNumberList()) {
+      const numberListUpperBlock = isUpperBlockEqualToNumberList();
+      if (!indexInSibling || !numberListUpperBlock) {
         listCnt.current = 1;
         return;
       }
-      if (isUpperBlockEqualToNumberList()) {
+      if (numberListUpperBlock) {
         listCnt.current = cntOfUpperNumberListBlock() + 1;
       }
     }
