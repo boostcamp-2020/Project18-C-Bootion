@@ -65,11 +65,10 @@ function Menu(): JSX.Element {
 
   const CreatingPageHandler = async () => {
     const { pages: updated, page: created } = await createPage();
-    const { blockMap } = await readBlockMap(created.id);
-    console.log({ blockMap });
-    setBlockMap(blockMap);
-    setPages(updated);
+
+    setBlockMap((await readBlockMap(created.id)).blockMap);
     setSelectedPage(created);
+    setPages(updated);
   };
 
   const clickCloseHandler = () => {

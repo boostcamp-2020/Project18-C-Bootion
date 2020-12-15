@@ -3,10 +3,9 @@
 import { jsx, css } from '@emotion/react';
 
 import { BlockComponent } from '@components/molecules';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { pageState, blockMapState } from '@/stores';
-import { Suspense, useEffect } from 'react';
-import { readBlockMap } from '@/utils';
+import { Suspense } from 'react';
 
 const wrapperCss = () => css`
   padding-left: calc(96px + env(safe-area-inset-left));
@@ -18,14 +17,7 @@ const wrapperCss = () => css`
 
 function Editor(): JSX.Element {
   const page = useRecoilValue(pageState);
-  // const blockMap = useRecoilValue(blockMapState);
-  const [blockMap, setBlockMap] = useRecoilState(blockMapState);
-
-  useEffect(() => {
-    (async () => {
-      setBlockMap((await readBlockMap(page.id)).blockMap);
-    })();
-  }, [page, setBlockMap]);
+  const blockMap = useRecoilValue(blockMapState);
 
   return (
     <div css={wrapperCss()}>
