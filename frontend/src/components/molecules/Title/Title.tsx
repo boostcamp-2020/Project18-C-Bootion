@@ -3,7 +3,7 @@
 import { jsx, css } from '@emotion/react';
 
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { pagesState, selectedPageState } from '@/stores';
+import { pagesState, pageState } from '@/stores';
 import { ChangeEvent, useEffect, useRef } from 'react';
 import { debounce, refreshPages, updatePage } from '@/utils';
 import { Page } from '@/schemes';
@@ -48,7 +48,7 @@ const titleCss = () => css`
 `;
 
 function Title(): JSX.Element {
-  const [selectedPage, setSelectedPage] = useRecoilState(selectedPageState);
+  const [selectedPage, setSelectedPage] = useRecoilState(pageState);
   const setPages = useSetRecoilState(pagesState);
   const caretRef = useRef(0);
   const updateSelectedPage = useRef(

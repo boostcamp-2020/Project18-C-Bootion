@@ -5,7 +5,7 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useState } from 'react';
 
 import { Page } from '@/schemes';
-import { pagesState, selectedPageState } from '@/stores';
+import { blockMapState, pagesState, pageState } from '@/stores';
 import { HeaderButton } from '@atoms/index';
 import { ReactComponent as Trash } from '@assets/trash.svg';
 import { deletePage, refreshPages } from '@/utils';
@@ -49,7 +49,7 @@ interface Props {
 }
 
 function MenuItem({ page }: Props): JSX.Element {
-  const [selectedPage, setSelectedPage] = useRecoilState(selectedPageState);
+  const [selectedPage, setSelectedPage] = useRecoilState(pageState);
   const [hoverToggle, setHoverToggle] = useState(false);
   const setPages = useSetRecoilState(pagesState);
 

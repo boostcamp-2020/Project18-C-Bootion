@@ -7,7 +7,7 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import {
   hoveredMenuToggleState,
   pagesState,
-  selectedPageState,
+  pageState,
   staticMenuToggleState,
 } from '@/stores';
 import { createPage } from '@/utils';
@@ -55,7 +55,7 @@ interface Props {}
 
 function Menu({}: Props): JSX.Element {
   const [pages, setPages] = useRecoilState(pagesState);
-  const setSelectedPage = useSetRecoilState(selectedPageState);
+  const setSelectedPage = useSetRecoilState(pageState);
   const [staticMenuToggle, setStaticMenuToggle] = useRecoilState(
     staticMenuToggleState,
   );
