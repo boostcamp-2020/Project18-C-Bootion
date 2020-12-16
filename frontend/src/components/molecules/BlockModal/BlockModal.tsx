@@ -132,10 +132,10 @@ function BlockModal(): JSX.Element {
     });
     startTransaction();
     const newBlock = insertNewSibling(updatedBlock);
-    // content =
-    //     content.substring(0, nowLetterIdx - 1) +
-    //     content.substring(nowLetterIdx, content.length);
-    // setBlock({...block, value: });
+    const content =
+      block.value.substring(0, modal.caretOffset - 1) +
+      block.value.substring(modal.caretOffset);
+    setBlock(modal.blockId, { value: content });
     commitTransaction();
     // setFocus(newBlock);
   };
