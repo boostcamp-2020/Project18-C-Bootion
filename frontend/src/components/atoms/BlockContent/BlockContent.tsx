@@ -73,6 +73,9 @@ const dragOverCss = () => css`
 function BlockContent(blockDTO: Block) {
   const contentEditableRef = useRef(null);
   const [blockMap, setBlockMap] = useRecoilState(blockMapState);
+  const [, { startTransaction, commitTransaction, deleteBlock }] = useManager(
+    blockDTO.id,
+  );
   const focusId = useRecoilValue(focusState);
   const caretRef = useRef(0);
   const listCnt = useRef(1);
@@ -210,6 +213,17 @@ function BlockContent(blockDTO: Block) {
       });
     }
   };
+
+  if (
+    (blockDTO.type === BlockType.GRID || blockDTO.type === BlockType.COLUMN) &&
+    !blockDTO.childIdList.length
+  ) {
+    setImmediate(() => {
+      startTransaction();
+      deleteBlock();
+      commitTransaction();
+    });
+  }
 
   useEffect(() => {
     (async () => {
