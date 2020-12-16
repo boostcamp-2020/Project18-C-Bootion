@@ -6,7 +6,7 @@ import { ReactComponent as Dots } from '@assets/dots.svg';
 import { ReactComponent as Check } from '@assets/check.svg';
 import { HeaderLink, HeaderButton } from '@components/atoms';
 import { useRecoilValue } from 'recoil';
-import { selectedPageState, staticMenuToggleState } from '@/stores';
+import { pageState, staticMenuToggleState } from '@/stores';
 
 const headerCss = () => css`
   width: 100%;
@@ -38,7 +38,7 @@ interface Props {}
 
 function Header({}: Props): JSX.Element {
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
-  const selectedPage = useRecoilValue(selectedPageState);
+  const selectedPage = useRecoilValue(pageState);
 
   return (
     <div css={headerCss()}>

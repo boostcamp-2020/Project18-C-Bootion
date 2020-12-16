@@ -5,12 +5,13 @@ import { Suspense } from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 
 import {
+  blockMapState,
   hoveredMenuToggleState,
   pagesState,
-  selectedPageState,
+  pageState,
   staticMenuToggleState,
 } from '@/stores';
-import { createPage } from '@/utils';
+import { createPage, readBlockMap } from '@/utils';
 import { HeaderButton } from '@atoms/index';
 import { ReactComponent as DoubleChevronLeft } from '@assets/doubleChevronLeft.svg';
 import { ReactComponent as PlusPage } from '@assets/plusPage.svg';
@@ -42,37 +43,36 @@ const buttonsCss = () => css`
   line-height: 1.2;
   font-size: 14px;
   flex-grow: 0;
-  margin-right: 8px;
+  margin-right: 14px;
   min-width: 0;
 `;
-const plusCss = () => css`
-  margin-right: 5px;
+const plusCss = (staticMenuToggle: boolean) => css`
+  margin-right: ${staticMenuToggle ? 5 : 0}px;
   border: 1px solid rgba(55, 53, 47, 0.16);
   border-radius: 3px;
 `;
 
-interface Props {}
-
-function Menu({}: Props): JSX.Element {
+function Menu(): JSX.Element {
   const [pages, setPages] = useRecoilState(pagesState);
-  const setSelectedPage = useSetRecoilState(selectedPageState);
+  const setSelectedPage = useSetRecoilState(pageState);
   const [staticMenuToggle, setStaticMenuToggle] = useRecoilState(
     staticMenuToggleState,
   );
   const [hoveredMenuToggle, setHoveredMenuToggle] = useRecoilState(
     hoveredMenuToggleState,
   );
+  const setBlockMap = useSetRecoilState(blockMapState);
 
-  const handleCreatingPage = () => {
-    const doFetch = async () => {
-      const { pages: updated, page: created } = await createPage();
-      setPages(updated);
-      setSelectedPage(created);
-    };
-    doFetch();
+  const CreatingPageHandler = async () => {
+    const { pages: updated, page: created } = await createPage();
+    const { blockMap } = await readBlockMap(created.id);
+    console.log({ blockMap });
+    setBlockMap(blockMap);
+    setPages(updated);
+    setSelectedPage(created);
   };
 
-  const handleClickClose = () => {
+  const clickCloseHandler = () => {
     setStaticMenuToggle(false);
     setHoveredMenuToggle(false);
   };
@@ -81,13 +81,13 @@ function Menu({}: Props): JSX.Element {
     <div css={wrapperCss(staticMenuToggle)}>
       {hoveredMenuToggle && (
         <div css={buttonsCss()}>
-          <div css={plusCss()}>
-            <HeaderButton handleClick={handleCreatingPage}>
+          <div css={plusCss(staticMenuToggle)}>
+            <HeaderButton clickHandler={CreatingPageHandler}>
               <PlusPage />
             </HeaderButton>
           </div>
           {staticMenuToggle && (
-            <HeaderButton handleClick={handleClickClose}>
+            <HeaderButton clickHandler={clickCloseHandler}>
               <DoubleChevronLeft />
             </HeaderButton>
           )}
@@ -96,7 +96,7 @@ function Menu({}: Props): JSX.Element {
       <div css={workspaceCss()}>WORKSPACE</div>
       <Suspense fallback={<div>Loading...</div>}>
         {pages.map((page) => (
-          <MenuItem page={page} />
+          <MenuItem key={page.id} page={page} />
         ))}
       </Suspense>
     </div>

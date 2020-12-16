@@ -4,13 +4,13 @@ import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useEffect, useRef, FormEvent, KeyboardEvent } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
-import { blockMapState, blockRefState, throttleState } from '@/stores';
+import { blockRefState, throttleState, blockMapState } from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
   regex,
   fontSize,
   placeHolder,
-  listComponent,
+  listBlockType,
 } from '@utils/blockContent';
 import { useCommand } from '@/hooks';
 import { focusState } from '@/stores/page';
@@ -55,7 +55,35 @@ function BlockContent(blockDTO: Block) {
   const [blockMap, setBlockMap] = useRecoilState(blockMapState);
   const focusId = useRecoilValue(focusState);
   const caretRef = useRef(0);
+  const listCnt = useRef(1);
   const [Dispatcher] = useCommand();
+
+  const indexInSibling: number = blockMap[
+    blockDTO.parentId
+  ].childIdList.findIndex((childId: string) => childId === blockDTO.id);
+
+  const upperBlocks: Array<Block> = blockMap[blockDTO.parentId].childIdList
+    .map((childId: any) => blockMap[childId])
+    .slice(0, indexInSibling)
+    .reverse();
+
+  const isUpperBlockEqualToNumberList = (): boolean => {
+    if (upperBlocks.length) {
+      return upperBlocks[0].type === BlockType.NUMBERED_LIST;
+    }
+    return false;
+  };
+
+  const cntOfUpperNumberListBlock = (): number => {
+    let cnt = 0;
+    for (const upperblock of upperBlocks) {
+      if (upperblock.type !== BlockType.NUMBERED_LIST) break;
+      cnt += 1;
+    }
+    return cnt;
+  };
+
+  const FIRST_LIST_NUMBER = '1';
 
   const handleBlock = (value: string, type?: BlockType) =>
     type
@@ -75,6 +103,19 @@ function BlockContent(blockDTO: Block) {
     );
 
     if (newType) {
+      if (newType[0] === BlockType.NUMBERED_LIST) {
+        if (!indexInSibling && content[0] !== FIRST_LIST_NUMBER) return;
+        if (indexInSibling) {
+          const numberListUpperBlock = isUpperBlockEqualToNumberList();
+          if (!numberListUpperBlock && content[0] !== FIRST_LIST_NUMBER) return;
+          if (
+            numberListUpperBlock &&
+            cntOfUpperNumberListBlock() + 1 !== +content[0]
+          )
+            return;
+        }
+      }
+
       handleBlock(
         content.slice(content.indexOf(' ') + 1, content.length),
         newType[0] as BlockType,
@@ -144,11 +185,22 @@ function BlockContent(blockDTO: Block) {
       caretRef.current = nodeLength;
     }
     selection.collapse(selection.focusNode, caretRef.current);
+
+    if (blockDTO.type === BlockType.NUMBERED_LIST) {
+      const numberListUpperBlock = isUpperBlockEqualToNumberList();
+      if (!indexInSibling || !numberListUpperBlock) {
+        listCnt.current = 1;
+        return;
+      }
+      if (numberListUpperBlock) {
+        listCnt.current = cntOfUpperNumberListBlock() + 1;
+      }
+    }
   }, [blockDTO.value]);
 
   return (
     <div css={blockContentCSS}>
-      {listComponent[blockDTO.type]}
+      {listBlockType(blockDTO, listCnt.current)}
       <div
         ref={contentEditableRef}
         css={editableDivCSS(blockDTO)}
