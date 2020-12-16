@@ -116,7 +116,8 @@ const useCommand = () => {
           setBlock(block.id, { type: BlockType.TEXT });
         } else if (
           siblingsIdList.length - 1 === blockIndex &&
-          grandParent?.type !== BlockType.GRID
+          grandParent &&
+          grandParent.type !== BlockType.GRID
         ) {
           pullOut();
         } else {
