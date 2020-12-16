@@ -22,7 +22,7 @@ export const update = async (
   pageDTO: PageDTO,
 ): Promise<PageDoc> => {
   if (!pageDTO?.title) {
-    throw new Error(ErrorMessage.BAD_REQUEST);
+    pageDTO.title = '';
   }
 
   const page = await Page.updateOnePage(pageId, pageDTO);
