@@ -35,6 +35,14 @@ const AnimatedMenu = styled(animated.div)`
   position: absolute;
   display: inline-block;
 `;
+const buttonWrapper = css`
+  position: relative;
+  width: 16px;
+  height: 16px;
+`;
+const AnimatedButton = styled(animated.div)`
+  position: absolute;
+`;
 
 function HeaderMenu(): JSX.Element {
   const [staticMenuToggle, setStaticMenuToggle] = useRecoilState(
@@ -49,6 +57,12 @@ function HeaderMenu(): JSX.Element {
     opacity: hoveredMenuToggle || staticMenuToggle ? 1 : 0,
     marginTop: staticMenuToggle ? 0 : 10,
   });
+  const hamburgerMenuStyleProps = useSpring({
+    opacity: hoveredMenuToggle ? 0 : 1,
+  });
+  const doubleChevronRightStyleProps = useSpring({
+    opacity: hoveredMenuToggle ? 1 : 0,
+  });
 
   return (
     <div
@@ -57,8 +71,16 @@ function HeaderMenu(): JSX.Element {
       onMouseLeave={() => setHoveredMenuToggle(false)}
     >
       <HeaderButton clickHandler={() => setStaticMenuToggle(!staticMenuToggle)}>
-        {staticMenuToggle ||
-          (!hoveredMenuToggle ? <HamburgerMenu /> : <DoubleChevronRight />)}
+        {staticMenuToggle || (
+          <div css={buttonWrapper}>
+            <AnimatedButton style={hamburgerMenuStyleProps}>
+              <HamburgerMenu />
+            </AnimatedButton>
+            <AnimatedButton style={doubleChevronRightStyleProps}>
+              <DoubleChevronRight />
+            </AnimatedButton>
+          </div>
+        )}
       </HeaderButton>
       <div css={hoverAreaCss} />
       <AnimatedMenu style={menuStyleProps}>
