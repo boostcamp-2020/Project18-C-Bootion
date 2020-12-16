@@ -1,7 +1,9 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
+import styled from '@emotion/styled';
 import { useRecoilState } from 'recoil';
+import { animated, useSpring, useTransition } from 'react-spring';
 
 import { HeaderButton } from '@components/atoms';
 import { ReactComponent as HamburgerMenu } from '@assets/hamburgerMenu.svg';
@@ -9,7 +11,7 @@ import { ReactComponent as DoubleChevronRight } from '@assets/doubleChevronRight
 import { hoveredMenuToggleState, staticMenuToggleState } from '@/stores';
 import { Menu } from '@molecules/index';
 
-const wrapperCss = () => css`
+const wrapperCss = css`
   position: relative;
   display: flex;
   align-items: center;
@@ -21,7 +23,7 @@ const wrapperCss = () => css`
   margin-right: 8px;
   min-width: 0;
 `;
-const hoverAreaCss = () => css`
+const hoverAreaCss = css`
   position: absolute;
   display: inline-block;
   top: 45px;
@@ -29,12 +31,9 @@ const hoverAreaCss = () => css`
   width: 100%;
   height: 100vh;
 `;
-const menuCss = (staticMenuToggle: boolean) => css`
+const AnimatedMenu = styled(animated.div)`
   position: absolute;
   display: inline-block;
-  top: ${staticMenuToggle ? 0 : 50}px;
-  left: 0;
-  margin-top: ${staticMenuToggle ? 0 : 10}px;
 `;
 
 function HeaderMenu(): JSX.Element {
@@ -44,10 +43,16 @@ function HeaderMenu(): JSX.Element {
   const [hoveredMenuToggle, setHoveredMenuToggle] = useRecoilState(
     hoveredMenuToggleState,
   );
+  const menuStyleProps = useSpring({
+    top: staticMenuToggle ? 0 : 50,
+    left: hoveredMenuToggle || staticMenuToggle ? 0 : -240,
+    opacity: hoveredMenuToggle || staticMenuToggle ? 1 : 0,
+    marginTop: staticMenuToggle ? 0 : 10,
+  });
 
   return (
     <div
-      css={wrapperCss()}
+      css={wrapperCss}
       onMouseEnter={() => setHoveredMenuToggle(true)}
       onMouseLeave={() => setHoveredMenuToggle(false)}
     >
@@ -55,12 +60,10 @@ function HeaderMenu(): JSX.Element {
         {staticMenuToggle ||
           (!hoveredMenuToggle ? <HamburgerMenu /> : <DoubleChevronRight />)}
       </HeaderButton>
-      <div css={hoverAreaCss()} />
-      {(staticMenuToggle || hoveredMenuToggle) && (
-        <div css={menuCss(staticMenuToggle)}>
-          <Menu />
-        </div>
-      )}
+      <div css={hoverAreaCss} />
+      <AnimatedMenu style={menuStyleProps}>
+        <Menu />
+      </AnimatedMenu>
     </div>
   );
 }
