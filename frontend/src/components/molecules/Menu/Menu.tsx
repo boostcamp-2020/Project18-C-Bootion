@@ -51,6 +51,10 @@ const plusCss = (staticMenuToggle: boolean) => css`
   border: 1px solid rgba(55, 53, 47, 0.16);
   border-radius: 3px;
 `;
+const menuListCss = () => css`
+  overflow-y: auto;
+  height: calc(100% - 44px);
+`;
 
 function Menu(): JSX.Element {
   const [pages, setPages] = useRecoilState(pagesState);
@@ -93,11 +97,13 @@ function Menu(): JSX.Element {
         </div>
       )}
       <div css={workspaceCss()}>WORKSPACE</div>
-      <Suspense fallback={<div>Loading...</div>}>
-        {pages.map((page) => (
-          <MenuItem key={page.id} page={page} />
-        ))}
-      </Suspense>
+      <div css={menuListCss()}>
+        <Suspense fallback={<div>Loading...</div>}>
+          {pages.map((page) => (
+            <MenuItem key={page.id} page={page} />
+          ))}
+        </Suspense>
+      </div>
     </div>
   );
 }
