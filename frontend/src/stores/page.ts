@@ -8,6 +8,7 @@ enum StateType {
   PAGE_STATE = 'pageState',
   BLOCK_STATE = 'blockState',
   HOVER_STATE = 'hoverState',
+  MODAL_STATE = 'modalState',
   FOCUS_STATE = 'focusState',
   CARET_STATE = 'caretState',
   BLOCK_REF_STATE = 'blockRefState',
@@ -62,6 +63,11 @@ export const caretState = atom({
 
 export const focusState = atom({
   key: StateType.FOCUS_STATE,
+  default: null,
+});
+
+export const modalState = atom({
+  key: StateType.MODAL_STATE,
   default: null,
 });
 
