@@ -53,7 +53,7 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
       }
     }
     /* block이 마지막 자식일 때. 다음 부모가 다음 Block 이다. */
-    const targetParentBlock = parents[parentIndex + 1];
+    const targetParentBlock = parents?.[parentIndex + 1];
     if (!targetParentBlock) {
       /** 현재 블록이 마지막 블록이다. */
       return null;

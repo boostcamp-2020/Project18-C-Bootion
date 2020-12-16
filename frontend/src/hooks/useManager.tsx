@@ -2,13 +2,15 @@ import { Block, BlockType, BlockFamily, FamilyFunc, BlockMap } from '@/schemes';
 import { useFamily } from '@/hooks';
 
 interface ManagerFunc {
-  addChild: (option?: any, insertIndex?: number) => Block;
-  addSibling: (option?: any, insertIndex?: number) => Block;
-  setBlock: (option?: any) => void;
+  insertNewChild: (option?: any, insertIndex?: number) => Block;
+  insertNewSibling: (option?: any, insertIndex?: number) => Block;
+  insertSibling: (id: string, inserIndex?: number) => Block;
+  setBlock: (id: string, option?: any) => Block;
   startTransaction: () => void;
   commitTransaction: () => void;
   pullIn: () => Block;
   pullOut: () => Block;
+  deleteBlock: () => string[];
 }
 
 const useManger = (
@@ -38,13 +40,15 @@ const useManger = (
     familyFunc.setBlockMap(transaction);
   };
 
-  const setBlock = (option: any = {}) => {
-    transaction[block.id] = {
-      ...block,
+  const setBlock = (id: string, option: any = {}) => {
+    transaction[id] = {
+      ...transaction[id],
       ...option,
     };
+    return transaction[id];
   };
-  const addChild = (option: any = {}, insertIndex = 0): Block => {
+
+  const insertNewChild = (option: any = {}, insertIndex = 0): Block => {
     const id = `${block.id}${children.length + 1}_${Date.now()}`;
     const newBlock: Block = {
       id,
@@ -55,17 +59,28 @@ const useManger = (
       pageId: page.id,
       ...option,
     };
-    transaction[id] = newBlock;
+    setBlock(id, newBlock);
     const copyChildIdList = [...childrenIdList];
     copyChildIdList.splice(insertIndex, 0, id);
-    transaction[block.id] = {
-      ...transaction[block.id],
+    setBlock(block.id, {
       childIdList: copyChildIdList,
-    };
+    });
     return newBlock;
   };
 
-  const addSibling = (
+  const insertSibling = (id: string, insertIndex: number = 0) => {
+    const copySiblingsIdList = transaction[parent.id].childIdList;
+    copySiblingsIdList.splice(insertIndex, 0, id);
+    setBlock(parent.id, {
+      childrenIdList: copySiblingsIdList,
+    });
+    setBlock(id, {
+      parentId: parent.id,
+    });
+    return transaction[id];
+  };
+
+  const insertNewSibling = (
     option: any = {},
     insertIndex = blockIndex + 1,
   ): Block => {
@@ -82,48 +97,41 @@ const useManger = (
     transaction[id] = newBlock;
     const copySiblingsIdList = [...siblingsIdList];
     copySiblingsIdList.splice(insertIndex, 0, id);
-    transaction[parent.id] = {
-      ...parent,
+    setBlock(parent.id, {
       childIdList: copySiblingsIdList,
-    };
+    });
     return newBlock;
+  };
+
+  const deleteBlock = () => {
+    const filteredSiblingsIdList = siblingsIdList.filter(
+      (id) => id !== block.id,
+    );
+    setBlock(parent.id, {
+      childIdList: filteredSiblingsIdList,
+    });
+    return [...transaction[block.id].childIdList];
   };
 
   const pullIn = () => {
     if (blockIndex) {
-      const targetSibling = transaction[siblingsIdList[blockIndex - 1]];
-      transaction[siblingsIdList[blockIndex - 1]] = {
-        ...targetSibling,
+      const targetSibling = siblings[blockIndex - 1];
+      setBlock(siblingsIdList[blockIndex - 1], {
         childIdList: [...targetSibling.childIdList, block.id],
-      };
-      transaction[parent.id] = {
-        ...transaction[parent.id],
-        childIdList: siblingsIdList.filter((id) => id !== block.id),
-      };
-      transaction[block.id] = {
-        ...block,
-        parentId: siblingsIdList[blockIndex - 1],
-      };
+      });
+      deleteBlock();
+      setBlock(block.id, { parentId: siblingsIdList[blockIndex - 1] });
     }
     return block;
   };
 
   const pullOut = () => {
     if (grandParent && grandParent.type !== BlockType.GRID) {
-      transaction[parent.id] = {
-        ...parent,
-        childIdList: parent.childIdList.filter((id) => id !== block.id),
-      };
+      deleteBlock();
       const copyParentsIdList = [...parentsIdList];
       copyParentsIdList.splice(parentIndex + 1, 0, block.id);
-      transaction[block.id] = {
-        ...block,
-        parentId: grandParent.id,
-      };
-      transaction[grandParent.id] = {
-        ...grandParent,
-        childIdList: copyParentsIdList,
-      };
+      setBlock(block.id, { parentId: grandParent.id });
+      setBlock(grandParent.id, { childIdList: copyParentsIdList });
     }
     return block;
   };
@@ -132,13 +140,15 @@ const useManger = (
     family,
     {
       ...familyFunc,
-      addChild,
-      addSibling,
+      insertNewChild,
+      insertNewSibling,
+      insertSibling,
       setBlock,
       startTransaction,
       commitTransaction,
       pullIn,
       pullOut,
+      deleteBlock,
     },
   ];
 };
