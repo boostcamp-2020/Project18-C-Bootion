@@ -66,7 +66,7 @@ function BlockContent(blockDTO: Block) {
   const [Dispatcher] = useCommand();
   const [
     { blockIndex, prevSiblings },
-    { commitTransaction, startTransaction, setBlock, setCaretOffset },
+    { commitTransaction, startTransaction, setBlock, setCaretOffset, deleteBlock },
   ] = useManager(blockDTO.id);
   const draggingBlock = useRecoilValue(draggingBlockState);
   const [dragOverToggle, setDragOverToggle] = useState(false);
@@ -166,6 +166,17 @@ function BlockContent(blockDTO: Block) {
       });
     }
   };
+
+  if (
+    (blockDTO.type === BlockType.GRID || blockDTO.type === BlockType.COLUMN) &&
+    !blockDTO.childIdList.length
+  ) {
+    setImmediate(() => {
+      startTransaction();
+      deleteBlock();
+      commitTransaction();
+    });
+  }
 
   useEffect(() => {
     blockRefState[blockDTO.id] = contentEditableRef;
