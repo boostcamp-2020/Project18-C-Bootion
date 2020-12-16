@@ -68,7 +68,11 @@ export const focusState = atom({
 
 export const modalState = atom({
   key: StateType.MODAL_STATE,
-  default: false,
+  default: {
+    isOpen: false,
+    top: 0,
+    left: 0,
+  },
 });
 
 export const staticMenuToggleState = atom({
