@@ -4,9 +4,10 @@ import { jsx, css } from '@emotion/react';
 
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { pagesState, pageState } from '@/stores';
-import { ChangeEvent, useEffect, useRef } from 'react';
+import { ChangeEvent, useRef } from 'react';
 import { debounce, refreshPages, updatePage } from '@/utils';
 import { Page } from '@/schemes';
+import { useManager } from '@/hooks';
 
 const wrapperCss = () => css`
   padding-left: calc(96px + env(safe-area-inset-left));
@@ -49,27 +50,22 @@ const titleCss = () => css`
 function Title(): JSX.Element {
   const [selectedPage, setSelectedPage] = useRecoilState(pageState);
   const setPages = useSetRecoilState(pagesState);
-  const caretRef = useRef(0);
+  const [, { setCaretOffset }] = useManager(selectedPage.rootId);
   const updateSelectedPage = useRef(
     debounce(async (page: Page) => {
-      caretRef.current = window.getSelection().focusOffset;
-
       const { page: updatedPage } = await updatePage(page);
       const updatedPages = await refreshPages();
+      const { focusOffset } = window.getSelection();
+      setTimeout(() => {
+        setCaretOffset(focusOffset);
+      });
+      titleRef.current.blur();
 
       setSelectedPage(updatedPage);
       setPages(updatedPages);
     }, 300),
   ).current;
-
-  useEffect(() => {
-    const selection = window.getSelection();
-    const nodeLength = selection.focusNode?.nodeValue?.length ?? 0;
-    if (caretRef.current > nodeLength) {
-      caretRef.current = nodeLength;
-    }
-    selection.collapse(selection.focusNode, caretRef.current);
-  }, [selectedPage]);
+  const titleRef = useRef(null);
 
   const handleChange = async (event: ChangeEvent<HTMLDivElement>) =>
     updateSelectedPage({
@@ -81,6 +77,7 @@ function Title(): JSX.Element {
     <div css={wrapperCss()}>
       <div css={titlePaddingTopCss()} />
       <div
+        ref={titleRef}
         contentEditable
         suppressContentEditableWarning
         css={titleCss()}
