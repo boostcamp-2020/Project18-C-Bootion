@@ -1,7 +1,7 @@
-import { atom, selector } from 'recoil';
+import { atom } from 'recoil';
 
 import { Block, BlockMap, Page } from '@/schemes';
-import { fetchDummyData, readBlockMap, refreshPages } from '@/utils';
+import { readBlockMap, refreshPages } from '@/utils';
 import { MutableRefObject } from 'react';
 
 enum StateType {
@@ -24,20 +24,13 @@ export const pagesState = atom({
   default: refreshPages(),
 });
 
-export const selectedPageState = atom({
-  key: StateType.SELECTED_PAGE_STATE,
-  default: (async () => (await refreshPages())[0])(),
-});
-
 export const pageState = atom<Page>({
   key: StateType.PAGE_STATE,
-  // default: (async () => (await fetchDummyData()).page)(),
   default: (async () => (await refreshPages())[0])(),
 });
 
 export const blockMapState = atom<BlockMap>({
   key: StateType.BLOCK_MAP_STATE,
-  // default: (async () => (await fetchDummyData()).blockMap)(),
   default: (async () => {
     const page = (await refreshPages())[0];
     const { blockMap } = await readBlockMap(page.id);
