@@ -5,12 +5,7 @@ import { jsx, css } from '@emotion/react';
 import { Header, Title, Editor } from '@components/molecules';
 import { HeaderMenu } from '@components/organisms';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import {
-  blockMapState,
-  draggingBlockState,
-  pageState,
-  staticMenuToggleState,
-} from '@/stores';
+import { blockMapState, pageState, staticMenuToggleState } from '@/stores';
 import { createBlock } from '@/utils';
 
 const staticMenuAreaCss = () => css`
@@ -45,7 +40,6 @@ function PageComponent(): JSX.Element {
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
   const page = useRecoilValue(pageState);
   const setBlockMap = useSetRecoilState(blockMapState);
-  const setDraggingBlock = useSetRecoilState(draggingBlockState);
 
   const createBlockHandler = async () => {
     const { parent, block } = await createBlock({ parentBlockId: page.rootId });
@@ -57,12 +51,8 @@ function PageComponent(): JSX.Element {
     });
   };
 
-  const resetDraggingBlockHandler = () => {
-    setDraggingBlock(null);
-  };
-
   return (
-    <div onMouseUp={resetDraggingBlockHandler}>
+    <div>
       <div css={staticMenuAreaCss()}>
         <HeaderMenu />
       </div>

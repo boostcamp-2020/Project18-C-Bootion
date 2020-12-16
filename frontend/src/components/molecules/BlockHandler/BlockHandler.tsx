@@ -5,9 +5,6 @@ import React from 'react';
 
 import { ReactComponent as DraggableIcon } from '@assets/draggable.svg';
 import { ReactComponent as PlusIcon } from '@assets/plus.svg';
-import { Block } from '@/schemes';
-import { useSetRecoilState } from 'recoil';
-import { draggingBlockState } from '@/stores';
 
 const buttonWrapperCss = () => css`
   display: flex;
@@ -30,21 +27,11 @@ const buttonCss = () => css`
   height: 16px;
 `;
 
-interface Props {
-  block: Block;
-}
-
-function BlockHandler({ block }: Props): JSX.Element {
-  const setDraggingBlock = useSetRecoilState(draggingBlockState);
-
-  const setDraggingBlockHandler = () => {
-    setDraggingBlock(block);
-  };
-
+function BlockHandler(): JSX.Element {
   return (
     <div css={buttonWrapperCss()}>
       <PlusIcon css={buttonCss()} />
-      <div css={buttonCss()} onMouseDown={setDraggingBlockHandler}>
+      <div css={buttonCss()}>
         <DraggableIcon css={buttonCss()} />
       </div>
     </div>

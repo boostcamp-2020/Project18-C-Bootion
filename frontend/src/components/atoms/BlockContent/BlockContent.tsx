@@ -1,7 +1,13 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useEffect, useRef, FormEvent, KeyboardEvent } from 'react';
+import { jsx, css } from '@emotion/react';
+import React, {
+  useEffect,
+  useRef,
+  FormEvent,
+  KeyboardEvent,
+  useState,
+} from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
 import {
@@ -25,10 +31,11 @@ const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
 
 const blockContentCSS = css`
+  position: relative;
   display: flex;
   align-items: stretch;
 `;
-const editableDivCSS = (block: Block): SerializedStyles => css`
+const editableDivCSS = (block: Block) => css`
   margin: 5;
   font-size: ${fontSize[block.type]};
   display: ${!isGridOrColumn(block) ? 'flex' : 'none'};
@@ -55,6 +62,13 @@ const editableDivCSS = (block: Block): SerializedStyles => css`
     cursor: text;
   }
 `;
+const dragOverCss = () => css`
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 15%;
+  background-color: rgba(80, 188, 223, 0.7);
+`;
 
 function BlockContent(blockDTO: Block) {
   const contentEditableRef = useRef(null);
@@ -65,6 +79,7 @@ function BlockContent(blockDTO: Block) {
   const [Dispatcher] = useCommand();
   const draggingBlock = useRecoilValue(draggingBlockState);
   const [{ blockIndex }] = useManager(blockDTO.id);
+  const [dragOverToggle, setDragOverToggle] = useState(false);
 
   useEffect(() => {
     blockRefState[blockDTO.id] = contentEditableRef;
@@ -224,7 +239,16 @@ function BlockContent(blockDTO: Block) {
     }
   }, [blockDTO.value]);
 
-  const dropDraggingBlockHandler = async () => {
+  const dragOverHandler = (event: React.DragEvent<HTMLDivElement>) => {
+    event.dataTransfer.dropEffect = 'move';
+
+    event.preventDefault();
+  };
+
+  const dropHandler = async (event: React.DragEvent<HTMLDivElement>) => {
+    setDragOverToggle(false);
+    event.dataTransfer.dropEffect = 'move';
+
     const blockId = draggingBlock?.id;
     if (!blockId || blockId === blockDTO.id) {
       return;
@@ -242,10 +266,18 @@ function BlockContent(blockDTO: Block) {
       next[to.id] = to;
       return next;
     });
+
+    event.preventDefault();
   };
 
   return (
-    <div css={blockContentCSS} onMouseUp={dropDraggingBlockHandler}>
+    <div
+      css={blockContentCSS}
+      onDragOver={dragOverHandler}
+      onDrop={dropHandler}
+      onDragEnter={() => setDragOverToggle(true)}
+      onDragLeave={() => setDragOverToggle(false)}
+    >
       {listBlockType(blockDTO, listCnt.current)}
       <div
         ref={contentEditableRef}
@@ -259,6 +291,7 @@ function BlockContent(blockDTO: Block) {
       >
         {blockDTO.value}
       </div>
+      {dragOverToggle && <div css={dragOverCss()} />}
     </div>
   );
 }

@@ -2,9 +2,6 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 import { MouseEvent } from 'react';
-import { Block } from '@/schemes';
-import { useRecoilValue } from 'recoil';
-import { draggingBlockState, hoverState } from '@/stores';
 
 const leftHoverAreaCss = css`
   position: absolute;
@@ -25,40 +22,18 @@ const commonHoverAreaCss = css`
     cursor: text;
   }
 `;
-const draggingHoverUnderlineCss = () => css`
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 15%;
-  background-color: rgba(80, 188, 223, 0.7);
-`;
 
 interface Props {
-  block: Block;
   clickHandler: (
     event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
   ) => void;
 }
 
-function HoverArea({ block, clickHandler }: Props): JSX.Element {
-  const draggingBlock = useRecoilValue(draggingBlockState);
-  const hoverId = useRecoilValue(hoverState);
-
-  const leftDragEndHandler = () => {
-    console.log(draggingBlock?.value);
-  };
-
-  const rightDragEndHandler = () => {
-    console.log(draggingBlock?.value);
-  };
-
+function HoverArea({ clickHandler }: Props): JSX.Element {
   return (
     <div css={commonHoverAreaCss} onClick={clickHandler} onKeyDown={() => {}}>
-      <div css={leftHoverAreaCss} onMouseUp={leftDragEndHandler} />
-      <div css={rightHoverAreaCss} onMouseUp={rightDragEndHandler} />
-      {draggingBlock && hoverId === block.id && (
-        <div css={draggingHoverUnderlineCss()} />
-      )}
+      <div css={leftHoverAreaCss} />
+      <div css={rightHoverAreaCss} />
     </div>
   );
 }

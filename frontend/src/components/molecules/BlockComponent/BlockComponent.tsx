@@ -1,6 +1,8 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css, SerializedStyles } from '@emotion/react';
+import { jsx, css } from '@emotion/react';
+import React from 'react';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { BlockContent } from '@atoms/index';
 import { BlockHandler, HoverArea } from '@components/molecules';
@@ -12,7 +14,6 @@ import {
   blockMapState,
   draggingBlockState,
 } from '@stores/page';
-import { useRecoilState, useRecoilValue } from 'recoil';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
@@ -27,7 +28,7 @@ const blockCss = css`
   color: inherit;
   fill: inherit;
 `;
-const descendantsCss = (block: Block): SerializedStyles => css`
+const descendantsCss = (block: Block) => css`
   display: flex;
   padding-left: ${!isGridOrColumn(block) ? '1.5rem' : 0};
   flex-direction: ${block.type !== BlockType.GRID ? 'column' : 'row'};
@@ -44,10 +45,18 @@ function BlockComponent({ blockDTO }: Props): JSX.Element {
   const [focusId, setFocusId] = useRecoilState<string>(focusState);
   const [hoverId, setHoverId] = useRecoilState(hoverState);
   const blockRef: any = blockRefState[blockDTO.id];
-  const draggingBlock = useRecoilValue(draggingBlockState);
+  const setDraggingBlock = useSetRecoilState(draggingBlockState);
+
+  const dragStartHandler = (event: React.DragEvent<HTMLDivElement>) => {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.dropEffect = 'move';
+    event.dataTransfer.setData('text/html', event.currentTarget.innerHTML);
+
+    setDraggingBlock(blockDTO);
+  };
 
   return (
-    <div css={blockCss}>
+    <div css={blockCss} draggable="true" onDragStart={dragStartHandler}>
       <div
         css={{ position: 'relative' }}
         onMouseEnter={() => setHoverId(blockDTO.id)}
@@ -57,13 +66,8 @@ function BlockComponent({ blockDTO }: Props): JSX.Element {
         }}
       >
         <BlockContent {...blockDTO} />
-        <HoverArea
-          block={blockDTO}
-          clickHandler={() => blockRef.current.focus()}
-        />
-        {!draggingBlock && hoverId === blockDTO.id && (
-          <BlockHandler block={blockDTO} />
-        )}
+        <HoverArea clickHandler={() => blockRef.current.focus()} />
+        {hoverId === blockDTO.id && <BlockHandler />}
       </div>
       {blockDTO.childIdList.length ? (
         <div css={descendantsCss(blockDTO)}>
