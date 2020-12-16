@@ -2,6 +2,8 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 import { MouseEvent } from 'react';
+import { useRecoilValue } from 'recoil';
+import { draggingBlockState } from '@/stores';
 
 const leftHoverAreaCss = css`
   position: absolute;
@@ -30,9 +32,11 @@ interface Props {
 }
 
 function HoverArea({ clickHandler }: Props): JSX.Element {
+  const draggingBlock = useRecoilValue(draggingBlockState);
+
   return (
     <div css={commonHoverAreaCss} onClick={clickHandler} onKeyDown={() => {}}>
-      <div css={leftHoverAreaCss} />
+      {!draggingBlock && <div css={leftHoverAreaCss} />}
       <div css={rightHoverAreaCss} />
     </div>
   );
