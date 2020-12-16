@@ -105,13 +105,19 @@ function BlockContent(blockDTO: Block) {
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     const content = event.currentTarget.textContent;
 
-    if (content[content.length - 1] === '/') {
+    let nowLetterIdx = window.getSelection().focusOffset;
+    if (!nowLetterIdx) nowLetterIdx += 1;
+    if (content[nowLetterIdx - 1] === '/') {
       const rect = window.getSelection().getRangeAt(0).getClientRects()[0];
-      setModal({ ...modal, isOpen: true, top: rect.top, left: rect.left }); // focus도 주기
-      event.preventDefault();
-    } else {
-      setModal({ ...modal, isOpen: false });
+      setModal({
+        isOpen: true,
+        top: rect.top,
+        left: rect.left,
+        caretOffset: nowLetterIdx,
+      });
+      return;
     }
+    setModal({ ...modal, isOpen: false });
 
     const newType = Object.entries(regex).find((testRegex) =>
       testRegex[1].test(content),
