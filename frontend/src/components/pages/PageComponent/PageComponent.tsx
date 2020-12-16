@@ -5,7 +5,12 @@ import { jsx, css } from '@emotion/react';
 import { Header, Title, Editor, BlockModal } from '@components/molecules';
 import { HeaderMenu } from '@components/organisms';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { blockMapState, pageState, staticMenuToggleState } from '@/stores';
+import {
+  blockMapState,
+  pageState,
+  staticMenuToggleState,
+  modalState,
+} from '@/stores';
 import { createBlock } from '@/utils';
 
 const staticMenuAreaCss = () => css`
@@ -37,6 +42,7 @@ const bottomMarginCss = () => css`
 `;
 
 function PageComponent(): JSX.Element {
+  const isModalOpen = useRecoilValue(modalState);
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
   const page = useRecoilValue(pageState);
   const setBlockMap = useSetRecoilState(blockMapState);
@@ -61,7 +67,7 @@ function PageComponent(): JSX.Element {
       </div>
       <div css={staticScrollAreaCss(staticMenuToggle)}>
         <Title />
-        <BlockModal />
+        {isModalOpen ?? <BlockModal />}
         <Editor />
         <div
           css={bottomMarginCss()}
