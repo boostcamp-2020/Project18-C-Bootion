@@ -110,16 +110,6 @@ const useManger = (
     setBlock(parent.id, {
       childIdList: filteredSiblingsIdList,
     });
-    if (
-      grandParent?.type === BlockType.GRID &&
-      transaction[parent.id].childIdList.length === 0
-    ) {
-      setBlock(grandParent.id, {
-        childrenIdList: transaction[grandParent.id].childIdList.filter(
-          (id) => id !== parent.id,
-        ),
-      });
-    }
     return [...transaction[block.id].childIdList];
   };
 
