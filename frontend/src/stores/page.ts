@@ -70,6 +70,7 @@ export const modalState = atom({
   key: StateType.MODAL_STATE,
   default: {
     isOpen: false,
+    caretOffset: 0,
     top: 0,
     left: 0,
   },
