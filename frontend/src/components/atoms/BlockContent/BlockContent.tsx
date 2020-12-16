@@ -157,10 +157,11 @@ function BlockContent(blockDTO: Block) {
         top: rect.top,
         left: rect.left,
         caretOffset: nowLetterIdx,
+        blockId: blockDTO.id,
       });
-      return;
+    } else {
+      setModal({ ...modal, isOpen: false });
     }
-    setModal({ ...modal, isOpen: false });
 
     const newType = Object.entries(regex).find((testRegex) =>
       testRegex[1].test(content),
