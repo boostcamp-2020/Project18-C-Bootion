@@ -121,7 +121,7 @@ function BlockModal(): JSX.Element {
   const focusId = useRecoilValue(focusState);
   const [
     { block, blockIndex },
-    { startTransaction, commitTransaction, addSibling },
+    { startTransaction, commitTransaction, addSibling, setBlock },
   ] = useManager(focusId);
 
   const createBlockHandler = async (type: string) => {
@@ -132,6 +132,10 @@ function BlockModal(): JSX.Element {
     });
     startTransaction();
     const newBlock = addSibling(updatedBlock);
+    // content =
+    //     content.substring(0, nowLetterIdx - 1) +
+    //     content.substring(nowLetterIdx, content.length);
+    // setBlock({...block, value: });
     commitTransaction();
     // setFocus(newBlock);
   };
