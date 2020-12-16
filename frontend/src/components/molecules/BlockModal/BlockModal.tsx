@@ -1,8 +1,11 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css } from '@emotion/react';
-import { ReactPortal } from 'react';
+import { jsx, css, SerializedStyles } from '@emotion/react';
+import { ReactPortal, MouseEvent } from 'react';
 import ReactDOM from 'react-dom';
+
+import { useRecoilValue } from 'recoil';
+import { modalState } from '@/stores';
 
 import TextImg from '@assets/text.png';
 import H1Img from '@assets/heading1.png';
@@ -13,10 +16,10 @@ import NumberedListImg from '@assets/numberedList.png';
 import ToggleListImg from '@assets/toggledList.png';
 import QuoteImg from '@assets/quote.png';
 
-const modalWrapperCss = css`
+const modalWrapperCss = (left: number, top: number): SerializedStyles => css`
   position: fixed;
-  left: 0;
-  top: 0;
+  left: ${left}px;
+  top: ${top}px;
   height: 300px;
   width: 250px;
   display: flex;
@@ -96,12 +99,22 @@ function ModalPortal({ children }: any): ReactPortal {
 }
 
 function BlockModal(): JSX.Element {
+  const modal = useRecoilValue(modalState);
+
+  const onClickType = (type: string) => (
+    event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
+  ) => {};
+
   return (
     <ModalPortal>
-      <div css={modalWrapperCss}>
-        <div className="header">BASIC BLOCKS</div>
+      <div css={modalWrapperCss(modal.left, modal.top)}>
         {Object.keys(typeObj).map((type) => (
-          <div css={modalComponentCss}>
+          <div
+            key={type}
+            css={modalComponentCss}
+            onClick={onClickType(type)}
+            onKeyPress={() => {}}
+          >
             <div>
               <img alt={type} src={typeImg[type]} />
             </div>
