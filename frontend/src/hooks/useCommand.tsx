@@ -1,12 +1,12 @@
 import { useRecoilState } from 'recoil';
-import { focusState, blockRefState } from '@/stores';
+import { focusState } from '@/stores';
 import { useManager } from '@/hooks';
-import { Block, BlockType } from '@/schemes';
+import { BlockType } from '@/schemes';
 
 const useCommand = () => {
-  const [focusId, setFocusId] = useRecoilState(focusState);
+  const [focusId] = useRecoilState(focusState);
   const [
-    { block, blockIndex, siblingsIdList, parent, grandParent, blockMap },
+    { block, blockIndex, siblingsIdList, grandParent },
     {
       getPrevBlock,
       getNextBlock,
@@ -19,29 +19,10 @@ const useCommand = () => {
       startTransaction,
       commitTransaction,
       deleteBlock,
+      setFocus,
+      setCaretOffset,
     },
   ] = useManager(focusId);
-
-  const setFocus = (targetBlock: Block) => {
-    if (!targetBlock) {
-      return null;
-    }
-    const beforeOffset = window.getSelection().focusOffset;
-    setFocusId(targetBlock.id);
-    const targetRef = blockRefState[targetBlock.id];
-    targetRef
-      ? targetRef.current.focus()
-      : blockRefState[block.id].current.blur();
-    return beforeOffset;
-  };
-
-  const setCaretOffset = (offset: number) => {
-    const sel = window.getSelection();
-    const { focusNode: node } = sel;
-    const { length } = node as any;
-    !(node instanceof HTMLElement) &&
-      sel.collapse(node, offset > length ? length : offset);
-  };
 
   const getSlicedValueToCaretOffset = () => {
     const { focusNode, anchorOffset, focusOffset } = window.getSelection();
