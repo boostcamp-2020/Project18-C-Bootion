@@ -4,7 +4,12 @@ import { jsx, css, SerializedStyles } from '@emotion/react';
 import { useEffect, useRef, FormEvent, KeyboardEvent } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
-import { blockRefState, throttleState, blockMapState } from '@/stores';
+import {
+  blockRefState,
+  throttleState,
+  blockMapState,
+  modalState,
+} from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
   regex,
@@ -53,6 +58,7 @@ const editableDivCSS = (block: Block): SerializedStyles => css`
 function BlockContent(blockDTO: Block) {
   const contentEditableRef = useRef(null);
   const [blockMap, setBlockMap] = useRecoilState(blockMapState);
+  const [modal, setModal] = useRecoilState(modalState);
   const focusId = useRecoilValue(focusState);
   const caretRef = useRef(0);
   const listCnt = useRef(1);
@@ -98,6 +104,15 @@ function BlockContent(blockDTO: Block) {
 
   const handleValue = (event: FormEvent<HTMLDivElement>) => {
     const content = event.currentTarget.textContent;
+
+    if (content[content.length - 1] === '/') {
+      const rect = window.getSelection().getRangeAt(0).getClientRects()[0];
+      setModal({ ...modal, isOpen: true, top: rect.top, left: rect.left }); // focus도 주기
+      event.preventDefault();
+    } else {
+      setModal({ ...modal, isOpen: false });
+    }
+
     const newType = Object.entries(regex).find((testRegex) =>
       testRegex[1].test(content),
     );
