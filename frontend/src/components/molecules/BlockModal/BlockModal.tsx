@@ -1,11 +1,13 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css, SerializedStyles } from '@emotion/react';
+import { jsx, css, keyframes } from '@emotion/react';
 import { ReactPortal, MouseEvent } from 'react';
 import ReactDOM from 'react-dom';
 
-import { useRecoilValue } from 'recoil';
-import { modalState } from '@/stores';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { modalState, focusState } from '@/stores';
+import { createBlock } from '@/utils';
+import { useManager } from '@/hooks';
 
 import TextImg from '@assets/text.png';
 import H1Img from '@assets/heading1.png';
@@ -16,7 +18,16 @@ import NumberedListImg from '@assets/numberedList.png';
 import ToggleListImg from '@assets/toggledList.png';
 import QuoteImg from '@assets/quote.png';
 
-const modalWrapperCss = (left: number, top: number): SerializedStyles => css`
+const fadein = keyframes`
+  from {
+      opacity:0;
+  }
+  to {
+      opacity:1;
+  }
+`;
+
+const modalWrapperCss = (left: number, top: number) => css`
   position: fixed;
   left: ${left}px;
   top: ${top}px;
@@ -36,7 +47,7 @@ const modalWrapperCss = (left: number, top: number): SerializedStyles => css`
   background-color: white;
   z-index: 2;
   overflow-y: scroll;
-
+  animation: ${fadein} 0.3s;
   .header {
     font-size: 12px;
     font-weight: 20px;
@@ -49,48 +60,55 @@ const modalComponentCss = css`
   padding: 5px;
   width: inherit;
   font-size: 15px;
-
   div {
     margin: 4px;
   }
-
   img {
     width: 50px;
     height: 50px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 5px;
   }
-
   .des {
     font-size: 12px;
     color: rgba(0, 0, 0, 0.3);
   }
-
   :hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
 `;
 
+const typeName: { [key: string]: string } = {
+  text: 'Text',
+  heading1: 'Heading1',
+  heading2: 'Heading2',
+  heading3: 'Heading3',
+  bulletedlist: 'Bulleted list',
+  numberedlist: 'Numbered list',
+  togglelist: 'Toggle list',
+  quote: 'Quote',
+};
+
 const typeObj: { [key: string]: string } = {
-  Text: 'Just start writing with plain text.',
-  Heading1: 'Big section heading.',
-  Heading2: 'Medium section heading.',
-  Heading3: 'Small section heading.',
-  'Bulleted list': 'Create a simple bulleted list.',
-  'Numbered list': 'Create a list with numbering.',
-  'Toggle list': 'Toggles can hide and show content inside.',
-  Quote: 'Capture a quote.',
+  text: 'Just start writing with plain text.',
+  heading1: 'Big section heading.',
+  heading2: 'Medium section heading.',
+  heading3: 'Small section heading.',
+  bulletedlist: 'Create a simple bulleted list.',
+  numberedlist: 'Create a list with numbering.',
+  togglelist: 'Toggles can hide and show content inside.',
+  quote: 'Capture a quote.',
 };
 
 const typeImg: { [key: string]: any } = {
-  Text: TextImg,
-  Heading1: H1Img,
-  Heading2: H2Img,
-  Heading3: H3Img,
-  'Bulleted list': BulletedListImg,
-  'Numbered list': NumberedListImg,
-  'Toggle list': ToggleListImg,
-  Quote: QuoteImg,
+  text: TextImg,
+  heading1: H1Img,
+  heading2: H2Img,
+  heading3: H3Img,
+  bulletedlist: BulletedListImg,
+  numberedlist: NumberedListImg,
+  togglelist: ToggleListImg,
+  quote: QuoteImg,
 };
 
 function ModalPortal({ children }: any): ReactPortal {
@@ -99,16 +117,36 @@ function ModalPortal({ children }: any): ReactPortal {
 }
 
 function BlockModal(): JSX.Element {
-  const modal = useRecoilValue(modalState);
+  const [modal, setModal] = useRecoilState(modalState);
+  const focusId = useRecoilValue(focusState);
+  const [
+    { block, blockIndex },
+    { startTransaction, commitTransaction, addSibling },
+  ] = useManager(focusId);
+
+  const createBlockHandler = async (type: string) => {
+    const { block: updatedBlock } = await createBlock({
+      parentBlockId: block.parentId,
+      index: blockIndex + 1,
+      block: { type },
+    });
+    startTransaction();
+    const newBlock = addSibling(updatedBlock);
+    commitTransaction();
+    // setFocus(newBlock);
+  };
 
   const onClickType = (type: string) => (
     event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
-  ) => {};
+  ) => {
+    createBlockHandler(type);
+    setModal({ ...modal, isOpen: false });
+  };
 
   return (
     <ModalPortal>
       <div css={modalWrapperCss(modal.left, modal.top)}>
-        {Object.keys(typeObj).map((type) => (
+        {Object.keys(typeName).map((type) => (
           <div
             key={type}
             css={modalComponentCss}
@@ -119,7 +157,7 @@ function BlockModal(): JSX.Element {
               <img alt={type} src={typeImg[type]} />
             </div>
             <div>
-              <div>{type}</div>
+              <div>{typeName[type]}</div>
               <div className="des">{typeObj[type]}</div>
             </div>
           </div>
