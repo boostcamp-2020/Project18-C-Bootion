@@ -12,7 +12,7 @@ import {
   placeHolder,
   listComponent,
 } from '@utils/blockContent';
-import { useCommand } from '@/hooks';
+import { useCommand, useManager } from '@/hooks';
 import { focusState } from '@/stores/page';
 
 const isGridOrColumn = (block: Block): boolean =>
@@ -53,6 +53,9 @@ const editableDivCSS = (block: Block): SerializedStyles => css`
 function BlockContent(blockDTO: Block) {
   const contentEditableRef = useRef(null);
   const [blockMap, setBlockMap] = useRecoilState(blockMapState);
+  const [, { startTransaction, commitTransaction, deleteBlock }] = useManager(
+    blockDTO.id,
+  );
   const focusId = useRecoilValue(focusState);
   const caretRef = useRef(0);
   const [Dispatcher] = useCommand();
@@ -125,6 +128,17 @@ function BlockContent(blockDTO: Block) {
       });
     }
   };
+
+  if (
+    (blockDTO.type === BlockType.GRID || blockDTO.type === BlockType.COLUMN) &&
+    !blockDTO.childIdList.length
+  ) {
+    setImmediate(() => {
+      startTransaction();
+      deleteBlock();
+      commitTransaction();
+    });
+  }
 
   useEffect(() => {
     blockRefState[blockDTO.id] = contentEditableRef;
