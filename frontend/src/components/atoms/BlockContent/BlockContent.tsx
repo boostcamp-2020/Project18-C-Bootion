@@ -154,12 +154,13 @@ function BlockContent(blockDTO: Block) {
       (event.key === 'ArrowRight' &&
         focusOffset ===
           ((focusNode as any).length ?? (focusNode as any).innerText.length)) ||
-      (event.key === 'Enter' && !event.shiftKey)
+      (event.key === 'Enter' && !event.shiftKey) ||
+      event.key === 'Tab'
     ) {
       throttleState.isThrottle = true;
       event.preventDefault();
       setImmediate(() => {
-        Dispatcher(event.key);
+        Dispatcher((event.shiftKey ? 'shift' : '') + event.key);
         throttleState.isThrottle = false;
       });
     }

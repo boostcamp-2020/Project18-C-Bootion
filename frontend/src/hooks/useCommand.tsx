@@ -10,9 +10,11 @@ const useCommand = () => {
     {
       getPrevBlock,
       getNextBlock,
-      addChild,
-      addSibling,
+      insertNewChild,
+      insertNewSibling,
       setBlock,
+      pullIn,
+      pullOut,
       startTransaction,
       commitTransaction,
     },
@@ -74,10 +76,10 @@ const useCommand = () => {
         const { focusOffset } = window.getSelection();
         startTransaction();
         if (!focusOffset) {
-          addSibling({}, blockIndex);
+          insertNewSibling({}, blockIndex);
         } else if (block.childIdList.length) {
-          setBlock({ value: before });
-          const newBlock = addChild({ value: after });
+          setBlock(block.id, { value: before });
+          const newBlock = insertNewChild({ value: after });
           setFocus(newBlock);
         } else {
           const type = [
@@ -87,10 +89,22 @@ const useCommand = () => {
           ].includes(block.type)
             ? block.type
             : BlockType.TEXT;
-          setBlock({ value: before });
-          const newBlock = addSibling({ value: after, type });
+          setBlock(block.id, { value: before });
+          const newBlock = insertNewSibling({ value: after, type });
           setFocus(newBlock);
         }
+        commitTransaction();
+        break;
+      }
+      case 'Tab': {
+        startTransaction();
+        pullIn();
+        commitTransaction();
+        break;
+      }
+      case 'shiftTab': {
+        startTransaction();
+        pullOut();
         commitTransaction();
         break;
       }
