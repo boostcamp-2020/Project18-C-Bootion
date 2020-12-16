@@ -1,7 +1,13 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx, css, SerializedStyles } from '@emotion/react';
-import { useEffect, useRef, FormEvent, KeyboardEvent } from 'react';
+import { jsx, css } from '@emotion/react';
+import React, {
+  useEffect,
+  useRef,
+  FormEvent,
+  KeyboardEvent,
+  useState,
+} from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
 import {
@@ -9,6 +15,7 @@ import {
   throttleState,
   blockMapState,
   modalState,
+  draggingBlockState,
 } from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
@@ -17,17 +24,19 @@ import {
   placeHolder,
   listBlockType,
 } from '@utils/blockContent';
-import { useCommand } from '@/hooks';
+import { useCommand, useManager } from '@/hooks';
 import { focusState } from '@/stores/page';
+import { moveBlock, updateBlock } from '@/utils';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
 
 const blockContentCSS = css`
+  position: relative;
   display: flex;
   align-items: stretch;
 `;
-const editableDivCSS = (block: Block): SerializedStyles => css`
+const editableDivCSS = (block: Block) => css`
   margin: 5;
   font-size: ${fontSize[block.type]};
   display: ${!isGridOrColumn(block) ? 'flex' : 'none'};
@@ -54,15 +63,49 @@ const editableDivCSS = (block: Block): SerializedStyles => css`
     cursor: text;
   }
 `;
+const dragOverCss = () => css`
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 15%;
+  background-color: rgba(80, 188, 223, 0.7);
+`;
 
 function BlockContent(blockDTO: Block) {
   const contentEditableRef = useRef(null);
   const [blockMap, setBlockMap] = useRecoilState(blockMapState);
   const [modal, setModal] = useRecoilState(modalState);
+  const [, { startTransaction, commitTransaction, deleteBlock }] = useManager(
+    blockDTO.id,
+  );
   const focusId = useRecoilValue(focusState);
   const caretRef = useRef(0);
   const listCnt = useRef(1);
   const [Dispatcher] = useCommand();
+  const [isBlur, setIsBlur] = useState(false);
+  const draggingBlock = useRecoilValue(draggingBlockState);
+  const [{ blockIndex }] = useManager(blockDTO.id);
+  const [dragOverToggle, setDragOverToggle] = useState(false);
+
+  useEffect(() => {
+    blockRefState[blockDTO.id] = contentEditableRef;
+    return () => {
+      blockRefState[blockDTO.id] = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (focusId === blockDTO.id) contentEditableRef.current.focus();
+  }, [focusId]);
+
+  useEffect(() => {
+    const selection = window.getSelection();
+    const nodeLength = selection.focusNode?.nodeValue?.length ?? 0;
+    if (caretRef.current > nodeLength) {
+      caretRef.current = nodeLength;
+    }
+    selection.collapse(selection.focusNode, caretRef.current);
+  }, [blockDTO.value]);
 
   const indexInSibling: number = blockMap[
     blockDTO.parentId
@@ -175,16 +218,36 @@ function BlockContent(blockDTO: Block) {
       (event.key === 'ArrowRight' &&
         focusOffset ===
           ((focusNode as any).length ?? (focusNode as any).innerText.length)) ||
-      (event.key === 'Enter' && !event.shiftKey)
+      (event.key === 'Enter' && !event.shiftKey) ||
+      event.key === 'Tab' ||
+      (event.key === 'Backspace' && !focusOffset)
     ) {
       throttleState.isThrottle = true;
       event.preventDefault();
       setImmediate(() => {
-        Dispatcher(event.key);
+        Dispatcher((event.shiftKey ? 'shift' : '') + event.key);
         throttleState.isThrottle = false;
       });
     }
   };
+
+  if (
+    (blockDTO.type === BlockType.GRID || blockDTO.type === BlockType.COLUMN) &&
+    !blockDTO.childIdList.length
+  ) {
+    setImmediate(() => {
+      startTransaction();
+      deleteBlock();
+      commitTransaction();
+    });
+  }
+
+  useEffect(() => {
+    (async () => {
+      const { block: updatedBlock } = await updateBlock(blockDTO);
+      setBlockMap({ ...blockMap, [blockDTO.id]: updatedBlock });
+    })();
+  }, [isBlur]);
 
   useEffect(() => {
     blockRefState[blockDTO.id] = contentEditableRef;
@@ -217,8 +280,45 @@ function BlockContent(blockDTO: Block) {
     }
   }, [blockDTO.value]);
 
+  const dragOverHandler = (event: React.DragEvent<HTMLDivElement>) => {
+    event.dataTransfer.dropEffect = 'move';
+
+    event.preventDefault();
+  };
+
+  const dropHandler = async (event: React.DragEvent<HTMLDivElement>) => {
+    setDragOverToggle(false);
+    event.dataTransfer.dropEffect = 'move';
+
+    const blockId = draggingBlock?.id;
+    if (!blockId || blockId === blockDTO.id) {
+      return;
+    }
+
+    const { block, from: fromBlock, to } = await moveBlock({
+      blockId,
+      toId: blockDTO.parentId,
+      index: blockIndex + 1,
+    });
+    setBlockMap((prev) => {
+      const next = { ...prev };
+      next[block.id] = block;
+      fromBlock && (next[fromBlock.id] = fromBlock);
+      next[to.id] = to;
+      return next;
+    });
+
+    event.preventDefault();
+  };
+
   return (
-    <div css={blockContentCSS}>
+    <div
+      css={blockContentCSS}
+      onDragOver={dragOverHandler}
+      onDrop={dropHandler}
+      onDragEnter={() => setDragOverToggle(true)}
+      onDragLeave={() => setDragOverToggle(false)}
+    >
       {listBlockType(blockDTO, listCnt.current)}
       <div
         ref={contentEditableRef}
@@ -229,9 +329,11 @@ function BlockContent(blockDTO: Block) {
         placeholder={placeHolder[blockDTO.type]}
         onInput={handleValue}
         onKeyUp={handleKeyUp}
+        onBlur={() => setIsBlur(!isBlur)}
       >
         {blockDTO.value}
       </div>
+      {dragOverToggle && <div css={dragOverCss()} />}
     </div>
   );
 }
