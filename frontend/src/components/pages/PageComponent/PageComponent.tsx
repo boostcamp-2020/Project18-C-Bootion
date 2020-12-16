@@ -42,7 +42,7 @@ const bottomMarginCss = () => css`
 `;
 
 function PageComponent(): JSX.Element {
-  const isModalOpen = useRecoilValue(modalState);
+  const { isOpen } = useRecoilValue(modalState);
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
   const page = useRecoilValue(pageState);
   const setBlockMap = useSetRecoilState(blockMapState);
@@ -67,7 +67,7 @@ function PageComponent(): JSX.Element {
       </div>
       <div css={staticScrollAreaCss(staticMenuToggle)}>
         <Title />
-        {isModalOpen ?? <BlockModal />}
+        {isOpen ? <BlockModal /> : ''}
         <Editor />
         <div
           css={bottomMarginCss()}
