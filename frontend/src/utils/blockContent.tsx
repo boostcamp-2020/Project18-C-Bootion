@@ -1,6 +1,6 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
-import { jsx } from '@emotion/react';
+import { jsx, css } from '@emotion/react';
 import { ReactComponent as Toggle } from '@assets/toggle-default.svg';
 
 export const regex: { [key: string]: RegExp } = {
