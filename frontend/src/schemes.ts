@@ -38,6 +38,10 @@ export interface BlockFamily {
   siblings: Block[];
   parentsIdList: IdType[];
   parents: Block[];
+  prevSibling: Block;
+  nextSibling: Block;
+  prevSiblings: Block[];
+  nextSiblings: Block[];
 }
 
 export interface FamilyFunc {
