@@ -1,7 +1,7 @@
-import { atom, selector } from 'recoil';
+import { atom } from 'recoil';
 
-import { BlockMap, Page } from '@/schemes';
-import { fetchDummyData, readBlockMap, refreshPages } from '@/utils';
+import { Block, BlockMap, Page } from '@/schemes';
+import { readBlockMap, refreshPages } from '@/utils';
 import { MutableRefObject } from 'react';
 
 enum StateType {
@@ -16,6 +16,7 @@ enum StateType {
   STATIC_MENU_TOGGLE_STATE = 'staticMenuToggleState',
   HOVERED_MENU_TOGGLE_STATE = 'hoveredMenuToggleState',
   SELECTED_PAGE_STATE = 'selectedPageState',
+  DRAGGING_BLOCK_STATE = 'draggingBlockState',
 }
 
 export const pagesState = atom({
@@ -23,20 +24,13 @@ export const pagesState = atom({
   default: refreshPages(),
 });
 
-export const selectedPageState = atom({
-  key: StateType.SELECTED_PAGE_STATE,
-  default: (async () => (await refreshPages())[0])(),
-});
-
 export const pageState = atom<Page>({
   key: StateType.PAGE_STATE,
-  // default: (async () => (await fetchDummyData()).page)(),
   default: (async () => (await refreshPages())[0])(),
 });
 
 export const blockMapState = atom<BlockMap>({
   key: StateType.BLOCK_MAP_STATE,
-  // default: (async () => (await fetchDummyData()).blockMap)(),
   default: (async () => {
     const page = (await refreshPages())[0];
     const { blockMap } = await readBlockMap(page.id);
@@ -73,4 +67,9 @@ export const staticMenuToggleState = atom({
 export const hoveredMenuToggleState = atom({
   key: StateType.HOVERED_MENU_TOGGLE_STATE,
   default: false,
+});
+
+export const draggingBlockState = atom<Block>({
+  key: StateType.DRAGGING_BLOCK_STATE,
+  default: null,
 });

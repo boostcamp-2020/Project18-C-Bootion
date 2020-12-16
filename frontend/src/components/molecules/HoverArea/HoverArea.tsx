@@ -2,37 +2,42 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 import { MouseEvent } from 'react';
+import { useRecoilValue } from 'recoil';
+import { draggingBlockState } from '@/stores';
 
-const LeftHoverAreaCss = css`
+const leftHoverAreaCss = css`
   position: absolute;
   top: 0;
   right: 100%;
   width: calc(10% + 36px);
   height: 100%;
 `;
-const RightHoverAreaCss = css`
+const rightHoverAreaCss = css`
   position: absolute;
   top: 0;
   left: 100%;
   width: 10%;
   height: 100%;
 `;
-const CommonHoverAreaCss = css`
+const commonHoverAreaCss = css`
   &:hover {
     cursor: text;
   }
 `;
-function HoverArea({
-  handleClick,
-}: {
-  handleClick: (
+
+interface Props {
+  clickHandler: (
     event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
   ) => void;
-}): React.ReactElement {
+}
+
+function HoverArea({ clickHandler }: Props): JSX.Element {
+  const draggingBlock = useRecoilValue(draggingBlockState);
+
   return (
-    <div css={CommonHoverAreaCss} onClick={handleClick} onKeyDown={() => {}}>
-      <div css={LeftHoverAreaCss} />
-      <div css={RightHoverAreaCss} />
+    <div css={commonHoverAreaCss} onClick={clickHandler} onKeyDown={() => {}}>
+      {!draggingBlock && <div css={leftHoverAreaCss} />}
+      <div css={rightHoverAreaCss} />
     </div>
   );
 }
