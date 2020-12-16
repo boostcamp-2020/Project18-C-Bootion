@@ -39,12 +39,11 @@ const titleCss = () => css`
 
   font-family: inter, Helvetica, 'Apple Color Emoji', Arial, sans-serif,
     'Segoe UI Emoji', 'Segoe UI Symbol';
-  
+
   &:empty:before {
     content: 'Untitled';
     color: rgba(55, 53, 47, 0.15);
   }
-}
 `;
 
 function Title(): JSX.Element {

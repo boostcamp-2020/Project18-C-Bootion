@@ -41,11 +41,19 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
       return children[0];
     }
     if (blockIndex !== siblings.length - 1) {
-      /** 자식이 없고 마지막 자식이 아니므로 다음 형제가 다음 Block 이다.  */
-      return siblings[blockIndex + 1];
+      const nextSibling = siblings[blockIndex + 1];
+      switch (nextSibling.type) {
+        case BlockType.COLUMN:
+          return blockMap[nextSibling.childIdList[0]];
+        case BlockType.GRID:
+          return blockMap[blockMap[nextSibling.childIdList[0]].childIdList[0]];
+        default:
+          /** 다음 부모의 타입이 COLUMN이나 GRID가 아니면 다음 Block 이다. */
+          return nextSibling;
+      }
     }
     /* block이 마지막 자식일 때. 다음 부모가 다음 Block 이다. */
-    const targetParentBlock = parents[parentIndex + 1];
+    const targetParentBlock = parents?.[parentIndex + 1];
     if (!targetParentBlock) {
       /** 현재 블록이 마지막 블록이다. */
       return null;
@@ -70,10 +78,8 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
       /** blockIndex가 0이 아니면 이전 형제에서 prev block을 찾을 수 있다. */
       const prevSibling = siblings[blockIndex - 1];
       if (prevSibling?.childIdList.length) {
-        /* 이전 형제에게 자식이 있다면 마지막 자식이 prev block 이다.  */
-        return blockMap[
-          prevSibling.childIdList[prevSibling.childIdList.length - 1]
-        ];
+        /* 이전 형제에게 자식이 있다면 마지막 후손이 prev block 이다.  */
+        return findLastDescendant(prevSibling);
       }
       /* 이전 형제에게 자식이 없다면 형제가 prev block 이다.  */
       return prevSibling;

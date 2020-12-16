@@ -25,7 +25,7 @@ import {
 } from '@utils/blockContent';
 import { useCommand, useManager } from '@/hooks';
 import { focusState } from '@/stores/page';
-import { moveBlock } from '@/utils';
+import { moveBlock, updateBlock } from '@/utils';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
@@ -77,6 +77,7 @@ function BlockContent(blockDTO: Block) {
   const caretRef = useRef(0);
   const listCnt = useRef(1);
   const [Dispatcher] = useCommand();
+  const [isBlur, setIsBlur] = useState(false);
   const draggingBlock = useRecoilValue(draggingBlockState);
   const [{ blockIndex }] = useManager(blockDTO.id);
   const [dragOverToggle, setDragOverToggle] = useState(false);
@@ -197,16 +198,25 @@ function BlockContent(blockDTO: Block) {
       (event.key === 'ArrowRight' &&
         focusOffset ===
           ((focusNode as any).length ?? (focusNode as any).innerText.length)) ||
-      (event.key === 'Enter' && !event.shiftKey)
+      (event.key === 'Enter' && !event.shiftKey) ||
+      event.key === 'Tab' ||
+      (event.key === 'Backspace' && !focusOffset)
     ) {
       throttleState.isThrottle = true;
       event.preventDefault();
       setImmediate(() => {
-        Dispatcher(event.key);
+        Dispatcher((event.shiftKey ? 'shift' : '') + event.key);
         throttleState.isThrottle = false;
       });
     }
   };
+
+  useEffect(() => {
+    (async () => {
+      const { block: updatedBlock } = await updateBlock(blockDTO);
+      setBlockMap({ ...blockMap, [blockDTO.id]: updatedBlock });
+    })();
+  }, [isBlur]);
 
   useEffect(() => {
     blockRefState[blockDTO.id] = contentEditableRef;
@@ -288,6 +298,7 @@ function BlockContent(blockDTO: Block) {
         placeholder={placeHolder[blockDTO.type]}
         onInput={handleValue}
         onKeyUp={handleKeyUp}
+        onBlur={() => setIsBlur(!isBlur)}
       >
         {blockDTO.value}
       </div>

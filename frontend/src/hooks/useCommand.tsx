@@ -6,15 +6,19 @@ import { Block, BlockType } from '@/schemes';
 const useCommand = () => {
   const [focusId, setFocusId] = useRecoilState(focusState);
   const [
-    { block, blockIndex },
+    { block, blockIndex, siblingsIdList, parent, grandParent, blockMap },
     {
       getPrevBlock,
       getNextBlock,
-      addChild,
-      addSibling,
+      insertSibling,
+      insertNewChild,
+      insertNewSibling,
       setBlock,
+      pullIn,
+      pullOut,
       startTransaction,
       commitTransaction,
+      deleteBlock,
     },
   ] = useManager(focusId);
 
@@ -74,10 +78,10 @@ const useCommand = () => {
         const { focusOffset } = window.getSelection();
         startTransaction();
         if (!focusOffset) {
-          addSibling({}, blockIndex);
+          insertNewSibling({}, blockIndex);
         } else if (block.childIdList.length) {
-          setBlock({ value: before });
-          const newBlock = addChild({ value: after });
+          setBlock(block.id, { value: before });
+          const newBlock = insertNewChild({ value: after });
           setFocus(newBlock);
         } else {
           const type = [
@@ -87,9 +91,48 @@ const useCommand = () => {
           ].includes(block.type)
             ? block.type
             : BlockType.TEXT;
-          setBlock({ value: before });
-          const newBlock = addSibling({ value: after, type });
+          setBlock(block.id, { value: before });
+          const newBlock = insertNewSibling({ value: after, type });
           setFocus(newBlock);
+        }
+        commitTransaction();
+        break;
+      }
+      case 'Tab': {
+        startTransaction();
+        pullIn();
+        commitTransaction();
+        break;
+      }
+      case 'shiftTab': {
+        startTransaction();
+        pullOut();
+        commitTransaction();
+        break;
+      }
+      case 'Backspace': {
+        startTransaction();
+        if (block.type !== BlockType.TEXT) {
+          setBlock(block.id, { type: BlockType.TEXT });
+        } else if (
+          siblingsIdList.length - 1 === blockIndex &&
+          grandParent &&
+          grandParent.type !== BlockType.GRID
+        ) {
+          pullOut();
+        } else {
+          const [, after] = getSlicedValueToCaretOffset();
+          const prevBlock = getPrevBlock();
+          if (prevBlock) {
+            const deletedBlockChildrenIdList = deleteBlock();
+            deletedBlockChildrenIdList.forEach((id, index) =>
+              insertSibling(id, index),
+            );
+            setFocus(
+              setBlock(prevBlock.id, { value: prevBlock.value + after }),
+            );
+            setCaretOffset(prevBlock.value.length);
+          }
         }
         commitTransaction();
         break;
