@@ -66,7 +66,13 @@ function BlockContent(blockDTO: Block) {
   const [Dispatcher] = useCommand();
   const [
     { blockIndex, prevSiblings },
-    { commitTransaction, startTransaction, setBlock, setCaretOffset, deleteBlock },
+    {
+      commitTransaction,
+      startTransaction,
+      setBlock,
+      setCaretOffset,
+      deleteBlock,
+    },
   ] = useManager(blockDTO.id);
   const draggingBlock = useRecoilValue(draggingBlockState);
   const [dragOverToggle, setDragOverToggle] = useState(false);
@@ -107,9 +113,9 @@ function BlockContent(blockDTO: Block) {
     startTransaction();
     setBlock(blockDTO.id, { value, type: type || blockDTO.type });
     contentEditableRef.current.blur();
-    setTimeout(() => {
-      setCaretOffset(caretOffset === -1 ? focusOffset : caretOffset);
-    });
+    setTimeout(() =>
+      setCaretOffset(caretOffset === -1 ? focusOffset : caretOffset),
+    );
     commitTransaction();
   };
 
@@ -164,6 +170,13 @@ function BlockContent(blockDTO: Block) {
         Dispatcher((event.shiftKey ? 'shift' : '') + event.key);
         throttleState.isThrottle = false;
       });
+    } else if (event.key === 'Enter' && event.shiftKey) {
+      const { textContent } = contentEditableRef.current;
+      const caretOffset = window.getSelection().focusOffset;
+      const cvTextContent = textContent
+        .slice(0, caretOffset)
+        .concat('\n', textContent.slice(caretOffset));
+      handleBlock(cvTextContent, null, caretOffset + 1);
     }
   };
 

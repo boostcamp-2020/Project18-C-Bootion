@@ -4,9 +4,10 @@ import { jsx, css } from '@emotion/react';
 
 import { Header, Title, Editor } from '@components/molecules';
 import { HeaderMenu } from '@components/organisms';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { blockMapState, pageState, staticMenuToggleState } from '@/stores';
+import { useRecoilValue } from 'recoil';
+import { pageState, staticMenuToggleState } from '@/stores';
 import { createBlock } from '@/utils';
+import { useManager } from '@/hooks';
 import styled from '@emotion/styled';
 import { animated, useSpring } from 'react-spring';
 
@@ -38,20 +39,28 @@ const bottomMarginCss = css`
 function PageComponent(): JSX.Element {
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
   const page = useRecoilValue(pageState);
-  const setBlockMap = useSetRecoilState(blockMapState);
+  const [
+    { children },
+    { setBlock, startTransaction, commitTransaction, setFocus },
+  ] = useManager(page.rootId);
   const staticAreaStyleProps = useSpring({
     left: staticMenuToggle ? 240 : 0,
     width: `calc(100% - ${staticMenuToggle ? 240 : 0}px)`,
   });
 
   const createBlockHandler = async () => {
-    const { parent, block } = await createBlock({ parentBlockId: page.rootId });
-    setBlockMap((prev) => {
-      const next = { ...prev };
-      next[parent.id] = parent;
-      next[block.id] = block;
-      return next;
+    if (children[children.length - 1].value === '') {
+      setFocus(children[children.length - 1]);
+      return;
+    }
+    const { parent, block } = await createBlock({
+      parentBlockId: page.rootId,
     });
+    startTransaction();
+    setBlock(parent.id, parent);
+    setBlock(block.id, block);
+    setFocus(block);
+    commitTransaction();
   };
 
   return (
