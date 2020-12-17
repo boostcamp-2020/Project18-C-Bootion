@@ -7,12 +7,12 @@ const BASE_URL = '/api/blocks';
 export const createBlock = (param: {
   parentBlockId: string;
   index?: number;
-  block?: Block;
+  block?: { type?: string; value?: string };
 }) =>
   fetchApi<
     { parent: Block; block: Block },
     {
-      block?: Block;
+      block?: { type?: string; value?: string };
       index?: number;
     }
   >({

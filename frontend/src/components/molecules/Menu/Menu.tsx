@@ -15,6 +15,7 @@ import { createPage, readBlockMap } from '@/utils';
 import { HeaderButton } from '@atoms/index';
 import { ReactComponent as DoubleChevronLeft } from '@assets/doubleChevronLeft.svg';
 import { ReactComponent as PlusPage } from '@assets/plusPage.svg';
+import { ReactComponent as Loading } from '@assets/loading.svg';
 import { MenuItem } from '@molecules/index';
 import { animated, useSpring } from 'react-spring';
 import styled from '@emotion/styled';
@@ -100,13 +101,11 @@ function Menu(): JSX.Element {
         )}
       </AnimatedButtons>
       <div css={workspaceCss()}>WORKSPACE</div>
-      <div css={menuListCss()}>
-        <Suspense fallback={<div>Loading...</div>}>
-          {pages.map((page) => (
-            <MenuItem key={page.id} page={page} />
-          ))}
-        </Suspense>
-      </div>
+      <Suspense fallback={<Loading />}>
+        {pages.map((page) => (
+          <MenuItem key={page.id} page={page} />
+        ))}
+      </Suspense>
     </div>
   );
 }

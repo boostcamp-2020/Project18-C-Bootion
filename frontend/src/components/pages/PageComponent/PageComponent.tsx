@@ -2,10 +2,10 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 
-import { Header, Title, Editor } from '@components/molecules';
+import { Header, Title, Editor, BlockModal } from '@components/molecules';
 import { HeaderMenu } from '@components/organisms';
 import { useRecoilValue } from 'recoil';
-import { pageState, staticMenuToggleState } from '@/stores';
+import { pageState, staticMenuToggleState, modalState } from '@/stores';
 import { createBlock } from '@/utils';
 import { useManager } from '@/hooks';
 import styled from '@emotion/styled';
@@ -37,6 +37,7 @@ const bottomMarginCss = css`
 `;
 
 function PageComponent(): JSX.Element {
+  const { isOpen } = useRecoilValue(modalState);
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
   const page = useRecoilValue(pageState);
   const [
@@ -73,6 +74,7 @@ function PageComponent(): JSX.Element {
       </AnimatedStaticHeaderArea>
       <AnimatedStaticScrollArea style={staticAreaStyleProps}>
         <Title />
+        {isOpen ? <BlockModal /> : ''}
         <Editor />
         <div
           css={bottomMarginCss}

@@ -1,10 +1,21 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
-import React, { useEffect, useRef, KeyboardEvent, useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import React, {
+  useEffect,
+  useRef,
+  KeyboardEvent,
+  useState,
+  FormEvent,
+} from 'react';
+import { useRecoilValue, useRecoilState } from 'recoil';
 
-import { blockRefState, draggingBlockState, throttleState } from '@/stores';
+import {
+  blockRefState,
+  throttleState,
+  modalState,
+  draggingBlockState,
+} from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
   regex,
@@ -61,6 +72,7 @@ const dragOverCss = () => css`
 
 function BlockContent(blockDTO: Block) {
   const contentEditableRef = useRef(null);
+  const [modal, setModal] = useRecoilState(modalState);
   const focusId = useRecoilValue(focusState);
   const listCnt = useRef(1);
   const [Dispatcher] = useCommand();
@@ -119,8 +131,24 @@ function BlockContent(blockDTO: Block) {
     commitTransaction();
   };
 
-  const handleValue = () => {
-    const content = contentEditableRef.current.textContent;
+  const handleValue = (event: FormEvent<HTMLDivElement>) => {
+    const content = event.currentTarget.textContent;
+
+    let nowLetterIdx = window.getSelection().focusOffset;
+    if (!nowLetterIdx) nowLetterIdx += 1;
+    if (content[nowLetterIdx - 1] === '/') {
+      const rect = window.getSelection().getRangeAt(0).getClientRects()[0];
+      setModal({
+        isOpen: true,
+        top: rect.top,
+        left: rect.left,
+        caretOffset: nowLetterIdx,
+        blockId: blockDTO.id,
+      });
+    } else {
+      setModal({ ...modal, isOpen: false });
+    }
+
     const newType = Object.entries(regex).find((testRegex) =>
       testRegex[1].test(content),
     );
