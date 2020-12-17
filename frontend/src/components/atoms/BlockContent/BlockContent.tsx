@@ -77,17 +77,16 @@ function BlockContent(blockDTO: Block) {
   const listCnt = useRef(1);
   const [Dispatcher] = useCommand();
   const [
-    { blockIndex, prevSiblings, blockMap },
+    { blockIndex, prevSiblings },
     {
       commitTransaction,
       startTransaction,
       setBlock,
       setCaretOffset,
       deleteBlock,
-      setFocus,
     },
   ] = useManager(blockDTO.id);
-  const draggingBlock = useRecoilValue(draggingBlockState);
+  const [draggingBlock, setDraggingBlock] = useRecoilState(draggingBlockState);
   const [dragOverToggle, setDragOverToggle] = useState(false);
 
   useEffect(() => {
@@ -101,7 +100,7 @@ function BlockContent(blockDTO: Block) {
     if (focusId === blockDTO.id) contentEditableRef.current.focus();
   }, [focusId]);
 
-  const upperBlocks: Array<Block> = prevSiblings.reverse();
+  const upperBlocks: Array<Block> = prevSiblings?.reverse();
 
   const isUpperBlockEqualToNumberList = (): boolean => {
     if (upperBlocks.length) {
@@ -121,19 +120,23 @@ function BlockContent(blockDTO: Block) {
 
   const FIRST_LIST_NUMBER = '1';
 
-  const handleBlock = (value: string, type?: BlockType, caretOffset = -1) => {
+  const handleBlock = async (
+    value: string,
+    type?: BlockType,
+    caretOffset = -1,
+  ) => {
     const { focusOffset } = window.getSelection();
     startTransaction();
-    setBlock(blockDTO.id, { value, type: type || blockDTO.type });
-    contentEditableRef.current.blur();
-    setImmediate(() => {
-      setCaretOffset(caretOffset === -1 ? focusOffset : caretOffset);
-      setFocus(blockDTO);
-    });
+    await setBlock(blockDTO.id, { value, type: type || blockDTO.type });
+    setCaretOffset(
+      caretOffset === -1 ? focusOffset : caretOffset,
+      type === undefined,
+      value !== '',
+    );
     commitTransaction();
   };
 
-  const handleValue = () => {
+  const handleValue = async () => {
     const content = contentEditableRef.current?.textContent ?? '';
 
     let nowLetterIdx = window.getSelection().focusOffset;
@@ -169,18 +172,18 @@ function BlockContent(blockDTO: Block) {
         }
       }
 
-      handleBlock(
+      await handleBlock(
         content.slice(content.indexOf(' ') + 1, content.length),
         newType[0] as BlockType,
       );
       return;
     }
-    handleBlock(content);
+    await handleBlock(content);
   };
-  const updateValue = debounce(handleValue, 30);
+  const updateValue = debounce(handleValue, 300);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const { focusNode, focusOffset } = window.getSelection();
+    const { focusNode, focusOffset, anchorOffset } = window.getSelection();
     if (throttleState.isThrottle) {
       event.preventDefault();
     } else if (
@@ -192,12 +195,14 @@ function BlockContent(blockDTO: Block) {
           ((focusNode as any).length ?? (focusNode as any).innerText.length)) ||
       (event.key === 'Enter' && !event.shiftKey) ||
       event.key === 'Tab' ||
-      (event.key === 'Backspace' && !focusOffset)
+      (event.key === 'Backspace' &&
+        !focusOffset &&
+        focusOffset === anchorOffset)
     ) {
       throttleState.isThrottle = true;
       event.preventDefault();
-      setImmediate(() => {
-        Dispatcher((event.shiftKey ? 'shift' : '') + event.key);
+      setImmediate(async () => {
+        await Dispatcher((event.shiftKey ? 'shift' : '') + event.key);
         throttleState.isThrottle = false;
       });
     } else if (event.key === 'Enter' && event.shiftKey) {
@@ -267,10 +272,11 @@ function BlockContent(blockDTO: Block) {
       index: blockIndex + 1,
     });
     startTransaction();
-    setBlock(block.id, block);
-    fromBlock && setBlock(fromBlock.id, fromBlock);
-    setBlock(to.id, to);
+    await setBlock(block.id, block);
+    fromBlock && (await setBlock(fromBlock.id, fromBlock));
+    await setBlock(to.id, to);
     commitTransaction();
+    setDraggingBlock(null);
     event.preventDefault();
   };
 
@@ -289,6 +295,7 @@ function BlockContent(blockDTO: Block) {
         contentEditable
         onKeyDown={handleKeyDown}
         suppressContentEditableWarning
+        spellCheck={false}
         placeholder={placeHolder[blockDTO.type]}
         onInput={updateValue}
       >
