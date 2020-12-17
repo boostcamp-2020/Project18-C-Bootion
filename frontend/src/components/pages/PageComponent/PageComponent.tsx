@@ -49,18 +49,18 @@ function PageComponent(): JSX.Element {
   });
 
   const createBlockHandler = async () => {
-    if (children[children.length - 1].value !== '') {
-      const { parent, block } = await createBlock({
-        parentBlockId: page.rootId,
-      });
-      startTransaction();
-      setBlock(parent.id, parent);
-      setBlock(block.id, block);
-      setFocus(block);
-      commitTransaction();
-    } else {
+    if (children[children.length - 1].value === '') {
       setFocus(children[children.length - 1]);
+      return;
     }
+    const { parent, block } = await createBlock({
+      parentBlockId: page.rootId,
+    });
+    startTransaction();
+    setBlock(parent.id, parent);
+    setBlock(block.id, block);
+    setFocus(block);
+    commitTransaction();
   };
 
   return (
