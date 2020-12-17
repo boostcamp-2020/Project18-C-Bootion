@@ -113,9 +113,9 @@ function BlockContent(blockDTO: Block) {
     startTransaction();
     setBlock(blockDTO.id, { value, type: type || blockDTO.type });
     contentEditableRef.current.blur();
-    setTimeout(() => {
-      setCaretOffset(caretOffset === -1 ? focusOffset : caretOffset);
-    });
+    setTimeout(() =>
+      setCaretOffset(caretOffset === -1 ? focusOffset : caretOffset),
+    );
     commitTransaction();
   };
 

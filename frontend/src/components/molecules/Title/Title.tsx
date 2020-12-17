@@ -56,9 +56,7 @@ function Title(): JSX.Element {
       const { page: updatedPage } = await updatePage(page);
       const updatedPages = await refreshPages();
       const { focusOffset } = window.getSelection();
-      setTimeout(() => {
-        setCaretOffset(focusOffset);
-      });
+      setTimeout(() => setCaretOffset(focusOffset));
       titleRef.current.blur();
 
       setSelectedPage(updatedPage);
