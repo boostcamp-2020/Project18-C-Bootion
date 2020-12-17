@@ -50,7 +50,7 @@ function PageComponent(): JSX.Element {
   });
 
   const createBlockHandler = async () => {
-    if (children[children.length - 1].value === '') {
+    if (children[children.length - 1]?.value === '') {
       setFocus(children[children.length - 1]);
       return;
     }
