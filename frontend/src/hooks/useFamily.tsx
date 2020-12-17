@@ -25,6 +25,10 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
   const parentIndex = grandParent?.childIdList?.findIndex(
     (_blockId: string) => _blockId === parent?.id,
   );
+  const prevSibling = siblings?.[blockIndex - 1];
+  const nextSibling = siblings?.[blockIndex + 1];
+  const prevSiblings = siblings?.slice(0, blockIndex).reverse();
+  const nextSiblings = siblings?.slice(blockIndex);
 
   const findLastDescendant = (targetBlock: Block) => {
     let currentBlock = targetBlock;
@@ -41,7 +45,6 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
       return children[0];
     }
     if (blockIndex !== siblings.length - 1) {
-      const nextSibling = siblings[blockIndex + 1];
       switch (nextSibling.type) {
         case BlockType.COLUMN:
           return blockMap[nextSibling.childIdList[0]];
@@ -76,7 +79,6 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
   const getPrevBlock = () => {
     if (blockIndex) {
       /** blockIndex가 0이 아니면 이전 형제에서 prev block을 찾을 수 있다. */
-      const prevSibling = siblings[blockIndex - 1];
       if (prevSibling?.childIdList.length) {
         /* 이전 형제에게 자식이 있다면 마지막 후손이 prev block 이다.  */
         return findLastDescendant(prevSibling);
@@ -133,6 +135,10 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
       siblings,
       parentsIdList,
       parents,
+      nextSibling,
+      prevSibling,
+      nextSiblings,
+      prevSiblings,
     },
     {
       getNextBlock,

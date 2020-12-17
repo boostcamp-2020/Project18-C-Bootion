@@ -17,6 +17,8 @@ import { ReactComponent as DoubleChevronLeft } from '@assets/doubleChevronLeft.s
 import { ReactComponent as PlusPage } from '@assets/plusPage.svg';
 import { ReactComponent as Loading } from '@assets/loading.svg';
 import { MenuItem } from '@molecules/index';
+import { animated, useSpring } from 'react-spring';
+import styled from '@emotion/styled';
 
 const wrapperCss = (staticMenuToggle: boolean) => css`
   position: relative;
@@ -35,7 +37,16 @@ const workspaceCss = () => css`
   width: 100%;
   color: rgba(55, 53, 47, 0.6);
 `;
-const buttonsCss = () => css`
+const plusCss = (staticMenuToggle: boolean) => css`
+  margin-right: ${staticMenuToggle ? 5 : 0}px;
+  border: 1px solid rgba(55, 53, 47, 0.16);
+  border-radius: 3px;
+`;
+const menuListCss = () => css`
+  overflow-y: auto;
+  height: calc(100% - 44px);
+`;
+const AnimatedButtons = styled(animated.div)`
   position: absolute;
   top: 7px;
   right: 0;
@@ -46,11 +57,6 @@ const buttonsCss = () => css`
   flex-grow: 0;
   margin-right: 14px;
   min-width: 0;
-`;
-const plusCss = (staticMenuToggle: boolean) => css`
-  margin-right: ${staticMenuToggle ? 5 : 0}px;
-  border: 1px solid rgba(55, 53, 47, 0.16);
-  border-radius: 3px;
 `;
 
 function Menu(): JSX.Element {
@@ -63,6 +69,9 @@ function Menu(): JSX.Element {
     hoveredMenuToggleState,
   );
   const setBlockMap = useSetRecoilState(blockMapState);
+  const buttonStyleProps = useSpring({
+    opacity: hoveredMenuToggle ? 1 : 0,
+  });
 
   const CreatingPageHandler = async () => {
     const { pages: updated, page: created } = await createPage();
@@ -79,20 +88,18 @@ function Menu(): JSX.Element {
 
   return (
     <div css={wrapperCss(staticMenuToggle)}>
-      {hoveredMenuToggle && (
-        <div css={buttonsCss()}>
-          <div css={plusCss(staticMenuToggle)}>
-            <HeaderButton clickHandler={CreatingPageHandler}>
-              <PlusPage />
-            </HeaderButton>
-          </div>
-          {staticMenuToggle && (
-            <HeaderButton clickHandler={clickCloseHandler}>
-              <DoubleChevronLeft />
-            </HeaderButton>
-          )}
+      <AnimatedButtons style={buttonStyleProps}>
+        <div css={plusCss(staticMenuToggle)}>
+          <HeaderButton clickHandler={CreatingPageHandler}>
+            <PlusPage />
+          </HeaderButton>
         </div>
-      )}
+        {staticMenuToggle && (
+          <HeaderButton clickHandler={clickCloseHandler}>
+            <DoubleChevronLeft />
+          </HeaderButton>
+        )}
+      </AnimatedButtons>
       <div css={workspaceCss()}>WORKSPACE</div>
       <Suspense fallback={<Loading />}>
         {pages.map((page) => (
