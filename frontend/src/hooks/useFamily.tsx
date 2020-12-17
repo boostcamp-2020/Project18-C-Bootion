@@ -39,6 +39,16 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
     return currentBlock;
   };
 
+  const getTopAncestor = () => {
+    const root = blockMap[page.rootId];
+    const rootChildren = root.childIdList;
+    let currentParent = block;
+    while (!rootChildren.includes(currentParent.id)) {
+      currentParent = blockMap[currentParent.parentId];
+    }
+    return currentParent;
+  };
+
   const getNextBlock = () => {
     if (children.length) {
       /* 자식이 있을 때 첫번째 자식이 다음 block 이다.  */
@@ -58,6 +68,24 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
     /* block이 마지막 자식일 때. 다음 부모가 다음 Block 이다. */
     const targetParentBlock = parents?.[parentIndex + 1];
     if (!targetParentBlock) {
+      const topAncestors = blockMap[page.rootId].childIdList;
+      const topAncestor: Block = getTopAncestor();
+      const topAncestorIndex = topAncestors.findIndex(
+        (_blockId) => _blockId === topAncestor.id,
+      );
+      const nextTopAncestor = blockMap[topAncestors[topAncestorIndex + 1]];
+      if (nextTopAncestor) {
+        switch (nextTopAncestor.type) {
+          case BlockType.COLUMN:
+            return blockMap[nextTopAncestor.childIdList[0]];
+          case BlockType.GRID:
+            return blockMap[
+              blockMap[nextTopAncestor.childIdList[0]].childIdList[0]
+            ];
+          default:
+            return nextTopAncestor;
+        }
+      }
       /** 현재 블록이 마지막 블록이다. */
       return null;
     }
