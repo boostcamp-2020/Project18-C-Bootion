@@ -170,6 +170,13 @@ function BlockContent(blockDTO: Block) {
         Dispatcher((event.shiftKey ? 'shift' : '') + event.key);
         throttleState.isThrottle = false;
       });
+    } else if (event.key === 'Enter' && event.shiftKey) {
+      const { textContent } = contentEditableRef.current;
+      const caretOffset = window.getSelection().focusOffset;
+      const cvTextContent = textContent
+        .slice(0, caretOffset)
+        .concat('\n', textContent.slice(caretOffset));
+      handleBlock(cvTextContent, null, caretOffset + 1);
     }
   };
 

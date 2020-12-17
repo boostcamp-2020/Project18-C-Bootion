@@ -1,5 +1,7 @@
 import { Block, BlockType, BlockFamily, FamilyFunc, BlockMap } from '@/schemes';
 import { useFamily } from '@/hooks';
+import { focusState, blockRefState } from '@/stores';
+import { useSetRecoilState } from 'recoil';
 
 interface ManagerFunc {
   insertNewChild: (option?: any, insertIndex?: number) => Block;
@@ -11,6 +13,8 @@ interface ManagerFunc {
   pullIn: () => Block;
   pullOut: () => Block;
   deleteBlock: () => string[];
+  setFocus: (targetBlock: Block) => number;
+  setCaretOffset: (offset?: number) => void;
 }
 
 const useManger = (
@@ -33,6 +37,8 @@ const useManger = (
     parents,
   } = family;
   let transaction: BlockMap = { ...blockMap };
+  const setFocusId = useSetRecoilState(focusState);
+
   const startTransaction = () => {
     transaction = { ...blockMap };
   };
@@ -136,6 +142,29 @@ const useManger = (
     return block;
   };
 
+  const setFocus = (targetBlock: Block) => {
+    if (!targetBlock) {
+      return null;
+    }
+    const beforeOffset = window.getSelection().focusOffset;
+    setFocusId(targetBlock.id);
+    const targetRef = blockRefState[targetBlock.id];
+    if (targetRef) {
+      targetRef.current.focus();
+    }
+    return beforeOffset;
+  };
+
+  const setCaretOffset = (
+    offset: number = window.getSelection().focusOffset,
+  ) => {
+    const sel = window.getSelection();
+    const { focusNode: node } = sel;
+    const { length } = node as any;
+    !(node instanceof HTMLElement) &&
+      sel.collapse(node, offset > length ? length : offset);
+  };
+
   return [
     family,
     {
@@ -149,6 +178,8 @@ const useManger = (
       pullIn,
       pullOut,
       deleteBlock,
+      setFocus,
+      setCaretOffset,
     },
   ];
 };
