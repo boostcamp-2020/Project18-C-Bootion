@@ -6,7 +6,7 @@ import { BlockType } from '@/schemes';
 const useCommand = () => {
   const [focusId] = useRecoilState(focusState);
   const [
-    { block, blockIndex, siblingsIdList, grandParent },
+    { block, blockIndex, siblingsIdList, grandParent, childrenIdList },
     {
       getPrevBlock,
       getNextBlock,
@@ -32,26 +32,26 @@ const useCommand = () => {
     ];
   };
 
-  const dispatcher = (key: String) => {
+  const dispatcher = async (key: String) => {
     switch (key) {
       case 'ArrowUp': {
         const beforeCaretOffset = setFocus(getPrevBlock());
-        beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset);
+        beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset, false);
         break;
       }
       case 'ArrowLeft': {
         const beforeCaretOffset = setFocus(getPrevBlock());
-        beforeCaretOffset !== null && setCaretOffset(Infinity);
+        beforeCaretOffset !== null && setCaretOffset(Infinity, false);
         break;
       }
       case 'ArrowDown': {
         const beforeCaretOffset = setFocus(getNextBlock());
-        beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset);
+        beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset, false);
         break;
       }
       case 'ArrowRight': {
         const beforeCaretOffset = setFocus(getNextBlock());
-        beforeCaretOffset !== null && setCaretOffset(0);
+        beforeCaretOffset !== null && setCaretOffset(0, false);
         break;
       }
       case 'Enter': {
@@ -59,11 +59,11 @@ const useCommand = () => {
         const { focusOffset } = window.getSelection();
         startTransaction();
         if (!focusOffset) {
-          insertNewSibling({}, blockIndex);
+          await insertNewSibling({}, blockIndex);
         } else if (block.childIdList.length) {
-          setBlock(block.id, { value: before });
-          const newBlock = insertNewChild({ value: after });
-          setFocus(newBlock);
+          await setBlock(block.id, { value: before });
+          const newBlock = await insertNewChild({ value: after });
+          await setFocus(newBlock);
         } else {
           const type = [
             BlockType.NUMBERED_LIST,
@@ -72,8 +72,8 @@ const useCommand = () => {
           ].includes(block.type)
             ? block.type
             : BlockType.TEXT;
-          setBlock(block.id, { value: before });
-          const newBlock = insertNewSibling({ value: after, type });
+          await setBlock(block.id, { value: before });
+          const newBlock = await insertNewSibling({ value: after, type });
           setFocus(newBlock);
         }
         commitTransaction();
@@ -81,37 +81,43 @@ const useCommand = () => {
       }
       case 'Tab': {
         startTransaction();
-        pullIn();
+        await pullIn();
         commitTransaction();
         break;
       }
       case 'shiftTab': {
         startTransaction();
-        pullOut();
+        await pullOut();
         commitTransaction();
         break;
       }
       case 'Backspace': {
         startTransaction();
         if (block.type !== BlockType.TEXT) {
-          setBlock(block.id, { type: BlockType.TEXT });
+          await setBlock(block.id, { type: BlockType.TEXT });
         } else if (
           siblingsIdList.length - 1 === blockIndex &&
           grandParent &&
           grandParent.type !== BlockType.GRID
         ) {
-          pullOut();
+          await pullOut();
         } else {
           const [, after] = getSlicedValueToCaretOffset();
           const prevBlock = getPrevBlock();
           if (prevBlock) {
-            const deletedBlockChildrenIdList = deleteBlock();
-            deletedBlockChildrenIdList.forEach((id, index) =>
-              insertSibling(id, index),
+            await Promise.all(
+              childrenIdList.map((id, index) => insertSibling(id, index)),
             );
-            setFocus(
-              setBlock(prevBlock.id, { value: prevBlock.value + after }),
-            );
+            await deleteBlock();
+            if (prevBlock.value + after !== '') {
+              setFocus(
+                await setBlock(prevBlock.id, {
+                  value: prevBlock.value + after,
+                }),
+              );
+            } else {
+              setFocus(prevBlock);
+            }
             setCaretOffset(prevBlock.value.length);
           }
         }
