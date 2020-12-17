@@ -8,12 +8,15 @@ const buttonCss = (): SerializedStyles => css`
   user-select: none;
   cursor: pointer;
   color: inherit;
-  minwidth: 0px;
+  min-width: 0px;
   padding: 6px;
   margin: auto;
   white-space: nowrap;
   border-radius: 3px;
   font-size: inherit;
+  border: 0;
+  outline: 0;
+
   &:hover {
     background-color: #cccccc;
   }

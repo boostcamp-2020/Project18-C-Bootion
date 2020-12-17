@@ -8,29 +8,29 @@ import { useRecoilValue } from 'recoil';
 import { pageState, staticMenuToggleState } from '@/stores';
 import { createBlock } from '@/utils';
 import { useManager } from '@/hooks';
+import styled from '@emotion/styled';
+import { animated, useSpring } from 'react-spring';
 
-const staticMenuAreaCss = () => css`
+
+const staticMenuAreaCss = css`
   position: fixed;
   z-index: 2;
 `;
-const staticHeaderAreaCss = (staticMenuToggle: boolean) => css`
+const AnimatedStaticHeaderArea = styled(animated.div)`
   position: fixed;
   right: 0;
-  left: ${staticMenuToggle ? 240 : 0}px;
-  width: calc(100% - ${staticMenuToggle ? 240 : 0}px);
   background-color: #ffffff;
   z-index: 1;
 `;
-const staticScrollAreaCss = (staticMenuToggle: boolean) => css`
+const AnimatedStaticScrollArea = styled(animated.div)`
   position: fixed;
   top: 45px;
   right: 0;
-  left: ${staticMenuToggle ? 240 : 0}px;
-  width: calc(100% - ${staticMenuToggle ? 240 : 0}px);
+  background-color: #ffffff;
   height: calc(100% - 45px);
   overflow: auto;
 `;
-const bottomMarginCss = () => css`
+const bottomMarginCss = css`
   display: inline-block;
   width: 100%;
   height: calc(100% - 200px);
@@ -44,6 +44,10 @@ function PageComponent(): JSX.Element {
     { children },
     { setBlock, startTransaction, commitTransaction, setFocus },
   ] = useManager(page.rootId);
+  const staticAreaStyleProps = useSpring({
+    left: staticMenuToggle ? 240 : 0,
+    width: `calc(100% - ${staticMenuToggle ? 240 : 0}px)`,
+  });
 
   const createBlockHandler = async () => {
     if (children[children.length - 1].value !== '') {
@@ -62,21 +66,21 @@ function PageComponent(): JSX.Element {
 
   return (
     <div>
-      <div css={staticMenuAreaCss()}>
+      <div css={staticMenuAreaCss}>
         <HeaderMenu />
       </div>
-      <div css={staticHeaderAreaCss(staticMenuToggle)}>
+      <AnimatedStaticHeaderArea style={staticAreaStyleProps}>
         <Header />
-      </div>
-      <div css={staticScrollAreaCss(staticMenuToggle)}>
+      </AnimatedStaticHeaderArea>
+      <AnimatedStaticScrollArea style={staticAreaStyleProps}>
         <Title />
         <Editor />
         <div
-          css={bottomMarginCss()}
+          css={bottomMarginCss}
           onClick={createBlockHandler}
           onKeyUp={createBlockHandler}
         />
-      </div>
+      </AnimatedStaticScrollArea>
     </div>
   );
 }
