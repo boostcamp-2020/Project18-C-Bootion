@@ -131,8 +131,8 @@ function BlockContent(blockDTO: Block) {
     commitTransaction();
   };
 
-  const handleValue = (event: FormEvent<HTMLDivElement>) => {
-    const content = event.currentTarget.textContent;
+  const handleValue = () => {
+    const content = contentEditableRef.current.textContent;
 
     let nowLetterIdx = window.getSelection().focusOffset;
     if (!nowLetterIdx) nowLetterIdx += 1;
