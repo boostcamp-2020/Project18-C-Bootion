@@ -77,13 +77,14 @@ function BlockContent(blockDTO: Block) {
   const listCnt = useRef(1);
   const [Dispatcher] = useCommand();
   const [
-    { blockIndex, prevSiblings },
+    { blockIndex, prevSiblings, blockMap },
     {
       commitTransaction,
       startTransaction,
       setBlock,
       setCaretOffset,
       deleteBlock,
+      setFocus,
     },
   ] = useManager(blockDTO.id);
   const draggingBlock = useRecoilValue(draggingBlockState);
@@ -125,14 +126,15 @@ function BlockContent(blockDTO: Block) {
     startTransaction();
     setBlock(blockDTO.id, { value, type: type || blockDTO.type });
     contentEditableRef.current.blur();
-    setTimeout(() =>
-      setCaretOffset(caretOffset === -1 ? focusOffset : caretOffset),
-    );
+    setImmediate(() => {
+      setCaretOffset(caretOffset === -1 ? focusOffset : caretOffset);
+      setFocus(blockDTO);
+    });
     commitTransaction();
   };
 
   const handleValue = () => {
-    const content = contentEditableRef.current.textContent;
+    const content = contentEditableRef.current?.textContent ?? '';
 
     let nowLetterIdx = window.getSelection().focusOffset;
     if (!nowLetterIdx) nowLetterIdx += 1;
@@ -175,7 +177,7 @@ function BlockContent(blockDTO: Block) {
     }
     handleBlock(content);
   };
-  const updateValue = useRef(debounce(handleValue, 300)).current;
+  const updateValue = debounce(handleValue, 30);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const { focusNode, focusOffset } = window.getSelection();
