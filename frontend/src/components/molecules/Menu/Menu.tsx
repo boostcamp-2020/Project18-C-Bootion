@@ -15,7 +15,7 @@ import { createPage, readBlockMap } from '@/utils';
 import { HeaderButton } from '@atoms/index';
 import { ReactComponent as DoubleChevronLeft } from '@assets/doubleChevronLeft.svg';
 import { ReactComponent as PlusPage } from '@assets/plusPage.svg';
-import { ReactComponent as Loading } from '@assets/lodaing.svg';
+import { ReactComponent as Loading } from '@assets/loading.svg';
 import { MenuItem } from '@molecules/index';
 
 const wrapperCss = (staticMenuToggle: boolean) => css`
