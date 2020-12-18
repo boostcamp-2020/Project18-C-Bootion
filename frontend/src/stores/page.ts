@@ -1,12 +1,14 @@
-import { atom, atomFamily, useRecoilValue } from 'recoil';
+import { atom } from 'recoil';
 
-import { IdType, Block, Page } from '@/schemes';
-import { createPage, fetchDummyData, readPage, readPages } from '@/utils';
+import { Block, BlockMap, Page } from '@/schemes';
+import { readBlockMap, refreshPages } from '@/utils';
+import { MutableRefObject } from 'react';
 
 enum StateType {
   PAGE_STATE = 'pageState',
   BLOCK_STATE = 'blockState',
   HOVER_STATE = 'hoverState',
+  MODAL_STATE = 'modalState',
   FOCUS_STATE = 'focusState',
   CARET_STATE = 'caretState',
   BLOCK_REF_STATE = 'blockRefState',
@@ -15,35 +17,33 @@ enum StateType {
   STATIC_MENU_TOGGLE_STATE = 'staticMenuToggleState',
   HOVERED_MENU_TOGGLE_STATE = 'hoveredMenuToggleState',
   SELECTED_PAGE_STATE = 'selectedPageState',
+  DRAGGING_BLOCK_STATE = 'draggingBlockState',
 }
 
-export const pageState = atomFamily({
-  key: StateType.PAGE_STATE,
-  default: async (id: IdType) => fetchDummyData(id),
+export const pagesState = atom({
+  key: StateType.PAGES_STATE,
+  default: refreshPages(),
 });
 
-export const blockMapState: { [id: string]: Block } = {};
+export const pageState = atom<Page>({
+  key: StateType.PAGE_STATE,
+  default: (async () => (await refreshPages())[0])(),
+});
 
-export const blockState = atomFamily({
-  key: StateType.BLOCK_STATE,
-  default: null,
-  effects_UNSTABLE: (blockId: string) => [
-    ({ onSet }) => {
-      onSet((block) => {
-        blockMapState[blockId] = block;
-      });
-    },
-  ],
+export const blockMapState = atom<BlockMap>({
+  key: StateType.BLOCK_MAP_STATE,
+  default: (async () => {
+    const page = (await refreshPages())[0];
+    const { blockMap } = await readBlockMap(page.id);
+    return blockMap;
+  })(),
 });
 
 export const throttleState = {
   isThrottle: false,
 };
 
-export const blockRefState = atom<any>({
-  key: StateType.BLOCK_REF_STATE,
-  default: {},
-});
+export const blockRefState: { [id: string]: MutableRefObject<any> } = {};
 
 export const hoverState = atom({
   key: StateType.HOVER_STATE,
@@ -60,15 +60,15 @@ export const focusState = atom({
   default: null,
 });
 
-export const pagesState = atom({
-  key: StateType.PAGES_STATE,
-  default: (async () => {
-    const pages = await readPages();
-    if (pages.length) {
-      return pages;
-    }
-    return (await createPage())?.pages;
-  })(),
+export const modalState = atom({
+  key: StateType.MODAL_STATE,
+  default: {
+    isOpen: false,
+    caretOffset: 0,
+    blockId: '',
+    top: 0,
+    left: 0,
+  },
 });
 
 export const staticMenuToggleState = atom({
@@ -81,7 +81,7 @@ export const hoveredMenuToggleState = atom({
   default: false,
 });
 
-export const selectedPageState = atom({
-  key: StateType.SELECTED_PAGE_STATE,
-  default: (async () => (await readPages())[0])(),
+export const draggingBlockState = atom<Block>({
+  key: StateType.DRAGGING_BLOCK_STATE,
+  default: null,
 });

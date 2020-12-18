@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-import { fetchDummyData } from '@/utils';
 import PageComponent from '.';
 
 const desc = {

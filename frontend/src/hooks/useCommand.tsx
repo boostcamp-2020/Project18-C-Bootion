@@ -1,31 +1,28 @@
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { focusState, blockRefState } from '@/stores';
+import { useRecoilState } from 'recoil';
+import { focusState } from '@/stores';
 import { useManager } from '@/hooks';
-import { Block, BlockType } from '@/schemes';
+import { BlockType } from '@/schemes';
 
 const useCommand = () => {
-  const [focusId, setFocusId] = useRecoilState(focusState);
-  const [{ block, blockIndex }, managerFunc] = useManager(focusId);
-  const blockRef = useRecoilValue(blockRefState);
-
-  const setFocus = (targetBlock: Block) => {
-    if (!targetBlock) {
-      return null;
-    }
-    const beforeOffset = window.getSelection().focusOffset;
-    setFocusId(targetBlock.id);
-    const targetRef = blockRef[targetBlock.id];
-    targetRef ? targetRef.current.focus() : blockRef[block.id].current.blur();
-    return beforeOffset;
-  };
-
-  const setCaretOffset = (offset: number) => {
-    const sel = window.getSelection();
-    const { focusNode: node } = sel;
-    const { length } = node as any;
-    !(node instanceof HTMLElement) &&
-      sel.collapse(node, offset > length ? length : offset);
-  };
+  const [focusId] = useRecoilState(focusState);
+  const [
+    { block, blockIndex, siblingsIdList, grandParent, childrenIdList },
+    {
+      getPrevBlock,
+      getNextBlock,
+      insertSibling,
+      insertNewChild,
+      insertNewSibling,
+      setBlock,
+      pullIn,
+      pullOut,
+      startTransaction,
+      commitTransaction,
+      deleteBlock,
+      setFocus,
+      setCaretOffset,
+    },
+  ] = useManager(focusId);
 
   const getSlicedValueToCaretOffset = () => {
     const { focusNode, anchorOffset, focusOffset } = window.getSelection();
@@ -35,53 +32,96 @@ const useCommand = () => {
     ];
   };
 
-  const dispatcher = (key: String) => {
+  const dispatcher = async (key: String) => {
     switch (key) {
       case 'ArrowUp': {
-        const beforeCaretOffset = setFocus(managerFunc.getPrevBlock());
-        beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset);
+        const beforeCaretOffset = setFocus(getPrevBlock());
+        beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset, false);
         break;
       }
       case 'ArrowLeft': {
-        const beforeCaretOffset = setFocus(managerFunc.getPrevBlock());
-        beforeCaretOffset !== null && setCaretOffset(Infinity);
+        const beforeCaretOffset = setFocus(getPrevBlock());
+        beforeCaretOffset !== null && setCaretOffset(Infinity, false);
         break;
       }
       case 'ArrowDown': {
-        const beforeCaretOffset = setFocus(managerFunc.getNextBlock());
-        beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset);
+        const beforeCaretOffset = setFocus(getNextBlock());
+        beforeCaretOffset !== null && setCaretOffset(beforeCaretOffset, false);
         break;
       }
       case 'ArrowRight': {
-        const beforeCaretOffset = setFocus(managerFunc.getNextBlock());
-        beforeCaretOffset !== null && setCaretOffset(0);
+        const beforeCaretOffset = setFocus(getNextBlock());
+        beforeCaretOffset !== null && setCaretOffset(0, false);
         break;
       }
       case 'Enter': {
         const [before, after] = getSlicedValueToCaretOffset();
         const { focusOffset } = window.getSelection();
+        startTransaction();
         if (!focusOffset) {
-          managerFunc.addSibling({}, {}, BlockType.TEXT, blockIndex);
-        } else if (block?.children.length) {
-          setFocus(
-            managerFunc.addChild(
-              { value: before },
-              { value: after },
-              block.type,
-            ),
-          );
+          await insertNewSibling({}, blockIndex);
+        } else if (block.childIdList.length) {
+          await setBlock(block.id, { value: before });
+          const newBlock = await insertNewChild({ value: after });
+          await setFocus(newBlock);
         } else {
           const type = [
-            BlockType.NUMBEREDLIST,
-            BlockType.BULLETEDLIST,
-            BlockType.TOGGLELIST,
+            BlockType.NUMBERED_LIST,
+            BlockType.BULLETED_LIST,
+            BlockType.TOGGLE_LIST,
           ].includes(block.type)
             ? block.type
             : BlockType.TEXT;
-          setFocus(
-            managerFunc.addSibling({ value: before }, { value: after }, type),
-          );
+          await setBlock(block.id, { value: before });
+          const newBlock = await insertNewSibling({ value: after, type });
+          setFocus(newBlock);
         }
+        commitTransaction();
+        break;
+      }
+      case 'Tab': {
+        startTransaction();
+        await pullIn();
+        commitTransaction();
+        break;
+      }
+      case 'shiftTab': {
+        startTransaction();
+        await pullOut();
+        commitTransaction();
+        break;
+      }
+      case 'Backspace': {
+        startTransaction();
+        if (block.type !== BlockType.TEXT) {
+          await setBlock(block.id, { type: BlockType.TEXT });
+        } else if (
+          siblingsIdList.length - 1 === blockIndex &&
+          grandParent &&
+          grandParent.type !== BlockType.GRID
+        ) {
+          await pullOut();
+        } else {
+          const [, after] = getSlicedValueToCaretOffset();
+          const prevBlock = getPrevBlock();
+          if (prevBlock) {
+            await Promise.all(
+              childrenIdList.map((id, index) => insertSibling(id, index)),
+            );
+            await deleteBlock();
+            if (prevBlock.value + after !== '') {
+              setFocus(
+                await setBlock(prevBlock.id, {
+                  value: prevBlock.value + after,
+                }),
+              );
+            } else {
+              setFocus(prevBlock);
+            }
+            setCaretOffset(prevBlock.value.length);
+          }
+        }
+        commitTransaction();
         break;
       }
     }
