@@ -65,7 +65,7 @@ const useManger = (
     return setUpdatedBlock(updatedBlock.id, updatedBlock);
   };
 
-  const setUpdatedBlock = async (id: string, option: any = {}) => {
+  const setUpdatedBlock = (id: string, option: any = {}) => {
     transaction = {
       ...transaction,
       [id]: {
@@ -173,20 +173,8 @@ const useManger = (
   ) => {
     const sel = window.getSelection();
     const { focusNode: beforeNode } = sel;
-    if (isBlur) {
-      beforeNode.parentElement.blur();
-    }
-    setTimeout(() => {
-      const { focusNode: afterNode } = window.getSelection();
-      const length = (afterNode as any).length && afterNode.textContent.length;
-      if (length && isCaret)
-        sel.collapse(beforeNode, offset > length ? length : offset);
-    });
-    // else {
-    //   const { focusNode: afterNode } = window.getSelection();
-    //   const length = (afterNode as any).length && afterNode.textContent.length;
-    //   if (length) sel.collapse(beforeNode, offset > length ? length : offset);
-    // }
+    const length = (beforeNode as any).length && beforeNode.textContent.length;
+    if (length) sel.collapse(beforeNode, offset > length ? length : offset);
   };
 
   return [
