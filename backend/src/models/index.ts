@@ -1,6 +1,7 @@
 import mongoose, { ConnectionOptions } from 'mongoose';
+import { Block } from '@models/block';
 
-export const connect = (): void => {
+export const connect = async (dbName?: string): Promise<void> => {
   const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_DATABASE } = process.env;
   let ip = 'mongo';
 
@@ -13,7 +14,7 @@ export const connect = (): void => {
   const options: ConnectionOptions = {
     user: MONGO_USERNAME,
     pass: MONGO_PASSWORD,
-    dbName: MONGO_DATABASE,
+    dbName: dbName ?? MONGO_DATABASE,
     useNewUrlParser: true,
     useUnifiedTopology: true,
     reconnectTries: Number.MAX_VALUE,
@@ -21,13 +22,15 @@ export const connect = (): void => {
     connectTimeoutMS: 10000,
   };
 
-  mongoose
-    .connect(url, options)
-    .then(() => console.log('MongoDB is connected'))
-    .catch((err) => console.log('MongoDB connection failed', err));
+  try {
+    await mongoose.connect(url, options);
+    console.log('MongoDB is connected');
+  } catch (e) {
+    console.error('MongoDB connection failed by', e);
+  }
 };
 
-export { PageModel } from './page';
-export type { Page, PageDoc } from './page';
-export { BlockModel } from './block';
-export type { BlockType, Block, BlockDoc } from './block';
+export type { PageDTO, PageDoc } from './page';
+export { Page } from './page';
+export type { BlockDTO, BlockDoc } from './block';
+export { Block, BlockType } from './block';

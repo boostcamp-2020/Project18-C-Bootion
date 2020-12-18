@@ -12,6 +12,7 @@ module.exports = {
     alias: {
       '@': resolvePathFromRoot('src'),
       '@routes': resolvePathFromRoot('src', 'routes'),
+      '@middlewares': resolvePathFromRoot('src', 'middlewares'),
       '@aops': resolvePathFromRoot('src', 'aops'),
       '@controllers': resolvePathFromRoot('src', 'controllers'),
       '@services': resolvePathFromRoot('src', 'services'),
@@ -31,7 +32,10 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        exclude: /node_modules/,
+        exclude: [
+          resolvePathFromRoot('node_modules'),
+          resolvePathFromRoot('test'),
+        ],
         loader: 'ts-loader',
       },
     ],

@@ -1,12 +1,25 @@
 import { Router } from 'express';
 
-import { pageController } from '@/controllers';
+import { objectIdValidator } from '@/middlewares';
 import { errorHandler } from '@/aops';
+import { pageController } from '@/controllers';
 
 export const pageRouter = Router();
 
 pageRouter.post('', errorHandler(pageController.create));
-pageRouter.get('', errorHandler(pageController.getAll));
-pageRouter.get('/id/:id', errorHandler(pageController.getOne));
-pageRouter.patch('/id/:id', errorHandler(pageController.update));
-pageRouter.delete('/id/:id', errorHandler(pageController.remove));
+pageRouter.get(
+  '/id/:pageId',
+  objectIdValidator('pageId'),
+  errorHandler(pageController.readOne),
+);
+pageRouter.get('', errorHandler(pageController.readAll));
+pageRouter.patch(
+  '/id/:pageId',
+  objectIdValidator('pageId'),
+  errorHandler(pageController.update),
+);
+pageRouter.delete(
+  '/id/:pageId',
+  objectIdValidator('pageId'),
+  errorHandler(pageController.deleteOne),
+);
