@@ -25,7 +25,7 @@ import {
 } from '@utils/blockContent';
 import { useCommand, useManager } from '@/hooks';
 import { focusState } from '@/stores/page';
-import { moveBlock, debounce } from '@/utils';
+import { moveBlock } from '@/utils';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
@@ -78,13 +78,7 @@ function BlockContent(blockDTO: Block) {
   const [Dispatcher] = useCommand();
   const [
     { blockIndex, prevSiblings },
-    {
-      commitTransaction,
-      startTransaction,
-      setBlock,
-      setCaretOffset,
-      deleteBlock,
-    },
+    { commitTransaction, startTransaction, setBlock, deleteBlock },
   ] = useManager(blockDTO.id);
   const [draggingBlock, setDraggingBlock] = useRecoilState(draggingBlockState);
   const [dragOverToggle, setDragOverToggle] = useState(false);
@@ -111,9 +105,11 @@ function BlockContent(blockDTO: Block) {
 
   const cntOfUpperNumberListBlock = (): number => {
     let cnt = 0;
-    for (const upperblock of upperBlocks) {
-      if (upperblock.type !== BlockType.NUMBERED_LIST) break;
-      cnt += 1;
+    if (upperBlocks) {
+      for (const upperblock of upperBlocks) {
+        if (upperblock.type !== BlockType.NUMBERED_LIST) break;
+        cnt += 1;
+      }
     }
     return cnt;
   };
@@ -125,64 +121,20 @@ function BlockContent(blockDTO: Block) {
     type?: BlockType,
     caretOffset = -1,
   ) => {
-    const { focusOffset } = window.getSelection();
     startTransaction();
     await setBlock(blockDTO.id, { value, type: type || blockDTO.type });
-    setCaretOffset(
-      caretOffset === -1 ? focusOffset : caretOffset,
-      type === undefined,
-      value !== '',
-    );
     commitTransaction();
   };
 
   const handleValue = async () => {
     const content = contentEditableRef.current?.textContent ?? '';
-
-    let nowLetterIdx = window.getSelection().focusOffset;
-    if (!nowLetterIdx) nowLetterIdx += 1;
-    if (content[nowLetterIdx - 1] === '/') {
-      const rect = window.getSelection().getRangeAt(0).getClientRects()[0];
-      setModal({
-        isOpen: true,
-        top: rect.top,
-        left: rect.left,
-        caretOffset: nowLetterIdx,
-        blockId: blockDTO.id,
-      });
-    } else {
-      setModal({ ...modal, isOpen: false });
+    if (blockDTO.value !== content) {
+      await handleBlock(content);
     }
-
-    const newType = Object.entries(regex).find((testRegex) =>
-      testRegex[1].test(content),
-    );
-
-    if (newType) {
-      if (newType[0] === BlockType.NUMBERED_LIST) {
-        if (!blockIndex && content[0] !== FIRST_LIST_NUMBER) return;
-        if (blockIndex) {
-          const numberListUpperBlock = isUpperBlockEqualToNumberList();
-          if (!numberListUpperBlock && content[0] !== FIRST_LIST_NUMBER) return;
-          if (
-            numberListUpperBlock &&
-            cntOfUpperNumberListBlock() + 1 !== +content[0]
-          )
-            return;
-        }
-      }
-
-      await handleBlock(
-        content.slice(content.indexOf(' ') + 1, content.length),
-        newType[0] as BlockType,
-      );
-      return;
-    }
-    await handleBlock(content);
   };
-  const updateValue = debounce(handleValue, 300);
+  const updateValue = handleValue;
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = async (event: KeyboardEvent<HTMLDivElement>) => {
     const { focusNode, focusOffset, anchorOffset } = window.getSelection();
     if (throttleState.isThrottle) {
       event.preventDefault();
@@ -212,6 +164,52 @@ function BlockContent(blockDTO: Block) {
         .slice(0, caretOffset)
         .concat('\n', textContent.slice(caretOffset));
       handleBlock(cvTextContent, null, caretOffset + 1);
+    } else if (event.key === ' ') {
+      const { focusOffset: caretOffset } = window.getSelection();
+      const beforeContent = (contentEditableRef.current?.textContent ??
+        '') as string;
+      const content = beforeContent
+        .slice(0, caretOffset)
+        .concat(' ', beforeContent.slice(caretOffset));
+      const newType = Object.entries(regex).find((testRegex) =>
+        testRegex[1].test(content),
+      );
+
+      if (newType) {
+        event.preventDefault();
+        if (newType[0] === BlockType.NUMBERED_LIST) {
+          if (!blockIndex && content[0] !== FIRST_LIST_NUMBER) return;
+          if (blockIndex) {
+            const numberListUpperBlock = isUpperBlockEqualToNumberList();
+            if (!numberListUpperBlock && content[0] !== FIRST_LIST_NUMBER)
+              return;
+            // if (
+            //   numberListUpperBlock &&
+            //   cntOfUpperNumberListBlock() + 1 !== +content[0]
+            // )
+            //   return;
+          }
+        }
+        const slicedContent = content.slice(
+          content.indexOf(' ') + 1,
+          content.length,
+        );
+        contentEditableRef.current.innerText = slicedContent;
+        await handleBlock(slicedContent, newType[0] as BlockType);
+      }
+    } else if (event.key === '/') {
+      let nowLetterIdx = window.getSelection().focusOffset;
+      if (!nowLetterIdx) nowLetterIdx += 1;
+      const rect = window.getSelection().getRangeAt(0).getClientRects()[0];
+      setModal({
+        isOpen: true,
+        top: rect.top,
+        left: rect.left,
+        caretOffset: nowLetterIdx,
+        blockId: blockDTO.id,
+      });
+    } else if (modal.isOpen) {
+      setModal({ ...modal, isOpen: false });
     }
   };
 
@@ -219,9 +217,9 @@ function BlockContent(blockDTO: Block) {
     (blockDTO.type === BlockType.GRID || blockDTO.type === BlockType.COLUMN) &&
     !blockDTO.childIdList.length
   ) {
-    setImmediate(() => {
+    setImmediate(async () => {
       startTransaction();
-      deleteBlock();
+      await deleteBlock();
       commitTransaction();
     });
   }
@@ -297,7 +295,7 @@ function BlockContent(blockDTO: Block) {
         suppressContentEditableWarning
         spellCheck={false}
         placeholder={placeHolder[blockDTO.type]}
-        onInput={updateValue}
+        onBlur={updateValue}
       >
         {blockDTO.value}
       </div>
