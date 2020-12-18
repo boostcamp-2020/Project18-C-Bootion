@@ -6,7 +6,6 @@ import ReactDOM from 'react-dom';
 
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { modalState, focusState } from '@/stores';
-import { createBlock } from '@/utils';
 import { useManager } from '@/hooks';
 
 import TextImg from '@assets/text.png';
@@ -121,23 +120,24 @@ function BlockModal(): JSX.Element {
   const focusId = useRecoilValue(focusState);
   const [
     { block, blockIndex },
-    { startTransaction, commitTransaction, insertNewSibling, setBlock },
+    {
+      startTransaction,
+      commitTransaction,
+      insertNewSibling,
+      setBlock,
+      setFocus,
+    },
   ] = useManager(focusId);
 
   const createBlockHandler = async (type: string) => {
-    const { block: updatedBlock } = await createBlock({
-      parentBlockId: block.parentId,
-      index: blockIndex + 1,
-      block: { type },
-    });
     startTransaction();
-    const newBlock = insertNewSibling(updatedBlock);
+    const newBlock = await insertNewSibling({ type }, blockIndex + 1);
     const content =
       block.value.substring(0, modal.caretOffset - 1) +
       block.value.substring(modal.caretOffset);
-    setBlock(modal.blockId, { value: content });
+    await setBlock(modal.blockId, { value: content });
     commitTransaction();
-    // setFocus(newBlock);
+    setFocus(newBlock);
   };
 
   const onClickType = (type: string) => (

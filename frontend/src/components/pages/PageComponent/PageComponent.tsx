@@ -6,7 +6,6 @@ import { Header, Title, Editor, BlockModal } from '@components/molecules';
 import { HeaderMenu } from '@components/organisms';
 import { useRecoilValue } from 'recoil';
 import { pageState, staticMenuToggleState, modalState } from '@/stores';
-import { createBlock } from '@/utils';
 import { useManager } from '@/hooks';
 import styled from '@emotion/styled';
 import { animated, useSpring } from 'react-spring';
@@ -42,7 +41,7 @@ function PageComponent(): JSX.Element {
   const page = useRecoilValue(pageState);
   const [
     { children },
-    { setBlock, startTransaction, commitTransaction, setFocus },
+    { insertNewChild, startTransaction, commitTransaction, setFocus },
   ] = useManager(page.rootId);
   const staticAreaStyleProps = useSpring({
     left: staticMenuToggle ? 240 : 0,
@@ -50,16 +49,12 @@ function PageComponent(): JSX.Element {
   });
 
   const createBlockHandler = async () => {
-    if (children[children.length - 1].value === '') {
+    if (children[children.length - 1]?.value === '') {
       setFocus(children[children.length - 1]);
       return;
     }
-    const { parent, block } = await createBlock({
-      parentBlockId: page.rootId,
-    });
     startTransaction();
-    setBlock(parent.id, parent);
-    setBlock(block.id, block);
+    const block = await insertNewChild({}, children.length);
     setFocus(block);
     commitTransaction();
   };

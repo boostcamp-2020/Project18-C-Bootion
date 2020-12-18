@@ -25,7 +25,7 @@ import {
 } from '@utils/blockContent';
 import { useCommand, useManager } from '@/hooks';
 import { focusState } from '@/stores/page';
-import { moveBlock, debounce } from '@/utils';
+import { moveBlock } from '@/utils';
 
 const isGridOrColumn = (block: Block): boolean =>
   block.type === BlockType.GRID || block.type === BlockType.COLUMN;
@@ -78,15 +78,9 @@ function BlockContent(blockDTO: Block) {
   const [Dispatcher] = useCommand();
   const [
     { blockIndex, prevSiblings },
-    {
-      commitTransaction,
-      startTransaction,
-      setBlock,
-      setCaretOffset,
-      deleteBlock,
-    },
+    { commitTransaction, startTransaction, setBlock, deleteBlock },
   ] = useManager(blockDTO.id);
-  const draggingBlock = useRecoilValue(draggingBlockState);
+  const [draggingBlock, setDraggingBlock] = useRecoilState(draggingBlockState);
   const [dragOverToggle, setDragOverToggle] = useState(false);
 
   useEffect(() => {
@@ -100,7 +94,7 @@ function BlockContent(blockDTO: Block) {
     if (focusId === blockDTO.id) contentEditableRef.current.focus();
   }, [focusId]);
 
-  const upperBlocks: Array<Block> = prevSiblings.reverse();
+  const upperBlocks: Array<Block> = prevSiblings?.reverse();
 
   const isUpperBlockEqualToNumberList = (): boolean => {
     if (upperBlocks.length) {
@@ -111,74 +105,37 @@ function BlockContent(blockDTO: Block) {
 
   const cntOfUpperNumberListBlock = (): number => {
     let cnt = 0;
-    for (const upperblock of upperBlocks) {
-      if (upperblock.type !== BlockType.NUMBERED_LIST) break;
-      cnt += 1;
+    if (upperBlocks) {
+      for (const upperblock of upperBlocks) {
+        if (upperblock.type !== BlockType.NUMBERED_LIST) break;
+        cnt += 1;
+      }
     }
     return cnt;
   };
 
   const FIRST_LIST_NUMBER = '1';
 
-  const handleBlock = (value: string, type?: BlockType, caretOffset = -1) => {
-    const { focusOffset } = window.getSelection();
+  const handleBlock = async (
+    value: string,
+    type?: BlockType,
+    caretOffset = -1,
+  ) => {
     startTransaction();
-    setBlock(blockDTO.id, { value, type: type || blockDTO.type });
-    contentEditableRef.current.blur();
-    setTimeout(() =>
-      setCaretOffset(caretOffset === -1 ? focusOffset : caretOffset),
-    );
+    await setBlock(blockDTO.id, { value, type: type || blockDTO.type });
     commitTransaction();
   };
 
-  const handleValue = (event: FormEvent<HTMLDivElement>) => {
-    const content = event.currentTarget.textContent;
-
-    let nowLetterIdx = window.getSelection().focusOffset;
-    if (!nowLetterIdx) nowLetterIdx += 1;
-    if (content[nowLetterIdx - 1] === '/') {
-      const rect = window.getSelection().getRangeAt(0).getClientRects()[0];
-      setModal({
-        isOpen: true,
-        top: rect.top,
-        left: rect.left,
-        caretOffset: nowLetterIdx,
-        blockId: blockDTO.id,
-      });
-    } else {
-      setModal({ ...modal, isOpen: false });
+  const handleValue = async () => {
+    const content = contentEditableRef.current?.textContent ?? '';
+    if (blockDTO.value !== content) {
+      await handleBlock(content);
     }
-
-    const newType = Object.entries(regex).find((testRegex) =>
-      testRegex[1].test(content),
-    );
-
-    if (newType) {
-      if (newType[0] === BlockType.NUMBERED_LIST) {
-        if (!blockIndex && content[0] !== FIRST_LIST_NUMBER) return;
-        if (blockIndex) {
-          const numberListUpperBlock = isUpperBlockEqualToNumberList();
-          if (!numberListUpperBlock && content[0] !== FIRST_LIST_NUMBER) return;
-          if (
-            numberListUpperBlock &&
-            cntOfUpperNumberListBlock() + 1 !== +content[0]
-          )
-            return;
-        }
-      }
-
-      handleBlock(
-        content.slice(content.indexOf(' ') + 1, content.length),
-        newType[0] as BlockType,
-      );
-      return;
-    }
-    handleBlock(content);
   };
-  const updateValue = useRef(debounce(handleValue, 300)).current;
+  const updateValue = handleValue;
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const { focusNode, focusOffset } = window.getSelection();
+  const handleKeyDown = async (event: KeyboardEvent<HTMLDivElement>) => {
+    const { focusNode, focusOffset, anchorOffset } = window.getSelection();
     if (throttleState.isThrottle) {
       event.preventDefault();
     } else if (
@@ -190,12 +147,14 @@ function BlockContent(blockDTO: Block) {
           ((focusNode as any).length ?? (focusNode as any).innerText.length)) ||
       (event.key === 'Enter' && !event.shiftKey) ||
       event.key === 'Tab' ||
-      (event.key === 'Backspace' && !focusOffset)
+      (event.key === 'Backspace' &&
+        !focusOffset &&
+        focusOffset === anchorOffset)
     ) {
       throttleState.isThrottle = true;
       event.preventDefault();
-      setImmediate(() => {
-        Dispatcher((event.shiftKey ? 'shift' : '') + event.key);
+      setImmediate(async () => {
+        await Dispatcher((event.shiftKey ? 'shift' : '') + event.key);
         throttleState.isThrottle = false;
       });
     } else if (event.key === 'Enter' && event.shiftKey) {
@@ -205,6 +164,52 @@ function BlockContent(blockDTO: Block) {
         .slice(0, caretOffset)
         .concat('\n', textContent.slice(caretOffset));
       handleBlock(cvTextContent, null, caretOffset + 1);
+    } else if (event.key === ' ') {
+      const { focusOffset: caretOffset } = window.getSelection();
+      const beforeContent = (contentEditableRef.current?.textContent ??
+        '') as string;
+      const content = beforeContent
+        .slice(0, caretOffset)
+        .concat(' ', beforeContent.slice(caretOffset));
+      const newType = Object.entries(regex).find((testRegex) =>
+        testRegex[1].test(content),
+      );
+
+      if (newType) {
+        event.preventDefault();
+        if (newType[0] === BlockType.NUMBERED_LIST) {
+          if (!blockIndex && content[0] !== FIRST_LIST_NUMBER) return;
+          if (blockIndex) {
+            const numberListUpperBlock = isUpperBlockEqualToNumberList();
+            if (!numberListUpperBlock && content[0] !== FIRST_LIST_NUMBER)
+              return;
+            // if (
+            //   numberListUpperBlock &&
+            //   cntOfUpperNumberListBlock() + 1 !== +content[0]
+            // )
+            //   return;
+          }
+        }
+        const slicedContent = content.slice(
+          content.indexOf(' ') + 1,
+          content.length,
+        );
+        contentEditableRef.current.innerText = slicedContent;
+        await handleBlock(slicedContent, newType[0] as BlockType);
+      }
+    } else if (event.key === '/') {
+      let nowLetterIdx = window.getSelection().focusOffset;
+      if (!nowLetterIdx) nowLetterIdx += 1;
+      const rect = window.getSelection().getRangeAt(0).getClientRects()[0];
+      setModal({
+        isOpen: true,
+        top: rect.top,
+        left: rect.left,
+        caretOffset: nowLetterIdx,
+        blockId: blockDTO.id,
+      });
+    } else if (modal.isOpen) {
+      setModal({ ...modal, isOpen: false });
     }
   };
 
@@ -212,9 +217,9 @@ function BlockContent(blockDTO: Block) {
     (blockDTO.type === BlockType.GRID || blockDTO.type === BlockType.COLUMN) &&
     !blockDTO.childIdList.length
   ) {
-    setImmediate(() => {
+    setImmediate(async () => {
       startTransaction();
-      deleteBlock();
+      await deleteBlock();
       commitTransaction();
     });
   }
@@ -243,7 +248,7 @@ function BlockContent(blockDTO: Block) {
         listCnt.current = cntOfUpperNumberListBlock() + 1;
       }
     }
-  }, [blockDTO.type]);
+  }, [blockDTO.value]);
 
   const dragOverHandler = (event: React.DragEvent<HTMLDivElement>) => {
     event.dataTransfer.dropEffect = 'move';
@@ -265,10 +270,11 @@ function BlockContent(blockDTO: Block) {
       index: blockIndex + 1,
     });
     startTransaction();
-    setBlock(block.id, block);
-    fromBlock && setBlock(fromBlock.id, fromBlock);
-    setBlock(to.id, to);
+    await setBlock(block.id, block);
+    fromBlock && (await setBlock(fromBlock.id, fromBlock));
+    await setBlock(to.id, to);
     commitTransaction();
+    setDraggingBlock(null);
     event.preventDefault();
   };
 
@@ -287,8 +293,9 @@ function BlockContent(blockDTO: Block) {
         contentEditable
         onKeyDown={handleKeyDown}
         suppressContentEditableWarning
+        spellCheck={false}
         placeholder={placeHolder[blockDTO.type]}
-        onInput={updateValue}
+        onBlur={updateValue}
       >
         {blockDTO.value}
       </div>

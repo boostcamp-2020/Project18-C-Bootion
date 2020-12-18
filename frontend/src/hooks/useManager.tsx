@@ -2,19 +2,29 @@ import { Block, BlockType, BlockFamily, FamilyFunc, BlockMap } from '@/schemes';
 import { useFamily } from '@/hooks';
 import { focusState, blockRefState } from '@/stores';
 import { useSetRecoilState } from 'recoil';
+import {
+  createBlock,
+  updateBlock,
+  moveBlock,
+  deletePageCascade,
+} from '@utils/blockApis';
 
 interface ManagerFunc {
-  insertNewChild: (option?: any, insertIndex?: number) => Block;
-  insertNewSibling: (option?: any, insertIndex?: number) => Block;
-  insertSibling: (id: string, inserIndex?: number) => Block;
-  setBlock: (id: string, option?: any) => Block;
+  insertNewChild: (option?: any, insertIndex?: number) => Promise<Block>;
+  insertNewSibling: (option?: any, insertIndex?: number) => Promise<Block>;
+  insertSibling: (id: string, inserIndex?: number) => Promise<Block>;
+  setBlock: (id: string, option?: any) => Promise<Block>;
   startTransaction: () => void;
   commitTransaction: () => void;
-  pullIn: () => Block;
-  pullOut: () => Block;
-  deleteBlock: () => string[];
+  pullIn: () => Promise<Block>;
+  pullOut: () => Promise<Block>;
+  deleteBlock: () => Promise<void>;
   setFocus: (targetBlock: Block) => number;
-  setCaretOffset: (offset?: number) => void;
+  setCaretOffset: (
+    offset?: number,
+    isBlur?: boolean,
+    isCaret?: boolean,
+  ) => void;
 }
 
 const useManger = (
@@ -42,102 +52,103 @@ const useManger = (
   const startTransaction = () => {
     transaction = { ...blockMap };
   };
+
   const commitTransaction = () => {
     familyFunc.setBlockMap(transaction);
   };
 
-  const setBlock = (id: string, option: any = {}) => {
-    transaction[id] = {
+  const setBlock = async (id: string, option: any = {}) => {
+    const { block: updatedBlock } = await updateBlock({
       ...transaction[id],
       ...option,
+    });
+    return setUpdatedBlock(updatedBlock.id, updatedBlock);
+  };
+
+  const setUpdatedBlock = (id: string, option: any = {}) => {
+    transaction = {
+      ...transaction,
+      [id]: {
+        ...transaction[id],
+        ...option,
+      },
     };
     return transaction[id];
   };
 
-  const insertNewChild = (option: any = {}, insertIndex = 0): Block => {
-    const id = `${block.id}${children.length + 1}_${Date.now()}`;
-    const newBlock: Block = {
-      id,
-      type: BlockType.TEXT,
-      value: '',
-      childIdList: [],
-      parentId: block?.id ?? null,
-      pageId: page.id,
-      ...option,
-    };
-    setBlock(id, newBlock);
-    const copyChildIdList = [...childrenIdList];
-    copyChildIdList.splice(insertIndex, 0, id);
-    setBlock(block.id, {
-      childIdList: copyChildIdList,
+  const insertNewChild = async (
+    option: any = {},
+    insertIndex = 0,
+  ): Promise<Block> => {
+    const { block: updatedBlock, parent: updatedParent } = await createBlock({
+      parentBlockId: block.id,
+      index: insertIndex,
+      block: option,
     });
-    return newBlock;
+    setUpdatedBlock(updatedBlock.id, updatedBlock);
+    setUpdatedBlock(updatedParent.id, updatedParent);
+    return updatedBlock;
   };
 
-  const insertSibling = (id: string, insertIndex: number = 0) => {
-    const copySiblingsIdList = transaction[parent.id].childIdList;
-    copySiblingsIdList.splice(insertIndex, 0, id);
-    setBlock(parent.id, {
-      childrenIdList: copySiblingsIdList,
+  const insertSibling = async (
+    id: string,
+    insertIndex: number = 0,
+  ): Promise<Block> => {
+    const { block: updatedBlock, from, to } = await moveBlock({
+      blockId: id,
+      toId: parent.id,
+      index: insertIndex,
     });
-    setBlock(id, {
-      parentId: parent.id,
-    });
-    return transaction[id];
+    setUpdatedBlock(updatedBlock.id, updatedBlock);
+    setUpdatedBlock(from.id, from);
+    setUpdatedBlock(to.id, to);
+    return updatedBlock;
   };
 
-  const insertNewSibling = (
+  const insertNewSibling = async (
     option: any = {},
     insertIndex = blockIndex + 1,
-  ): Block => {
-    const id = `${parent?.id ?? ''}${siblings.length + 1}_${Date.now()}`;
-    const newBlock: Block = {
-      id,
-      type: BlockType.TEXT,
-      value: '',
-      childIdList: [],
-      parentId: parent?.id ?? null,
-      pageId: page.id,
-      ...option,
-    };
-    transaction[id] = newBlock;
-    const copySiblingsIdList = [...siblingsIdList];
-    copySiblingsIdList.splice(insertIndex, 0, id);
-    setBlock(parent.id, {
-      childIdList: copySiblingsIdList,
+  ): Promise<Block> => {
+    const { block: updatedBlock, parent: updatedParent } = await createBlock({
+      parentBlockId: parent.id,
+      index: insertIndex,
+      block: option,
     });
-    return newBlock;
+    setUpdatedBlock(updatedBlock.id, updatedBlock);
+    setUpdatedBlock(updatedParent.id, updatedParent);
+    return updatedBlock;
   };
 
-  const deleteBlock = () => {
-    const filteredSiblingsIdList = siblingsIdList.filter(
-      (id) => id !== block.id,
-    );
-    setBlock(parent.id, {
-      childIdList: filteredSiblingsIdList,
-    });
-    return [...transaction[block.id].childIdList];
+  const deleteBlock = async () => {
+    const { parent: updatedBlock } = await deletePageCascade(block.id);
+    setUpdatedBlock(updatedBlock.id, updatedBlock);
   };
 
-  const pullIn = () => {
+  const pullIn = async () => {
     if (blockIndex) {
-      const targetSibling = siblings[blockIndex - 1];
-      setBlock(siblingsIdList[blockIndex - 1], {
-        childIdList: [...targetSibling.childIdList, block.id],
+      const { block: updatedBlock, from, to } = await moveBlock({
+        blockId: block.id,
+        toId: siblingsIdList[blockIndex - 1],
       });
-      deleteBlock();
-      setBlock(block.id, { parentId: siblingsIdList[blockIndex - 1] });
+      setUpdatedBlock(updatedBlock.id, updatedBlock);
+      setUpdatedBlock(from.id, from);
+      setUpdatedBlock(to.id, to);
+      return updatedBlock;
     }
     return block;
   };
 
-  const pullOut = () => {
+  const pullOut = async () => {
     if (grandParent && grandParent.type !== BlockType.GRID) {
-      deleteBlock();
-      const copyParentsIdList = [...parentsIdList];
-      copyParentsIdList.splice(parentIndex + 1, 0, block.id);
-      setBlock(block.id, { parentId: grandParent.id });
-      setBlock(grandParent.id, { childIdList: copyParentsIdList });
+      const { block: updatedBlock, from, to } = await moveBlock({
+        blockId: block.id,
+        toId: grandParent.id,
+        index: parentIndex + 1,
+      });
+      setUpdatedBlock(updatedBlock.id, updatedBlock);
+      setUpdatedBlock(from.id, from);
+      setUpdatedBlock(to.id, to);
+      return updatedBlock;
     }
     return block;
   };
@@ -157,12 +168,13 @@ const useManger = (
 
   const setCaretOffset = (
     offset: number = window.getSelection().focusOffset,
+    isBlur: boolean = true,
+    isCaret: boolean = true,
   ) => {
     const sel = window.getSelection();
-    const { focusNode: node } = sel;
-    const { length } = node as any;
-    !(node instanceof HTMLElement) &&
-      sel.collapse(node, offset > length ? length : offset);
+    const { focusNode: beforeNode } = sel;
+    const length = (beforeNode as any).length && beforeNode.textContent.length;
+    if (length) sel.collapse(beforeNode, offset > length ? length : offset);
   };
 
   return [
