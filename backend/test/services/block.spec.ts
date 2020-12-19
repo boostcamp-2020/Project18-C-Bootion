@@ -59,11 +59,7 @@ describe('@services/block', () => {
 
     expect(received.value).toEqual(expected.value);
     expect(received.type).toEqual(expected.type);
-    expect(
-      parent.childIdList.findIndex(
-        (childId) => childId.toHexString() === received.id,
-      ),
-    ).toEqual(index);
+    expect(parent.findIndexFromChildIdList(received.id)).toEqual(index);
   });
 
   it('create: Duplicated error', async () => {

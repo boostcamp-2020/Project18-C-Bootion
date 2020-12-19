@@ -89,6 +89,7 @@ export interface BlockDoc extends Document {
   ) => Promise<void>;
   deleteChild?: (this: BlockDoc, childId: string) => Promise<void>;
   deleteCascade?: (this: BlockDoc) => Promise<void>;
+  findIndexFromChildIdList?: (this: BlockDoc, childId: string) => number;
 }
 
 BlockSchema.statics.createOne = async function (
@@ -167,9 +168,7 @@ BlockSchema.methods.deleteChild = async function (
   this: BlockDoc,
   childId: string,
 ): Promise<void> {
-  const index = this.childIdList.findIndex(
-    (_childId) => _childId.toHexString() === childId,
-  );
+  const index = this.findIndexFromChildIdList(childId);
   this.childIdList.splice(index, 1);
   await this.save();
 };
@@ -183,6 +182,15 @@ BlockSchema.methods.deleteCascade = async function (
   }
 
   await Block.findByIdAndDelete(this.id).exec();
+};
+
+BlockSchema.methods.findIndexFromChildIdList = function (
+  this: BlockDoc,
+  childId: string,
+): number {
+  return this.childIdList.findIndex(
+    (_childId) => _childId.toHexString() === childId,
+  );
 };
 
 export const Block = model<BlockDoc>(MODEL_NAME, BlockSchema) as BlockModel;
