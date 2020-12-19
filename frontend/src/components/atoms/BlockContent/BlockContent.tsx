@@ -277,6 +277,13 @@ function BlockContent(blockDTO: Block) {
     event.preventDefault();
   };
 
+  const onBlurHandler = () => {
+    setModal({
+      ...modal,
+      isOpen: false,
+    });
+  };
+
   return (
     <div
       css={blockContentCSS}
@@ -284,6 +291,7 @@ function BlockContent(blockDTO: Block) {
       onDrop={dropHandler}
       onDragEnter={() => setDragOverToggle(true)}
       onDragLeave={() => setDragOverToggle(false)}
+      onBlur={onBlurHandler}
     >
       {listBlockType(blockDTO, listCnt.current)}
       <div
