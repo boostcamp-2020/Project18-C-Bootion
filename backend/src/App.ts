@@ -7,22 +7,34 @@ import { apiRouter } from '@/routes';
 import { StatusCode, ErrorMessage } from '@/aops';
 
 export class App {
-  public app: Application;
+  private app: Application;
 
-  public static bootstrap(): App {
-    return new App();
+  static bootstrap(port: number) {
+    const app = new App();
+    app.listen(port);
   }
 
-  constructor() {
+  private constructor() {
     connect();
 
     this.app = express();
+
+    this.initMiddlewares();
+    this.initRouters();
+    this.initErrorHandler();
+  }
+
+  private initMiddlewares() {
     this.app.use(logger('dev'));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
+  }
 
+  private initRouters() {
     this.app.use('/api', apiRouter);
+  }
 
+  private initErrorHandler() {
     this.app.use((req, res, next) =>
       next(createHttpError(StatusCode.NOT_FOUND, ErrorMessage.NOT_FOUND)),
     );
@@ -35,7 +47,7 @@ export class App {
     );
   }
 
-  listen(port: number): void {
+  private listen(port: number): void {
     this.app
       .listen(port, () => console.log(`Express server listening at ${port}`))
       .on('error', (err) => console.error(err));
