@@ -183,11 +183,11 @@ function BlockContent(blockDTO: Block) {
             const numberListUpperBlock = isUpperBlockEqualToNumberList();
             if (!numberListUpperBlock && content[0] !== FIRST_LIST_NUMBER)
               return;
-            // if (
-            //   numberListUpperBlock &&
-            //   cntOfUpperNumberListBlock() + 1 !== +content[0]
-            // )
-            //   return;
+            if (
+              numberListUpperBlock &&
+              cntOfUpperNumberListBlock() + 1 !== +content[0]
+            )
+              return;
           }
         }
         const slicedContent = content.slice(
@@ -200,13 +200,15 @@ function BlockContent(blockDTO: Block) {
     } else if (event.key === '/') {
       let nowLetterIdx = window.getSelection().focusOffset;
       if (!nowLetterIdx) nowLetterIdx += 1;
-      const rect = window.getSelection().getRangeAt(0).getClientRects()[0];
-      setModal({
-        isOpen: true,
-        top: rect.top,
-        left: rect.left,
-        caretOffset: nowLetterIdx,
-        blockId: blockDTO.id,
+      setTimeout(() => {
+        const rect = window.getSelection().getRangeAt(0).getClientRects()[0];
+        setModal({
+          isOpen: true,
+          top: rect.top,
+          left: rect.left,
+          caretOffset: nowLetterIdx,
+          blockId: blockDTO.id,
+        });
       });
     } else if (modal.isOpen) {
       setModal({ ...modal, isOpen: false });
