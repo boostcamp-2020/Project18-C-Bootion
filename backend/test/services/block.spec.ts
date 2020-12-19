@@ -199,7 +199,6 @@ describe('@services/block', () => {
       parentId: block.id,
     });
 
-    const receivedParentId = block.parentId.toHexString();
     const parent = await blockService.deleteOnly(block.id);
     child = await Block.readOne(child.id);
     anotherChild = await Block.readOne(anotherChild.id);
@@ -207,9 +206,10 @@ describe('@services/block', () => {
       childId.toHexString(),
     );
 
-    expect(parent.id).toEqual(receivedParentId);
-    expect(child.parentId).toEqual(receivedParentId);
-    expect(anotherChild.parentId).toEqual(receivedParentId);
+    expect(await Block.readOne(block.id)).toBeNull();
+    expect(parent.id).toEqual(block.parentId.toHexString());
+    expect(child.parentId).toEqual(block.parentId);
+    expect(anotherChild.parentId).toEqual(block.parentId);
     expect(receivedChildIdList).toEqual([
       child.id,
       anotherChild.id,
