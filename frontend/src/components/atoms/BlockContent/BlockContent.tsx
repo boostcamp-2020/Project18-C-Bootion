@@ -123,6 +123,7 @@ function BlockContent(blockDTO: Block) {
     if (blockDTO.value !== content) {
       await handleBlock(content);
     }
+    onBlurHandler();
   };
   const updateValue = handleValue;
 
@@ -291,7 +292,6 @@ function BlockContent(blockDTO: Block) {
       onDrop={dropHandler}
       onDragEnter={() => setDragOverToggle(true)}
       onDragLeave={() => setDragOverToggle(false)}
-      onBlur={onBlurHandler}
     >
       {listBlockType(blockDTO, listCnt.current)}
       <div
