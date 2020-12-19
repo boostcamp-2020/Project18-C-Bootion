@@ -72,5 +72,18 @@ export const deleteCascade = async (blockId: string): Promise<BlockDoc> => {
 };
 
 export const deleteOnly = async (blockId: string): Promise<BlockDoc> => {
-  return null;
+  const block = await Block.readOne(blockId);
+  if (!block) {
+    throw new Error(ErrorMessage.NOT_FOUND);
+  }
+
+  const parent = await Block.readOne(block.parentId.toHexString());
+  const index = parent.childIdList.findIndex(
+    (childId) => childId.toHexString() === blockId,
+  );
+
+  await parent.setChildren(block.childIdList, index);
+  await parent.deleteChild(blockId);
+  await Block.deleteOneBlock(blockId);
+  return parent;
 };
