@@ -88,17 +88,19 @@ function BlockContent(blockDTO: Block) {
     if (focusId === blockDTO.id) contentEditableRef.current.focus();
   }, [focusId]);
 
+  const upperBlocks: Array<Block> = prevSiblings?.reverse();
+
   const isUpperBlockEqualToNumberList = (): boolean => {
-    if (prevSiblings.length) {
-      return prevSiblings[0].type === BlockType.NUMBERED_LIST;
+    if (upperBlocks.length) {
+      return upperBlocks[0].type === BlockType.NUMBERED_LIST;
     }
     return false;
   };
 
   const cntOfUpperNumberListBlock = (): number => {
     let cnt = 0;
-    if (prevSiblings) {
-      for (const upperblock of prevSiblings) {
+    if (upperBlocks) {
+      for (const upperblock of upperBlocks) {
         if (upperblock.type !== BlockType.NUMBERED_LIST) break;
         cnt += 1;
       }

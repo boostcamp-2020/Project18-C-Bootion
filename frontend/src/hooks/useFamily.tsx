@@ -27,7 +27,7 @@ const useFamily = (blockId: string): [BlockFamily, FamilyFunc] => {
   );
   const prevSibling = siblings?.[blockIndex - 1];
   const nextSibling = siblings?.[blockIndex + 1];
-  const prevSiblings = siblings?.slice(0, blockIndex).reverse();
+  const prevSiblings = siblings?.slice(0, blockIndex);
   const nextSiblings = siblings?.slice(blockIndex);
 
   const findLastDescendant = (targetBlock: Block) => {
