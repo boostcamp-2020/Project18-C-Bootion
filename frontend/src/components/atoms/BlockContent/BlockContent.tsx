@@ -247,7 +247,7 @@ function BlockContent(blockDTO: Block) {
         listCnt.current = cntOfUpperNumberListBlock() + 1;
       }
     }
-  }, [blockDTO.value, blockDTO.type]);
+  }, [blockDTO.type]);
 
   const dragOverHandler = (event: React.DragEvent<HTMLDivElement>) => {
     event.dataTransfer.dropEffect = 'move';
