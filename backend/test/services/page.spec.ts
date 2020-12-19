@@ -93,15 +93,6 @@ describe('@services/page', () => {
     ).rejects.toThrow();
   });
 
-  it('update: Bad request', async () => {
-    const received: PageDTO = (await pageService.create()).toJSON();
-    delete received.title;
-
-    await expect(async () =>
-      pageService.update(received.id, received),
-    ).rejects.toThrow(ErrorMessage.BAD_REQUEST);
-  });
-
   it('delete: Success', async () => {
     const pageDTO: PageDTO = (await pageService.create()).toJSON();
     const received = await pageService.deleteOne(pageDTO.id);

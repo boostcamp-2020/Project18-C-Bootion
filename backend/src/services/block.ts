@@ -50,9 +50,7 @@ export const move = async (
   }
 
   toIndex ??= to.childIdList.length;
-  const fromIndex = from.childIdList.findIndex(
-    (_childId) => _childId.toHexString() === blockId,
-  );
+  const fromIndex = from.findIndexFromChildIdList(blockId);
   toIndex = fromIndex < toIndex ? toIndex - 1 : toIndex;
   await to.deleteChild(blockId);
   await to.setChild(block, toIndex);
@@ -68,5 +66,20 @@ export const deleteCascade = async (blockId: string): Promise<BlockDoc> => {
   const parent = await Block.readOne(block.parentId.toHexString());
   await block.deleteCascade();
   await parent.deleteChild(blockId);
+  return parent;
+};
+
+export const deleteOnly = async (blockId: string): Promise<BlockDoc> => {
+  const block = await Block.readOne(blockId);
+  if (!block) {
+    throw new Error(ErrorMessage.NOT_FOUND);
+  }
+
+  const parent = await Block.readOne(block.parentId.toHexString());
+  const index = parent.findIndexFromChildIdList(blockId);
+
+  await parent.setChildren(block.childIdList, index);
+  await parent.deleteChild(blockId);
+  await Block.deleteOneBlock(blockId);
   return parent;
 };

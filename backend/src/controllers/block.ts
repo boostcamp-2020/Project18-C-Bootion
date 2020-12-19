@@ -49,3 +49,27 @@ export const deleteCascade = transactionHandler(
     res.status(StatusCode.OK).json({ parent });
   },
 );
+
+export const createAndUpdate = transactionHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { create, update } = req.body;
+    const { parent, block } = await blockService.create(create);
+    let updated: BlockDoc = null;
+    if (update) {
+      updated = await blockService.update(update.blockId, update);
+    }
+    res.status(StatusCode.OK).json({ parent, block, updated });
+  },
+);
+
+export const deleteAndUpdate = transactionHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { deleteId, update } = req.body;
+    const parent = await blockService.deleteOnly(deleteId);
+    let updated: BlockDoc = null;
+    if (update) {
+      updated = await blockService.update(update.blockId, update);
+    }
+    res.status(StatusCode.OK).json({ parent, updated });
+  },
+);
