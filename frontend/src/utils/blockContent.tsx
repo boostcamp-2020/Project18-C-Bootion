@@ -6,13 +6,24 @@ import { Block, BlockType } from '@/schemes';
 import { ReactComponent as Toggle } from '@assets/toggle-default.svg';
 
 export const regex: { [key: string]: RegExp } = {
-  heading1: /^#\s[^\s.]*/gm,
-  heading2: /^##\s[^\s.]*/gm,
-  heading3: /^###\s[^\s.]*/gm,
-  bulletedlist: /^[-,+]\s[^\s.]*/gm,
-  numberedlist: /^\d.\s[^\s.]*/gm,
-  togglelist: /^>\s[^\s.]*/gm,
-  quote: /^\|\s[^\s.]*/gm,
+  heading1: /^#/gm,
+  heading2: /^##/gm,
+  heading3: /^###/gm,
+  bulletedlist: /^[-,+]/gm,
+  numberedlist: /^\d+\./gm,
+  togglelist: /^>/gm,
+  quote: /^\|/gm,
+};
+
+export const validateType = (content: string): BlockType => {
+  if (content === '#') return BlockType.HEADING1;
+  if (content === '##') return BlockType.HEADING2;
+  if (content === '###') return BlockType.HEADING3;
+  if (content === '-' || content === '+') return BlockType.BULLETED_LIST;
+  if (/^\d+\./gm.test(content)) return BlockType.NUMBERED_LIST;
+  if (content === '>') return BlockType.TOGGLE_LIST;
+  if (content === '|') return BlockType.QUOTE;
+  return null;
 };
 
 const divCSS = css`
