@@ -7,7 +7,7 @@ import { ReactComponent as DraggableIcon } from '@assets/draggable.svg';
 import { ReactComponent as PlusIcon } from '@assets/plus.svg';
 import { useSetRecoilState } from 'recoil';
 
-import { draggingBlockState, modalState } from '@/stores';
+import { draggingBlockState, modalState, focusState } from '@/stores';
 import { Block } from '@/schemes';
 
 const buttonWrapperCss = () => css`
@@ -39,6 +39,7 @@ interface Props {
 function BlockHandler({ blockDTO, blockComponentRef }: Props): JSX.Element {
   const setDraggingBlock = useSetRecoilState(draggingBlockState);
   const setModal = useSetRecoilState(modalState);
+  const setFocus = useSetRecoilState(focusState);
 
   const dragStartHandler = (event: React.DragEvent<HTMLDivElement>) => {
     event.dataTransfer.effectAllowed = 'move';
@@ -49,11 +50,12 @@ function BlockHandler({ blockDTO, blockComponentRef }: Props): JSX.Element {
   };
 
   const handleModal = (event: React.MouseEvent) => {
+    setFocus(blockDTO.id);
     setModal({
       isOpen: true,
       top: event.clientY,
       left: event.clientX,
-      caretOffset: 0,
+      caretOffset: blockDTO.value.length + 1,
       blockId: blockDTO.id,
     });
   };
