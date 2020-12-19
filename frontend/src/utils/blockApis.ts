@@ -52,3 +52,34 @@ export const deletePageCascade = (blockId: string) =>
     method: 'DELETE',
     defaultReturn: { parent: null },
   })();
+
+type CreateAndUpdateBody = {
+  create: {
+    parentId: string;
+    index?: number;
+    blockDTO?: { type?: string; value?: string };
+  };
+  update: Block | null;
+};
+
+export const createAndUpdate = (param: CreateAndUpdateBody) =>
+  fetchApi<
+    { parent: Block; block: Block; updated: Block },
+    CreateAndUpdateBody
+  >({
+    url: `${BASE_URL}/create-and-update`,
+    method: 'PATCH',
+    defaultReturn: { parent: null, block: null, updated: null },
+  })(param);
+
+type DeleteAndUpdateBody = {
+  deleteId: string;
+  update: Block | null;
+};
+
+export const deleteAndUpdate = (param: DeleteAndUpdateBody) =>
+  fetchApi<{ parent: Block; updated: Block }, DeleteAndUpdateBody>({
+    url: `${BASE_URL}/delete-and-update`,
+    method: 'PATCH',
+    defaultReturn: { parent: null, updated: null },
+  })(param);
