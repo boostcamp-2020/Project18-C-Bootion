@@ -1,13 +1,7 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
-import React, {
-  useEffect,
-  useRef,
-  KeyboardEvent,
-  useState,
-  FormEvent,
-} from 'react';
+import React, { useEffect, useRef, KeyboardEvent, useState } from 'react';
 import { useRecoilValue, useRecoilState } from 'recoil';
 
 import {
@@ -18,7 +12,7 @@ import {
 } from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
-  regex,
+  validateType,
   fontSize,
   placeHolder,
   listBlockType,
@@ -94,19 +88,17 @@ function BlockContent(blockDTO: Block) {
     if (focusId === blockDTO.id) contentEditableRef.current.focus();
   }, [focusId]);
 
-  const upperBlocks: Array<Block> = prevSiblings?.reverse();
-
   const isUpperBlockEqualToNumberList = (): boolean => {
-    if (upperBlocks.length) {
-      return upperBlocks[0].type === BlockType.NUMBERED_LIST;
+    if (prevSiblings.length) {
+      return prevSiblings[0].type === BlockType.NUMBERED_LIST;
     }
     return false;
   };
 
   const cntOfUpperNumberListBlock = (): number => {
     let cnt = 0;
-    if (upperBlocks) {
-      for (const upperblock of upperBlocks) {
+    if (prevSiblings) {
+      for (const upperblock of prevSiblings) {
         if (upperblock.type !== BlockType.NUMBERED_LIST) break;
         cnt += 1;
       }
@@ -171,23 +163,28 @@ function BlockContent(blockDTO: Block) {
       const content = beforeContent
         .slice(0, caretOffset)
         .concat(' ', beforeContent.slice(caretOffset));
-      const newType = Object.entries(regex).find((testRegex) =>
-        testRegex[1].test(content),
-      );
 
+      const newType = validateType(content.split(' ', 1)[0]);
       if (newType) {
         event.preventDefault();
-        if (newType[0] === BlockType.NUMBERED_LIST) {
-          if (!blockIndex && content[0] !== FIRST_LIST_NUMBER) return;
+        if (newType === BlockType.NUMBERED_LIST) {
+          const frontContent = content
+            .split(' ', 1)[0]
+            .slice(0, content.length - 2);
+          if (!blockIndex && frontContent !== FIRST_LIST_NUMBER) {
+            return;
+          }
           if (blockIndex) {
             const numberListUpperBlock = isUpperBlockEqualToNumberList();
-            if (!numberListUpperBlock && content[0] !== FIRST_LIST_NUMBER)
+            if (!numberListUpperBlock && frontContent !== FIRST_LIST_NUMBER) {
               return;
+            }
             if (
               numberListUpperBlock &&
-              cntOfUpperNumberListBlock() + 1 !== +content[0]
-            )
+              cntOfUpperNumberListBlock() + 1 !== +frontContent
+            ) {
               return;
+            }
           }
         }
         const slicedContent = content.slice(
@@ -195,7 +192,7 @@ function BlockContent(blockDTO: Block) {
           content.length,
         );
         contentEditableRef.current.innerText = slicedContent;
-        await handleBlock(slicedContent, newType[0] as BlockType);
+        await handleBlock(slicedContent, newType);
       }
     } else if (event.key === '/') {
       let nowLetterIdx = window.getSelection().focusOffset;
@@ -250,7 +247,7 @@ function BlockContent(blockDTO: Block) {
         listCnt.current = cntOfUpperNumberListBlock() + 1;
       }
     }
-  }, [blockDTO.value]);
+  }, [blockDTO.value, blockDTO.type]);
 
   const dragOverHandler = (event: React.DragEvent<HTMLDivElement>) => {
     event.dataTransfer.dropEffect = 'move';
