@@ -4,8 +4,8 @@ import { jsx, css, keyframes } from '@emotion/react';
 import { ReactPortal, MouseEvent, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { modalState, focusState } from '@/stores';
+import { useRecoilState } from 'recoil';
+import { modalState } from '@/stores';
 import { useManager } from '@/hooks';
 
 import TextImg from '@assets/text.png';
@@ -117,7 +117,6 @@ function ModalPortal({ children }: any): ReactPortal {
 
 function BlockModal(): JSX.Element {
   const [modal, setModal] = useRecoilState(modalState);
-  const focusId = useRecoilValue(focusState);
   const [
     { block, blockIndex },
     {
@@ -127,7 +126,7 @@ function BlockModal(): JSX.Element {
       setBlock,
       setFocus,
     },
-  ] = useManager(focusId);
+  ] = useManager(modal.blockId);
   const modalEL = useRef<HTMLDivElement>();
 
   const createBlockHandler = async (type: string) => {
