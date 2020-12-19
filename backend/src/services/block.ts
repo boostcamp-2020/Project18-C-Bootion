@@ -70,3 +70,7 @@ export const deleteCascade = async (blockId: string): Promise<BlockDoc> => {
   await parent.deleteChild(blockId);
   return parent;
 };
+
+export const deleteOnly = async (blockId: string): Promise<BlockDoc> => {
+  return null;
+};

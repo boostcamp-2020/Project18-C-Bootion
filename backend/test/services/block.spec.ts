@@ -184,4 +184,44 @@ describe('@services/block', () => {
       blockService.deleteCascade(received.id),
     ).rejects.toThrow();
   });
+
+  it('deleteOnly: Success', async () => {
+    const { block } = await blockService.create({
+      parentId: page.rootId.toHexString(),
+    });
+    const { block: sibling } = await blockService.create({
+      parentId: page.rootId.toHexString(),
+    });
+    let { block: child } = await blockService.create({
+      parentId: block.id,
+    });
+    let { block: anotherChild } = await blockService.create({
+      parentId: block.id,
+    });
+
+    const receivedParentId = block.parentId.toHexString();
+    const parent = await blockService.deleteOnly(block.id);
+    child = await Block.readOne(child.id);
+    anotherChild = await Block.readOne(anotherChild.id);
+    const receivedChildIdList = parent.childIdList.map((childId) =>
+      childId.toHexString(),
+    );
+
+    expect(parent.id).toEqual(receivedParentId);
+    expect(child.parentId).toEqual(receivedParentId);
+    expect(anotherChild.parentId).toEqual(receivedParentId);
+    expect(receivedChildIdList).toEqual([
+      child.id,
+      anotherChild.id,
+      sibling.id,
+    ]);
+  });
+
+  it('deleteOnly: Not found', async () => {
+    const received: BlockDTO = { id: 'invalid id' };
+
+    await expect(async () =>
+      blockService.deleteOnly(received.id),
+    ).rejects.toThrow();
+  });
 });
