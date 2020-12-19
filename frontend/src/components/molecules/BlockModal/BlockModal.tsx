@@ -1,7 +1,7 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css, keyframes } from '@emotion/react';
-import { ReactPortal, MouseEvent } from 'react';
+import { ReactPortal, MouseEvent, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -128,6 +128,7 @@ function BlockModal(): JSX.Element {
       setFocus,
     },
   ] = useManager(focusId);
+  const modalEL = useRef<HTMLDivElement>();
 
   const createBlockHandler = async (type: string) => {
     startTransaction();
@@ -147,9 +148,21 @@ function BlockModal(): JSX.Element {
     setModal({ ...modal, isOpen: false });
   };
 
+  const handleClickOutside = ({ target }: any) => {
+    if (modal.isOpen && !modalEL.current.contains(target))
+      setModal({ ...modal, isOpen: false });
+  };
+
+  useEffect(() => {
+    window.addEventListener('click', handleClickOutside);
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   return (
     <ModalPortal>
-      <div css={modalWrapperCss(modal.left, modal.top)}>
+      <div css={modalWrapperCss(modal.left, modal.top)} ref={modalEL}>
         {Object.keys(typeName).map((type) => (
           <div
             key={type}
