@@ -31,3 +31,11 @@ blockRouter.delete(
   objectIdValidator('blockId'),
   errorHandler(blockController.deleteCascade),
 );
+blockRouter.patch(
+  '/create-and-update',
+  errorHandler(blockController.createAndUpdate),
+);
+blockRouter.patch(
+  '/delete-and-update',
+  errorHandler(blockController.deleteAndUpdate),
+);
