@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import { blockMiddleware } from '@/middlewares';
 import { blockController } from '@/controllers';
 import { errorHandler } from '@/aops';
 import { objectIdValidator } from '@/middlewares';
@@ -9,7 +10,8 @@ export const blockRouter = Router();
 blockRouter.post(
   '/parent-id/:parentId',
   objectIdValidator('parentId'),
-  errorHandler(blockController.create),
+  errorHandler(blockMiddleware.create),
+  blockController.publish,
 );
 blockRouter.get(
   '/page-id/:pageId',
@@ -19,23 +21,28 @@ blockRouter.get(
 blockRouter.patch(
   '/id/:blockId',
   objectIdValidator('blockId'),
-  errorHandler(blockController.update),
+  errorHandler(blockMiddleware.update),
+  blockController.publish,
 );
 blockRouter.patch(
   '/id/:blockId/to/:toId',
   objectIdValidator('blockId', 'toId'),
-  errorHandler(blockController.move),
+  errorHandler(blockMiddleware.move),
+  blockController.publish,
 );
 blockRouter.delete(
   '/id/:blockId',
   objectIdValidator('blockId'),
-  errorHandler(blockController.deleteCascade),
+  errorHandler(blockMiddleware.deleteCascade),
+  blockController.publish,
 );
 blockRouter.patch(
   '/create-and-update',
-  errorHandler(blockController.createAndUpdate),
+  errorHandler(blockMiddleware.createAndUpdate),
+  blockController.publish,
 );
 blockRouter.patch(
   '/delete-and-update',
-  errorHandler(blockController.deleteAndUpdate),
+  errorHandler(blockMiddleware.deleteAndUpdate),
+  blockController.publish,
 );
