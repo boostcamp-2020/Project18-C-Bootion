@@ -2,11 +2,10 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 
-import { ReactComponent as Dots } from '@assets/dots.svg';
-import { ReactComponent as Check } from '@assets/check.svg';
 import { HeaderLink, HeaderButton } from '@components/atoms';
 import { useRecoilValue } from 'recoil';
 import { pageState, staticMenuToggleState } from '@/stores';
+import { timeSince } from '@/utils';
 
 const headerCss = () => css`
   width: 100%;
@@ -40,6 +39,9 @@ function Header({}: Props): JSX.Element {
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
   const selectedPage = useRecoilValue(pageState);
 
+  const date = `Updated ${timeSince(new Date())} ago`;
+  const people = `${3}명 접속중`;
+
   return (
     <div css={headerCss()}>
       <div css={wrapperCss()}>
@@ -47,15 +49,8 @@ function Header({}: Props): JSX.Element {
         <HeaderLink>{selectedPage?.title || 'Untitled'}</HeaderLink>
       </div>
       <div css={wrapperCss()}>
-        <HeaderButton>Share</HeaderButton>
-        <HeaderButton>
-          <Check />
-          Updates
-        </HeaderButton>
-        <HeaderButton>Favorite</HeaderButton>
-        <HeaderButton>
-          <Dots />
-        </HeaderButton>
+        <HeaderButton>{date}</HeaderButton>
+        <HeaderButton>{people}</HeaderButton>
       </div>
     </div>
   );

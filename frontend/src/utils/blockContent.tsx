@@ -5,7 +5,7 @@ import { jsx, css } from '@emotion/react';
 import { Block, BlockType } from '@/schemes';
 import { ReactComponent as Toggle } from '@assets/toggle-default.svg';
 
-export const regex: { [key: string]: RegExp } = {
+export const regexType: { [key: string]: RegExp } = {
   heading1: /^#/gm,
   heading2: /^##/gm,
   heading3: /^###/gm,
@@ -15,14 +15,12 @@ export const regex: { [key: string]: RegExp } = {
   quote: /^\|/gm,
 };
 
+const validator = (regex: RegExp, content: string) => regex.test(content);
+
 export const validateType = (content: string): BlockType => {
-  if (content === '#') return BlockType.HEADING1;
-  if (content === '##') return BlockType.HEADING2;
-  if (content === '###') return BlockType.HEADING3;
-  if (content === '-' || content === '+') return BlockType.BULLETED_LIST;
-  if (/^\d+\./gm.test(content)) return BlockType.NUMBERED_LIST;
-  if (content === '>') return BlockType.TOGGLE_LIST;
-  if (content === '|') return BlockType.QUOTE;
+  for (const [key, reg] of Object.entries(regexType)) {
+    if (validator(reg, content)) return key as BlockType;
+  }
   return null;
 };
 
