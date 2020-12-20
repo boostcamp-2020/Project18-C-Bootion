@@ -18,6 +18,9 @@ enum StateType {
   HOVERED_MENU_TOGGLE_STATE = 'hoveredMenuToggleState',
   SELECTED_PAGE_STATE = 'selectedPageState',
   DRAGGING_BLOCK_STATE = 'draggingBlockState',
+  ALL_USER_COUNT_STATE = 'allusercountstate',
+  PAGE_USER_COUNT_STATE = 'pageusercountstate',
+  LAST_UPDATE = 'lastupdate',
 }
 
 export const pagesState = atom({
@@ -37,6 +40,21 @@ export const blockMapState = atom<BlockMap>({
     const { blockMap } = await readBlockMap(page.id);
     return blockMap;
   })(),
+});
+
+export const lastUpdateState = atom({
+  key: StateType.LAST_UPDATE,
+  default: new Date(),
+});
+
+export const allUserCountState = atom({
+  key: StateType.ALL_USER_COUNT_STATE,
+  default: 0,
+});
+
+export const pageUserCountState = atom({
+  key: StateType.PAGE_USER_COUNT_STATE,
+  default: 0,
 });
 
 export const throttleState = {

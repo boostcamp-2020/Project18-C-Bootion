@@ -22,7 +22,7 @@ function Editor(): JSX.Element {
   return (
     <div css={wrapperCss()}>
       <Suspense fallback={<div>로딩 중...</div>}>
-        {blockMap[page.rootId].childIdList.map((blockId: string) => (
+        {blockMap[page.rootId]?.childIdList.map((blockId: string) => (
           <BlockComponent key={blockId} blockDTO={blockMap[blockId]} />
         ))}
       </Suspense>
