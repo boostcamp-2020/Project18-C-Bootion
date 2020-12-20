@@ -3,7 +3,7 @@ import { blockMapState, pagesState } from '@/stores';
 import { pageIO, pageListIO } from '@/socket';
 import { BlockMap, Page } from '@/schemes';
 import { useEffect } from 'react';
-import { pageUserCountState, lastUpdateState } from '@/stores/page';
+import { pageUserCountState, lastUpdateState, pageState } from '@/stores/page';
 
 const doSomeThing = () => {};
 
@@ -12,11 +12,21 @@ const useSocket = () => {
   const setPages = useSetRecoilState(pagesState);
   const setPageUserCount = useSetRecoilState(pageUserCountState);
   const setLastUpdate = useSetRecoilState(lastUpdateState);
+  const setPage = useSetRecoilState(pageState);
 
   useEffect(() => {
-    pageListIO.on('PageListUpdate', (pages: Page[]) => {
-      setPages(pages);
-    });
+    pageListIO.on(
+      'PageListUpdate',
+      ({ currentPageId, pages }: { currentPageId: string; pages: Page[] }) => {
+        setPages(pages);
+        const currentPage = pages.find((page) => page.id === currentPageId);
+        if (currentPage) {
+          setPage(currentPage);
+        } else if (pages?.[0]) {
+          setPage(pages?.[0]);
+        }
+      },
+    );
 
     pageListIO.on('allUserCount', (count: number) => {
       console.log(`allUserCount: ${count}`);
