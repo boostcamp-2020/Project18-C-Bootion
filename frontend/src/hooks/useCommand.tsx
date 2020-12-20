@@ -145,6 +145,11 @@ const useCommand = () => {
             }
             // setFocus(updatedBlock);
             setCaretOffset(prevBlock.value.length);
+          } else if (
+            block.value !== '' &&
+            blockRefState[block.id].current.textContent === ''
+          ) {
+            setBlock(block.id, { ...block, value: '' });
           }
         }
         // commitTransaction();
