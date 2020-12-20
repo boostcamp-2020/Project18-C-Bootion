@@ -24,6 +24,7 @@ export const readAll = async (req: Request, res: Response): Promise<void> => {
     },
     {},
   );
+  (req.session as any).pageId = req.params.pageId;
   res.status(StatusCode.OK).json({ blockMap });
 };
 
