@@ -14,7 +14,6 @@ import H2Img from '@assets/heading2.png';
 import H3Img from '@assets/heading3.png';
 import BulletedListImg from '@assets/bulletedList.png';
 import NumberedListImg from '@assets/numberedList.png';
-import ToggleListImg from '@assets/toggledList.png';
 import QuoteImg from '@assets/quote.png';
 
 const fadein = keyframes`
@@ -84,7 +83,6 @@ const typeName: { [key: string]: string } = {
   heading3: 'Heading3',
   bulletedlist: 'Bulleted list',
   numberedlist: 'Numbered list',
-  togglelist: 'Toggle list',
   quote: 'Quote',
 };
 
@@ -95,7 +93,6 @@ const typeObj: { [key: string]: string } = {
   heading3: 'Small section heading.',
   bulletedlist: 'Create a simple bulleted list.',
   numberedlist: 'Create a list with numbering.',
-  togglelist: 'Toggles can hide and show content inside.',
   quote: 'Capture a quote.',
 };
 
@@ -106,7 +103,6 @@ const typeImg: { [key: string]: any } = {
   heading3: H3Img,
   bulletedlist: BulletedListImg,
   numberedlist: NumberedListImg,
-  togglelist: ToggleListImg,
   quote: QuoteImg,
 };
 
