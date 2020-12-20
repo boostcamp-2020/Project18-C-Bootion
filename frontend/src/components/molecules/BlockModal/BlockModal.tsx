@@ -5,7 +5,7 @@ import { ReactPortal, MouseEvent, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 import { useRecoilState } from 'recoil';
-import { modalState } from '@/stores';
+import { modalState, blockRefState } from '@/stores';
 import { useManager } from '@/hooks';
 
 import TextImg from '@assets/text.png';
@@ -121,9 +121,10 @@ function BlockModal(): JSX.Element {
 
   const createBlockHandler = async (type: string) => {
     const newBlock = await insertNewSibling({ type }, blockIndex + 1);
+    const text = blockRefState[block.id].current.textContent;
     const content =
-      block.value.substring(0, modal.caretOffset - 1) +
-      block.value.substring(modal.caretOffset);
+      text.substring(0, modal.caretOffset) +
+      text.substring(modal.caretOffset + 1);
     await setBlock(modal.blockId, { value: content });
     setFocus(newBlock);
   };

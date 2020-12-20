@@ -42,7 +42,6 @@ const useSocket = () => {
       const { focusOffset: beforeOffset, focusNode } = window.getSelection();
       const beforeLength = (focusNode as any)?.length;
       if (beforeLength) {
-        focusNode.parentElement.blur();
         setTimeout(() => {
           try {
             const sel = window.getSelection();

@@ -195,8 +195,7 @@ function BlockContent(blockDTO: Block) {
         await handleBlock(slicedContent, newType);
       }
     } else if (event.key === '/') {
-      let nowLetterIdx = window.getSelection().focusOffset;
-      if (!nowLetterIdx) nowLetterIdx += 1;
+      const nowLetterIdx = window.getSelection().focusOffset;
       setTimeout(() => {
         const rect = window.getSelection().getRangeAt(0).getClientRects()[0];
         setModal({

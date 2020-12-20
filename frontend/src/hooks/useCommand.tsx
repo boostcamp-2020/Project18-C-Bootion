@@ -1,8 +1,7 @@
 import { useRecoilState } from 'recoil';
-import { focusState } from '@/stores';
+import { focusState, blockRefState } from '@/stores';
 import { useManager } from '@/hooks';
 import { BlockType } from '@/schemes';
-import { pageIO } from '@/socket';
 
 const useCommand = () => {
   const [focusId] = useRecoilState(focusState);
@@ -56,15 +55,15 @@ const useCommand = () => {
         break;
       }
       case 'Enter': {
-        pageIO.emit('InputEnter');
         const [before, after] = getSlicedValueToCaretOffset();
         const { focusOffset } = window.getSelection();
         // startTransaction();
         if (!focusOffset) {
-          const newBlock = await insertNewSibling({}, blockIndex);
+          await insertNewSibling({}, blockIndex);
           setFocus(block);
         } else if (block.childIdList.length) {
-          await setBlock(block.id, { value: before });
+          // await setBlock(block.id, { value: before });
+          blockRefState[block.id].current.innerText = before;
           const newBlock = await insertNewChild({ value: after });
           // const newBlock = await insertAndUpdate(
           //   block.id,
@@ -82,7 +81,8 @@ const useCommand = () => {
           ].includes(block.type)
             ? block.type
             : BlockType.TEXT;
-          await setBlock(block.id, { value: before });
+          // await setBlock(block.id, { value: before });
+          blockRefState[block.id].current.innerText = before;
           const newBlock = await insertNewSibling({ value: after, type });
 
           // const newBlock = await insertAndUpdate(

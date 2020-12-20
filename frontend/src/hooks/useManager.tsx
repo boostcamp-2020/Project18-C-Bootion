@@ -172,6 +172,10 @@ const useManger = (
 
   const pullIn = async () => {
     if (blockIndex) {
+      await setBlock(block.id, {
+        ...block,
+        value: blockRefState[block.id].current.innerText,
+      });
       const { block: updatedBlock, from, to } = await moveBlock({
         blockId: block.id,
         toId: siblingsIdList[blockIndex - 1],
@@ -186,6 +190,10 @@ const useManger = (
 
   const pullOut = async () => {
     if (grandParent && grandParent.type !== BlockType.GRID) {
+      await setBlock(block.id, {
+        ...block,
+        value: blockRefState[block.id].current.innerText,
+      });
       const { block: updatedBlock, from, to } = await moveBlock({
         blockId: block.id,
         toId: grandParent.id,
