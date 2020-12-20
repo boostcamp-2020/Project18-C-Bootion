@@ -119,24 +119,16 @@ function BlockModal(): JSX.Element {
   const [modal, setModal] = useRecoilState(modalState);
   const [
     { block, blockIndex },
-    {
-      startTransaction,
-      commitTransaction,
-      insertNewSibling,
-      setBlock,
-      setFocus,
-    },
+    { insertNewSibling, setBlock, setFocus },
   ] = useManager(modal.blockId);
   const modalEL = useRef<HTMLDivElement>();
 
   const createBlockHandler = async (type: string) => {
-    startTransaction();
     const newBlock = await insertNewSibling({ type }, blockIndex + 1);
     const content =
       block.value.substring(0, modal.caretOffset - 1) +
       block.value.substring(modal.caretOffset);
     await setBlock(modal.blockId, { value: content });
-    commitTransaction();
     setFocus(newBlock);
   };
 

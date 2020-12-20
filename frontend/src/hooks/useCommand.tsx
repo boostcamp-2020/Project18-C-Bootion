@@ -2,11 +2,12 @@ import { useRecoilState } from 'recoil';
 import { focusState } from '@/stores';
 import { useManager } from '@/hooks';
 import { BlockType } from '@/schemes';
+import { pageIO } from '@/socket';
 
 const useCommand = () => {
   const [focusId] = useRecoilState(focusState);
   const [
-    { block, blockIndex, siblingsIdList, grandParent, childrenIdList },
+    { block, blockIndex, siblingsIdList, grandParent, parent, childrenIdList },
     {
       getPrevBlock,
       getNextBlock,
@@ -16,11 +17,11 @@ const useCommand = () => {
       setBlock,
       pullIn,
       pullOut,
-      startTransaction,
-      commitTransaction,
       deleteBlock,
       setFocus,
       setCaretOffset,
+      insertAndUpdate,
+      deleteAndUpdateWithChildren,
     },
   ] = useManager(focusId);
 
@@ -55,15 +56,25 @@ const useCommand = () => {
         break;
       }
       case 'Enter': {
+        pageIO.emit('InputEnter');
         const [before, after] = getSlicedValueToCaretOffset();
         const { focusOffset } = window.getSelection();
-        startTransaction();
+        // startTransaction();
         if (!focusOffset) {
-          await insertNewSibling({}, blockIndex);
+          const newBlock = await insertNewSibling({}, blockIndex);
+          setFocus(block);
         } else if (block.childIdList.length) {
           await setBlock(block.id, { value: before });
           const newBlock = await insertNewChild({ value: after });
-          await setFocus(newBlock);
+          // const newBlock = await insertAndUpdate(
+          //   block.id,
+          //   { value: before },
+          //   0,
+          //   {
+          //     value: after,
+          //   },
+          // );
+          setFocus(newBlock);
         } else {
           const type = [
             BlockType.NUMBERED_LIST,
@@ -74,25 +85,35 @@ const useCommand = () => {
             : BlockType.TEXT;
           await setBlock(block.id, { value: before });
           const newBlock = await insertNewSibling({ value: after, type });
+
+          // const newBlock = await insertAndUpdate(
+          //   parent.id,
+          //   { value: before },
+          //   0,
+          //   {
+          //     value: after,
+          //     type,
+          //   },
+          // );
           setFocus(newBlock);
         }
-        commitTransaction();
+        // commitTransaction();
         break;
       }
       case 'Tab': {
-        startTransaction();
+        // startTransaction();
         await pullIn();
-        commitTransaction();
+        // commitTransaction();
         break;
       }
       case 'shiftTab': {
-        startTransaction();
+        // startTransaction();
         await pullOut();
-        commitTransaction();
+        // commitTransaction();
         break;
       }
       case 'Backspace': {
-        startTransaction();
+        // startTransaction();
         if (block.type !== BlockType.TEXT) {
           await setBlock(block.id, { type: BlockType.TEXT });
         } else if (
@@ -109,6 +130,11 @@ const useCommand = () => {
               childrenIdList.map((id, index) => insertSibling(id, index)),
             );
             await deleteBlock();
+            // const updatedBlock = await deleteAndUpdateWithChildren({
+            //   ...prevBlock,
+            //   value:
+            //     prevBlock.value + after !== '' ? prevBlock.value + after : '',
+            // });
             if (prevBlock.value + after !== '') {
               setFocus(
                 await setBlock(prevBlock.id, {
@@ -118,10 +144,11 @@ const useCommand = () => {
             } else {
               setFocus(prevBlock);
             }
+            // setFocus(updatedBlock);
             setCaretOffset(prevBlock.value.length);
           }
         }
-        commitTransaction();
+        // commitTransaction();
         break;
       }
     }

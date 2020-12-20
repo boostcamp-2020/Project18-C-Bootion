@@ -70,10 +70,9 @@ function BlockContent(blockDTO: Block) {
   const focusId = useRecoilValue(focusState);
   const listCnt = useRef(1);
   const [Dispatcher] = useCommand();
-  const [
-    { blockIndex, prevSiblings },
-    { commitTransaction, startTransaction, setBlock, deleteBlock },
-  ] = useManager(blockDTO.id);
+  const [{ blockIndex, prevSiblings }, { setBlock, deleteBlock }] = useManager(
+    blockDTO.id,
+  );
   const [draggingBlock, setDraggingBlock] = useRecoilState(draggingBlockState);
   const [dragOverToggle, setDragOverToggle] = useState(false);
 
@@ -115,9 +114,7 @@ function BlockContent(blockDTO: Block) {
     type?: BlockType,
     caretOffset = -1,
   ) => {
-    startTransaction();
     await setBlock(blockDTO.id, { value, type: type || blockDTO.type });
-    commitTransaction();
   };
 
   const handleValue = async () => {
@@ -220,9 +217,7 @@ function BlockContent(blockDTO: Block) {
     !blockDTO.childIdList.length
   ) {
     setImmediate(async () => {
-      startTransaction();
       await deleteBlock();
-      commitTransaction();
     });
   }
 
@@ -271,11 +266,9 @@ function BlockContent(blockDTO: Block) {
       toId: blockDTO.parentId,
       index: blockIndex + 1,
     });
-    startTransaction();
     await setBlock(block.id, block);
     fromBlock && (await setBlock(fromBlock.id, fromBlock));
     await setBlock(to.id, to);
-    commitTransaction();
     setDraggingBlock(null);
     event.preventDefault();
   };

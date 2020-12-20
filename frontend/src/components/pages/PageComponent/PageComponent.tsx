@@ -6,9 +6,11 @@ import { Header, Title, Editor, BlockModal } from '@components/molecules';
 import { HeaderMenu } from '@components/organisms';
 import { useRecoilValue } from 'recoil';
 import { pageState, staticMenuToggleState, modalState } from '@/stores';
-import { useManager } from '@/hooks';
+import { useManager, useSocket } from '@/hooks';
 import styled from '@emotion/styled';
 import { animated, useSpring } from 'react-spring';
+import { useEffect } from 'react';
+import { pageIO } from '@/socket';
 
 const staticMenuAreaCss = css`
   position: fixed;
@@ -39,10 +41,12 @@ function PageComponent(): JSX.Element {
   const { isOpen } = useRecoilValue(modalState);
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
   const page = useRecoilValue(pageState);
-  const [
-    { children },
-    { insertNewChild, startTransaction, commitTransaction, setFocus },
-  ] = useManager(page.rootId);
+  useSocket();
+  const [{ children }, { insertNewChild, setFocus }] = useManager(page.rootId);
+  useEffect(() => {
+    pageIO.emit('join', page.id);
+  }, [page]);
+
   const staticAreaStyleProps = useSpring({
     left: staticMenuToggle ? 240 : 0,
     width: `calc(100% - ${staticMenuToggle ? 240 : 0}px)`,
@@ -53,10 +57,8 @@ function PageComponent(): JSX.Element {
       setFocus(children[children.length - 1]);
       return;
     }
-    startTransaction();
     const block = await insertNewChild({}, children.length);
     setFocus(block);
-    commitTransaction();
   };
 
   return (
