@@ -130,13 +130,13 @@ function BlockModal(): JSX.Element {
   const modalEL = useRef<HTMLDivElement>();
 
   const createBlockHandler = async (type: string) => {
-    startTransaction();
+    // startTransaction();
     const newBlock = await insertNewSibling({ type }, blockIndex + 1);
     const content =
       block.value.substring(0, modal.caretOffset - 1) +
       block.value.substring(modal.caretOffset);
     await setBlock(modal.blockId, { value: content });
-    commitTransaction();
+    // commitTransaction();
     setFocus(newBlock);
   };
 
