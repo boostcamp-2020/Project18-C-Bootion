@@ -3,7 +3,6 @@
 import { jsx, css } from '@emotion/react';
 
 import { Block, BlockType } from '@/schemes';
-import { ReactComponent as Toggle } from '@assets/toggle-default.svg';
 
 export const regexType: { [key: string]: RegExp } = {
   heading1: /^#/gm,
@@ -11,7 +10,6 @@ export const regexType: { [key: string]: RegExp } = {
   heading3: /^###/gm,
   bulletedlist: /^[-,+]/gm,
   numberedlist: /^\d+\./gm,
-  togglelist: /^>/gm,
   quote: /^\|/gm,
 };
 
@@ -40,11 +38,6 @@ export const listBlockType = (block: Block, idx: number) => {
 
 export const listComponent: { [key: string]: any } = {
   bulletedlist: <div css={divCSS}>•</div>,
-  togglelist: (
-    <div css={divCSS}>
-      <Toggle />
-    </div>
-  ),
   quote: <div css={divCSS}>▕</div>,
 };
 
