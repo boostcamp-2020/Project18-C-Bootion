@@ -33,6 +33,7 @@ services:
       - MONGO_USERNAME=${MONGO_USERNAME}
       - MONGO_PASSWORD=${MONGO_PASSWORD}
       - MONGO_DATABASE=${MONGO_DATABASE}
+      - COOKIE_SECRET=${COOKIE_SECRET}
     command:
       - bash
       - -c
