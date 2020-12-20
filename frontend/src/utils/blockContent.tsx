@@ -3,16 +3,23 @@
 import { jsx, css } from '@emotion/react';
 
 import { Block, BlockType } from '@/schemes';
-import { ReactComponent as Toggle } from '@assets/toggle-default.svg';
 
-export const regex: { [key: string]: RegExp } = {
-  heading1: /^#\s[^\s.]*/gm,
-  heading2: /^##\s[^\s.]*/gm,
-  heading3: /^###\s[^\s.]*/gm,
-  bulletedlist: /^[-,+]\s[^\s.]*/gm,
-  numberedlist: /^\d.\s[^\s.]*/gm,
-  togglelist: /^>\s[^\s.]*/gm,
-  quote: /^\|\s[^\s.]*/gm,
+export const regexType: { [key: string]: RegExp } = {
+  heading1: /^#/gm,
+  heading2: /^##/gm,
+  heading3: /^###/gm,
+  bulletedlist: /^[-,+]/gm,
+  numberedlist: /^\d+\./gm,
+  quote: /^\|/gm,
+};
+
+const validator = (regex: RegExp, content: string) => regex.test(content);
+
+export const validateType = (content: string): BlockType => {
+  for (const [key, reg] of Object.entries(regexType)) {
+    if (validator(reg, content)) return key as BlockType;
+  }
+  return null;
 };
 
 const divCSS = css`
@@ -31,11 +38,6 @@ export const listBlockType = (block: Block, idx: number) => {
 
 export const listComponent: { [key: string]: any } = {
   bulletedlist: <div css={divCSS}>•</div>,
-  togglelist: (
-    <div css={divCSS}>
-      <Toggle />
-    </div>
-  ),
   quote: <div css={divCSS}>▕</div>,
 };
 

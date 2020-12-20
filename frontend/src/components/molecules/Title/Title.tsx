@@ -50,26 +50,26 @@ const titleCss = () => css`
 function Title(): JSX.Element {
   const [selectedPage, setSelectedPage] = useRecoilState(pageState);
   const setPages = useSetRecoilState(pagesState);
-  const [, { setCaretOffset }] = useManager(selectedPage.rootId);
-  const updateSelectedPage = useRef(
-    debounce(async (page: Page) => {
-      const { page: updatedPage } = await updatePage(page);
-      const updatedPages = await refreshPages();
-      const { focusOffset } = window.getSelection();
-      setTimeout(() => setCaretOffset(focusOffset));
-      titleRef.current.blur();
+  const updateSelectedPage = async (page: Page) => {
+    const { page: updatedPage } = await updatePage(page);
+    const updatedPages = await refreshPages();
 
-      setSelectedPage(updatedPage);
-      setPages(updatedPages);
-    }, 300),
-  ).current;
+    setSelectedPage(updatedPage);
+    setPages(updatedPages);
+  };
+
   const titleRef = useRef(null);
 
-  const handleChange = async (event: ChangeEvent<HTMLDivElement>) =>
+  const handleChange = async () => {
+    const sel = window.getSelection();
+    const text = (sel.focusNode as any).length
+      ? sel.focusNode.textContent
+      : sel.focusNode.parentElement.innerText;
     updateSelectedPage({
       ...selectedPage,
-      title: event.currentTarget.textContent,
+      title: text,
     });
+  };
 
   return (
     <div css={wrapperCss()}>
@@ -79,7 +79,7 @@ function Title(): JSX.Element {
         contentEditable
         suppressContentEditableWarning
         css={titleCss()}
-        onInput={handleChange}
+        onBlur={handleChange}
       >
         {selectedPage.title}
       </div>

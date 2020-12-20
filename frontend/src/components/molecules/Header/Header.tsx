@@ -2,11 +2,17 @@
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
 
-import { ReactComponent as Dots } from '@assets/dots.svg';
-import { ReactComponent as Check } from '@assets/check.svg';
 import { HeaderLink, HeaderButton } from '@components/atoms';
 import { useRecoilValue } from 'recoil';
-import { pageState, staticMenuToggleState } from '@/stores';
+import { useEffect, useState } from 'react';
+import {
+  pageState,
+  staticMenuToggleState,
+  pageUserCountState,
+  lastUpdateState,
+} from '@/stores';
+import { timeSince } from '@/utils';
+import { boolean } from '@storybook/addon-knobs';
 
 const headerCss = () => css`
   width: 100%;
@@ -39,6 +45,21 @@ interface Props {}
 function Header({}: Props): JSX.Element {
   const staticMenuToggle = useRecoilValue(staticMenuToggleState);
   const selectedPage = useRecoilValue(pageState);
+  const [tic, setTic] = useState(true);
+  const pageUserCount = useRecoilValue(pageUserCountState);
+  const lastUpdate = useRecoilValue(lastUpdateState);
+
+  const date = `Updated ${timeSince(lastUpdate)} ago`;
+  const people = `${pageUserCount}명 접속중`;
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setTic(!tic);
+    }, 1000);
+    return () => {
+      clearInterval(id);
+    };
+  });
 
   return (
     <div css={headerCss()}>
@@ -47,15 +68,8 @@ function Header({}: Props): JSX.Element {
         <HeaderLink>{selectedPage?.title || 'Untitled'}</HeaderLink>
       </div>
       <div css={wrapperCss()}>
-        <HeaderButton>Share</HeaderButton>
-        <HeaderButton>
-          <Check />
-          Updates
-        </HeaderButton>
-        <HeaderButton>Favorite</HeaderButton>
-        <HeaderButton>
-          <Dots />
-        </HeaderButton>
+        <HeaderButton>{date}</HeaderButton>
+        <HeaderButton>{people}</HeaderButton>
       </div>
     </div>
   );

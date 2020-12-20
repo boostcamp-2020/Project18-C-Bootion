@@ -1,13 +1,7 @@
 /** @jsx jsx */
 /** @jsxRuntime classic */
 import { jsx, css } from '@emotion/react';
-import React, {
-  useEffect,
-  useRef,
-  KeyboardEvent,
-  useState,
-  FormEvent,
-} from 'react';
+import React, { useEffect, useRef, KeyboardEvent, useState } from 'react';
 import { useRecoilValue, useRecoilState } from 'recoil';
 
 import {
@@ -18,7 +12,7 @@ import {
 } from '@/stores';
 import { Block, BlockType } from '@/schemes';
 import {
-  regex,
+  validateType,
   fontSize,
   placeHolder,
   listBlockType,
@@ -76,10 +70,9 @@ function BlockContent(blockDTO: Block) {
   const focusId = useRecoilValue(focusState);
   const listCnt = useRef(1);
   const [Dispatcher] = useCommand();
-  const [
-    { blockIndex, prevSiblings },
-    { commitTransaction, startTransaction, setBlock, deleteBlock },
-  ] = useManager(blockDTO.id);
+  const [{ blockIndex, prevSiblings }, { setBlock, deleteBlock }] = useManager(
+    blockDTO.id,
+  );
   const [draggingBlock, setDraggingBlock] = useRecoilState(draggingBlockState);
   const [dragOverToggle, setDragOverToggle] = useState(false);
 
@@ -121,9 +114,7 @@ function BlockContent(blockDTO: Block) {
     type?: BlockType,
     caretOffset = -1,
   ) => {
-    startTransaction();
     await setBlock(blockDTO.id, { value, type: type || blockDTO.type });
-    commitTransaction();
   };
 
   const handleValue = async () => {
@@ -131,6 +122,7 @@ function BlockContent(blockDTO: Block) {
     if (blockDTO.value !== content) {
       await handleBlock(content);
     }
+    onBlurHandler();
   };
   const updateValue = handleValue;
 
@@ -171,23 +163,28 @@ function BlockContent(blockDTO: Block) {
       const content = beforeContent
         .slice(0, caretOffset)
         .concat(' ', beforeContent.slice(caretOffset));
-      const newType = Object.entries(regex).find((testRegex) =>
-        testRegex[1].test(content),
-      );
 
+      const newType = validateType(content.split(' ', 1)[0]);
       if (newType) {
         event.preventDefault();
-        if (newType[0] === BlockType.NUMBERED_LIST) {
-          if (!blockIndex && content[0] !== FIRST_LIST_NUMBER) return;
+        if (newType === BlockType.NUMBERED_LIST) {
+          const frontContent = content
+            .split(' ', 1)[0]
+            .slice(0, content.length - 2);
+          if (!blockIndex && frontContent !== FIRST_LIST_NUMBER) {
+            return;
+          }
           if (blockIndex) {
             const numberListUpperBlock = isUpperBlockEqualToNumberList();
-            if (!numberListUpperBlock && content[0] !== FIRST_LIST_NUMBER)
+            if (!numberListUpperBlock && frontContent !== FIRST_LIST_NUMBER) {
               return;
-            // if (
-            //   numberListUpperBlock &&
-            //   cntOfUpperNumberListBlock() + 1 !== +content[0]
-            // )
-            //   return;
+            }
+            if (
+              numberListUpperBlock &&
+              cntOfUpperNumberListBlock() + 1 !== +frontContent
+            ) {
+              return;
+            }
           }
         }
         const slicedContent = content.slice(
@@ -195,18 +192,20 @@ function BlockContent(blockDTO: Block) {
           content.length,
         );
         contentEditableRef.current.innerText = slicedContent;
-        await handleBlock(slicedContent, newType[0] as BlockType);
+        await handleBlock(slicedContent, newType);
       }
     } else if (event.key === '/') {
       let nowLetterIdx = window.getSelection().focusOffset;
       if (!nowLetterIdx) nowLetterIdx += 1;
-      const rect = window.getSelection().getRangeAt(0).getClientRects()[0];
-      setModal({
-        isOpen: true,
-        top: rect.top,
-        left: rect.left,
-        caretOffset: nowLetterIdx,
-        blockId: blockDTO.id,
+      setTimeout(() => {
+        const rect = window.getSelection().getRangeAt(0).getClientRects()[0];
+        setModal({
+          isOpen: true,
+          top: rect.top,
+          left: rect.left,
+          caretOffset: nowLetterIdx,
+          blockId: blockDTO.id,
+        });
       });
     } else if (modal.isOpen) {
       setModal({ ...modal, isOpen: false });
@@ -218,9 +217,7 @@ function BlockContent(blockDTO: Block) {
     !blockDTO.childIdList.length
   ) {
     setImmediate(async () => {
-      startTransaction();
       await deleteBlock();
-      commitTransaction();
     });
   }
 
@@ -248,7 +245,7 @@ function BlockContent(blockDTO: Block) {
         listCnt.current = cntOfUpperNumberListBlock() + 1;
       }
     }
-  }, [blockDTO.value]);
+  }, [blockDTO.type]);
 
   const dragOverHandler = (event: React.DragEvent<HTMLDivElement>) => {
     event.dataTransfer.dropEffect = 'move';
@@ -269,13 +266,18 @@ function BlockContent(blockDTO: Block) {
       toId: blockDTO.parentId,
       index: blockIndex + 1,
     });
-    startTransaction();
     await setBlock(block.id, block);
     fromBlock && (await setBlock(fromBlock.id, fromBlock));
     await setBlock(to.id, to);
-    commitTransaction();
     setDraggingBlock(null);
     event.preventDefault();
+  };
+
+  const onBlurHandler = () => {
+    setModal({
+      ...modal,
+      isOpen: false,
+    });
   };
 
   return (

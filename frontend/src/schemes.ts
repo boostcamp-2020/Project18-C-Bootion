@@ -7,7 +7,6 @@ export enum BlockType {
   HEADING3 = 'heading3',
   BULLETED_LIST = 'bulletedlist',
   NUMBERED_LIST = 'numberedlist',
-  TOGGLE_LIST = 'togglelist',
   QUOTE = 'quote',
   PAGE = 'page',
 }
