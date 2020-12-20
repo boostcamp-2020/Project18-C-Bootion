@@ -7,6 +7,8 @@ import {
   updateBlock,
   moveBlock,
   deletePageCascade,
+  createAndUpdate,
+  deleteAndUpdate,
 } from '@utils/blockApis';
 
 interface ManagerFunc {
@@ -20,6 +22,13 @@ interface ManagerFunc {
   pullOut: () => Promise<Block>;
   deleteBlock: () => Promise<void>;
   setFocus: (targetBlock: Block) => number;
+  insertAndUpdate: (
+    parentId: string,
+    option: any,
+    insertIndex: number,
+    updateOption: any,
+  ) => Promise<Block>;
+  deleteAndUpdateWithChildren: (updateOption: any) => Promise<Block>;
   setCaretOffset: (
     offset?: number,
     isBlur?: boolean,
@@ -62,19 +71,19 @@ const useManger = (
       ...transaction[id],
       ...option,
     });
-    return setUpdatedBlock(updatedBlock.id, updatedBlock);
+    return updatedBlock;
   };
 
-  const setUpdatedBlock = (id: string, option: any = {}) => {
-    transaction = {
-      ...transaction,
-      [id]: {
-        ...transaction[id],
-        ...option,
-      },
-    };
-    return transaction[id];
-  };
+  // const setUpdatedBlock = (id: string, option: any = {}) => {
+  //   transaction = {
+  //     ...transaction,
+  //     [id]: {
+  //       ...transaction[id],
+  //       ...option,
+  //     },
+  //   };
+  //   return transaction[id];
+  // };
 
   const insertNewChild = async (
     option: any = {},
@@ -85,8 +94,8 @@ const useManger = (
       index: insertIndex,
       block: option,
     });
-    setUpdatedBlock(updatedBlock.id, updatedBlock);
-    setUpdatedBlock(updatedParent.id, updatedParent);
+    // setUpdatedBlock(updatedBlock.id, updatedBlock);
+    // setUpdatedBlock(updatedParent.id, updatedParent);
     return updatedBlock;
   };
 
@@ -99,9 +108,9 @@ const useManger = (
       toId: parent.id,
       index: insertIndex,
     });
-    setUpdatedBlock(updatedBlock.id, updatedBlock);
-    setUpdatedBlock(from.id, from);
-    setUpdatedBlock(to.id, to);
+    // setUpdatedBlock(updatedBlock.id, updatedBlock);
+    // setUpdatedBlock(from.id, from);
+    // setUpdatedBlock(to.id, to);
     return updatedBlock;
   };
 
@@ -109,19 +118,56 @@ const useManger = (
     option: any = {},
     insertIndex = blockIndex + 1,
   ): Promise<Block> => {
-    const { block: updatedBlock, parent: updatedParent } = await createBlock({
+    const { block: newBlock, parent: updatedParent } = await createBlock({
       parentBlockId: parent.id,
       index: insertIndex,
       block: option,
     });
-    setUpdatedBlock(updatedBlock.id, updatedBlock);
-    setUpdatedBlock(updatedParent.id, updatedParent);
-    return updatedBlock;
+    // setUpdatedBlock(updatedBlock.id, updatedBlock);
+    // setUpdatedBlock(updatedParent.id, updatedParent);
+    return newBlock;
+  };
+
+  const insertAndUpdate = async (
+    parentId: string,
+    option: any = {},
+    insertIndex = blockIndex + 1,
+    updateOption: any = {},
+  ) => {
+    const {
+      parent: updatedParent,
+      block: newBlock,
+      updated: updatedBlock,
+    } = await createAndUpdate({
+      create: {
+        parentId,
+        index: insertIndex,
+        blockDTO: { ...option },
+      },
+      update: { ...block, ...updateOption },
+    });
+    // setUpdatedBlock(updatedParent.id, updatedParent);
+    // setUpdatedBlock(updatedBlock.id, updatedBlock);
+    // setUpdatedBlock(newBlock.id, newBlock);
+    return block;
   };
 
   const deleteBlock = async () => {
     const { parent: updatedBlock } = await deletePageCascade(block.id);
-    setUpdatedBlock(updatedBlock.id, updatedBlock);
+    // setUpdatedBlock(updatedBlock.id, updatedBlock);
+  };
+
+  const deleteAndUpdateWithChildren = async (updateOption: any) => {
+    const {
+      parent: updatedParent,
+      updated: updatedBlock,
+    } = await deleteAndUpdate({
+      deleteId: block.id,
+      update: { ...updateOption },
+    });
+    // setUpdatedBlock(updatedParent.id, updatedParent);
+    // setUpdatedBlock(updatedBlock.id, updatedBlock);
+    return updatedBlock;
   };
 
   const pullIn = async () => {
@@ -130,9 +176,9 @@ const useManger = (
         blockId: block.id,
         toId: siblingsIdList[blockIndex - 1],
       });
-      setUpdatedBlock(updatedBlock.id, updatedBlock);
-      setUpdatedBlock(from.id, from);
-      setUpdatedBlock(to.id, to);
+      // setUpdatedBlock(updatedBlock.id, updatedBlock);
+      // setUpdatedBlock(from.id, from);
+      // setUpdatedBlock(to.id, to);
       return updatedBlock;
     }
     return block;
@@ -145,9 +191,9 @@ const useManger = (
         toId: grandParent.id,
         index: parentIndex + 1,
       });
-      setUpdatedBlock(updatedBlock.id, updatedBlock);
-      setUpdatedBlock(from.id, from);
-      setUpdatedBlock(to.id, to);
+      // setUpdatedBlock(updatedBlock.id, updatedBlock);
+      // setUpdatedBlock(from.id, from);
+      // setUpdatedBlock(to.id, to);
       return updatedBlock;
     }
     return block;
@@ -192,6 +238,8 @@ const useManger = (
       deleteBlock,
       setFocus,
       setCaretOffset,
+      insertAndUpdate,
+      deleteAndUpdateWithChildren,
     },
   ];
 };
