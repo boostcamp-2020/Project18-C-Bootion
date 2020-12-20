@@ -59,11 +59,7 @@ describe('@services/block', () => {
 
     expect(received.value).toEqual(expected.value);
     expect(received.type).toEqual(expected.type);
-    expect(
-      parent.childIdList.findIndex(
-        (childId) => childId.toHexString() === received.id,
-      ),
-    ).toEqual(index);
+    expect(parent.findIndexFromChildIdList(received.id)).toEqual(index);
   });
 
   it('create: Duplicated error', async () => {
@@ -182,6 +178,46 @@ describe('@services/block', () => {
 
     await expect(async () =>
       blockService.deleteCascade(received.id),
+    ).rejects.toThrow();
+  });
+
+  it('deleteOnly: Success', async () => {
+    const { block } = await blockService.create({
+      parentId: page.rootId.toHexString(),
+    });
+    const { block: sibling } = await blockService.create({
+      parentId: page.rootId.toHexString(),
+    });
+    let { block: child } = await blockService.create({
+      parentId: block.id,
+    });
+    let { block: anotherChild } = await blockService.create({
+      parentId: block.id,
+    });
+
+    const parent = await blockService.deleteOnly(block.id);
+    child = await Block.readOne(child.id);
+    anotherChild = await Block.readOne(anotherChild.id);
+    const receivedChildIdList = parent.childIdList.map((childId) =>
+      childId.toHexString(),
+    );
+
+    expect(await Block.readOne(block.id)).toBeNull();
+    expect(parent.id).toEqual(block.parentId.toHexString());
+    expect(child.parentId).toEqual(block.parentId);
+    expect(anotherChild.parentId).toEqual(block.parentId);
+    expect(receivedChildIdList).toEqual([
+      child.id,
+      anotherChild.id,
+      sibling.id,
+    ]);
+  });
+
+  it('deleteOnly: Not found', async () => {
+    const received: BlockDTO = { id: 'invalid id' };
+
+    await expect(async () =>
+      blockService.deleteOnly(received.id),
     ).rejects.toThrow();
   });
 });

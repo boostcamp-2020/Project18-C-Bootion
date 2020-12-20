@@ -71,6 +71,7 @@ export interface BlockModel extends Model<BlockDoc> {
     blockId: string,
     blockDTO: BlockDTO,
   ) => Promise<BlockDoc>;
+  deleteOneBlock?: (this: BlockModel, blockId: string) => Promise<void>;
 }
 
 export interface BlockDoc extends Document {
@@ -81,8 +82,14 @@ export interface BlockDoc extends Document {
   childIdList?: Types.ObjectId[];
 
   setChild?: (this: BlockDoc, child: BlockDoc, index?: number) => Promise<void>;
+  setChildren?: (
+    this: BlockDoc,
+    childIdList: Types.ObjectId[],
+    index?: number,
+  ) => Promise<void>;
   deleteChild?: (this: BlockDoc, childId: string) => Promise<void>;
   deleteCascade?: (this: BlockDoc) => Promise<void>;
+  findIndexFromChildIdList?: (this: BlockDoc, childId: string) => number;
 }
 
 BlockSchema.statics.createOne = async function (
@@ -117,6 +124,13 @@ BlockSchema.statics.updateOneBlock = async function (
   return this.findByIdAndUpdate(blockId, { type, value }, { new: true }).exec();
 };
 
+BlockSchema.statics.deleteOneBlock = async function (
+  this: BlockModel,
+  blockId: string,
+): Promise<BlockDoc> {
+  return this.findByIdAndDelete(blockId).exec();
+};
+
 BlockSchema.methods.setChild = async function (
   this: BlockDoc,
   child: BlockDoc,
@@ -130,13 +144,31 @@ BlockSchema.methods.setChild = async function (
   await this.save();
 };
 
+BlockSchema.methods.setChildren = async function (
+  this: BlockDoc,
+  childIdList: Types.ObjectId[],
+  index?: number,
+): Promise<void> {
+  const $in = childIdList.map((childId) => childId.toHexString());
+  await Block.update(
+    { _id: { $in } },
+    { $set: { parentId: this.id, pageId: this.parentId } },
+    { multi: true },
+  ).exec();
+
+  await this.childIdList.splice(
+    index ?? this.childIdList.length,
+    0,
+    ...childIdList,
+  );
+  await this.save();
+};
+
 BlockSchema.methods.deleteChild = async function (
   this: BlockDoc,
   childId: string,
 ): Promise<void> {
-  const index = this.childIdList.findIndex(
-    (_childId) => _childId.toHexString() === childId,
-  );
+  const index = this.findIndexFromChildIdList(childId);
   this.childIdList.splice(index, 1);
   await this.save();
 };
@@ -150,6 +182,15 @@ BlockSchema.methods.deleteCascade = async function (
   }
 
   await Block.findByIdAndDelete(this.id).exec();
+};
+
+BlockSchema.methods.findIndexFromChildIdList = function (
+  this: BlockDoc,
+  childId: string,
+): number {
+  return this.childIdList.findIndex(
+    (_childId) => _childId.toHexString() === childId,
+  );
 };
 
 export const Block = model<BlockDoc>(MODEL_NAME, BlockSchema) as BlockModel;
