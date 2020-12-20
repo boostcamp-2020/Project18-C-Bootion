@@ -34,16 +34,51 @@
 
 http://bootion.kro.kr/
 
+> drag & drop
+
+| 형제 "Block" 간 위치 이동 | 부모 - 자식 "Block" 간 위치 이동 |
+| --- | --- |
+| ![drag-drop-1](https://user-images.githubusercontent.com/37685690/102720921-97455680-433a-11eb-8344-9cf1b236817e.gif) | ![drag-drop-2](https://user-images.githubusercontent.com/37685690/102720922-99a7b080-433a-11eb-86ff-f65d3b669743.gif)|
+
+> 블록 타입 변경
+
+| 헤딩 형 "Block" 변경 | 리스트 형 "Block" 변경 |
+| --- | --- |
+| ![heading](https://user-images.githubusercontent.com/37685690/102721010-336f5d80-433b-11eb-9430-e259f08a4d2d.gif) | ![list](https://user-images.githubusercontent.com/37685690/102721005-2d797c80-433b-11eb-85dd-a497abbec324.gif)|
+
+> 키보드 Interaction
+
+| "/" 헤딩 형 "Block" 변경 | "/" 리스트 형 "Block" 변경 |
+| --- | --- |
+| ![heading-modal](https://user-images.githubusercontent.com/37685690/102721487-6f57f200-433e-11eb-82f7-3d2ac0df28dc.gif) | ![list-modal](https://user-images.githubusercontent.com/37685690/102721490-70891f00-433e-11eb-9ece-5137a0b055d7.gif)|
+
+| "Enter" 입력 | "Backspace" 입력 |
+| --- | --- |
+| ![Enter](https://user-images.githubusercontent.com/37685690/102721569-fb6a1980-433e-11eb-994d-74674b94e0e8.gif) | ![backspace](https://user-images.githubusercontent.com/37685690/102721591-176dbb00-433f-11eb-9168-720afefc7da6.gif)|
+
+| "Tab" 입력 | "Shift" + "Tab" 입력 |
+| --- | --- |
+| ![tab](https://user-images.githubusercontent.com/37685690/102721646-729fad80-433f-11eb-8165-0595317b5723.gif) | ![shiftTab](https://user-images.githubusercontent.com/37685690/102721647-74697100-433f-11eb-93a1-a6a5775d07be.gif)|
+
+> 모달 Interaction
+
+| "+" 버튼 클릭 |
+| --- |
+| ![block-handler](https://user-images.githubusercontent.com/37685690/102721138-49315280-433c-11eb-8d06-5f257091b9cf.gif)|
+
+> 실시간 동시 편집
+
+|  |
+| --- |
+| ![sync](https://user-images.githubusercontent.com/37685690/102721229-eab8a400-433c-11eb-851d-a38feaa2b3a1.gif) |
+
 ## ⚙️ 기술 스택
 
-| Tech | Stack |
-|:---:|:---:|
-| Lang | <img height="50" src="https://icongr.am/devicon/typescript-original.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://icongr.am/devicon/nodejs-original-wordmark.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://icongr.am/devicon/npm-original-wordmark.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://d33wubrfki0l68.cloudfront.net/204482ca413433c80cd14fe369e2181dd97a2a40/092e2/assets/img/logo.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://prettier.io/icon.png"/> |
-| Front End | <img height="50" src="https://icongr.am/devicon/react-original.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://miro.medium.com/max/2000/1*0SkjAGdVWYe4ja5Qu4DeJg.jpeg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://raw.githubusercontent.com/emotion-js/emotion/master/emotion.png"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://icongr.am/devicon/webpack-original.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://icongr.am/devicon/babel-original.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://pbs.twimg.com/profile_images/1100804485616566273/sOct-Txm.png"/> |
-| Back End | <img height="50" src="https://icongr.am/devicon/express-original-wordmark.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://icongr.am/devicon/mongodb-original.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://nesoy.github.io/assets/posts/20170602/1.PNG"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://pbs.twimg.com/profile_images/821713465245102080/mMtKIMax.jpg"/> |
-| Production | <img height="50" src="https://icongr.am/devicon/nginx-original.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://icongr.am/devicon/docker-original.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://raw.githubusercontent.com/docker/compose/master/logo.png"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://www.ncloud.com/public/img/logo-m.png"/> |
-| CI / CD | <img height="50" src="https://img2.storyblok.com/672x0/f/79165/1200x630/ebb5571e69/github-action-01.png"/> |
-| SCM |  <img height="50" src="https://icongr.am/devicon/git-original.svg"/>&nbsp;&nbsp;&nbsp;<img height="50" src="https://icongr.am/devicon/github-original.svg"/> |
+<div align="center">
+
+<img width="1165" alt="무제" src="https://user-images.githubusercontent.com/37685690/102722136-6ec15a80-4342-11eb-9b2a-e3f9a5c66d0b.png">
+
+</div>
 
 ## 🔗 인프라 구조
 
