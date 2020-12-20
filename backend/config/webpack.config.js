@@ -1,4 +1,5 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 
 const path = require('path');
 
@@ -41,4 +42,5 @@ module.exports = {
     ],
   },
   plugins: [new CleanWebpackPlugin()],
+  externals: [nodeExternals()],
 };
