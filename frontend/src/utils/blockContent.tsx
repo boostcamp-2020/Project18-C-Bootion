@@ -5,9 +5,9 @@ import { jsx, css } from '@emotion/react';
 import { Block, BlockType } from '@/schemes';
 
 export const regexType: { [key: string]: RegExp } = {
-  heading1: /^#/gm,
-  heading2: /^##/gm,
   heading3: /^###/gm,
+  heading2: /^##/gm,
+  heading1: /^#/gm,
   bulletedlist: /^[-,+]/gm,
   numberedlist: /^\d+\./gm,
   quote: /^\|/gm,
