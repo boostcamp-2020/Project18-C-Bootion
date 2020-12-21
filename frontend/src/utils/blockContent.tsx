@@ -13,12 +13,13 @@ export const regexType: { [key: string]: RegExp } = {
   quote: /^\|/gm,
 };
 
-const validator = (regex: RegExp, content: string) => regex.test(content);
-
 export const validateType = (content: string): BlockType => {
-  for (const [key, reg] of Object.entries(regexType)) {
-    if (validator(reg, content)) return key as BlockType;
-  }
+  if (content === '#') return BlockType.HEADING1;
+  if (content === '##') return BlockType.HEADING2;
+  if (content === '###') return BlockType.HEADING3;
+  if (content === '-' || content === '+') return BlockType.BULLETED_LIST;
+  if (/^\d+\./gm.test(content)) return BlockType.NUMBERED_LIST;
+  if (content === '|') return BlockType.QUOTE;
   return null;
 };
 
