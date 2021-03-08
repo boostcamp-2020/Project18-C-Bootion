@@ -19,6 +19,7 @@
     "@types/socket.io-client": "^1.4.34",
     "axios": "^0.21.0",
     "babel-loader": "^8.1.0",
+    "draft-js": "^0.11.7",
     "react": "^17.0.1",
     "react-app-rewire-alias": "^0.1.8",
     "react-app-rewired": "^2.1.6",
